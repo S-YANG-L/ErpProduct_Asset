@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.inout.dao.InoutBillDao">
+
+    <!-- 输出 字段 e列 -->
+    <sql id="inoutBillColumns">
+		a.sys_code AS "sysCode",
+		a.bill_code AS "billCode",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.dept_code AS "deptCode",
+		a.dept_name AS "deptName",
+		a.order_date AS "orderDate",
+		a.inout_flag AS "inoutFlag",
+		a.wh_code AS "whCode",
+		a.wh_name AS "whName",
+		a.tel AS "tel",
+		a.link_man AS "linkMan",
+		a.memo AS "memo",
+		a.psn_code AS "psnCode",
+		a.psn_name AS "psnName",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.remarks AS "remarks"
+	</sql>
+
+    <!-- 输出字段关联表 -->
+    <sql id="inoutBillJoins">
+    </sql>
+
+    <!-- 获取单行数据 -->
+    <select id="get" resultType="InoutBill">
+        SELECT
+        <include refid="inoutBillColumns"/>
+        FROM ass_inout_bill a
+        <include refid="inoutBillJoins"/>
+        WHERE a.sys_code = #{sysCode}
+    </select>
+
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="InoutBill">
+        SELECT
+        <include refid="inoutBillColumns"/>
+        FROM ass_inout_bill a
+        <where>
+            a.status != #{STATUS_DELETE}
+            AND a.memo =#{memo}
+            <if test="billCode != null and billCode != ''">
+                AND a.bill_code = #{billCode}
+            </if>
+            <if test="companyCode != null and companyCode != ''">
+                AND a.company_code = #{companyCode}
+            </if>
+            <if test="deptCode != null and deptCode != ''">
+                AND a.dept_code = #{deptCode}
+            </if>
+            <if test="orderDate != null and orderDate != ''">
+                AND DATE_FORMAT(a.order_date,'%Y-%m-%d') = DATE_FORMAT(#{orderDate},'%Y-%m-%d')
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findAllList" resultType="InoutBill">
+        SELECT
+        <include refid="inoutBillColumns"/>
+        FROM ass_inout_bill a
+        <include refid="inoutBillJoins"/>
+        <where>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insert">
+		INSERT INTO ass_inout_bill(
+			sys_code,
+			bill_code,
+			company_code,
+			company_name,
+			dept_code,
+			dept_name,
+			order_date,
+			inout_flag,
+			wh_code,
+			wh_name,
+			tel,
+			link_man,
+			memo,
+			psn_code,
+			psn_name,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+			remarks
+		) VALUES (
+			#{sysCode},
+			#{billCode},
+			#{companyCode},
+			#{companyName},
+			#{deptCode},
+			#{deptName},
+			#{orderDate},
+			#{inoutFlag},
+			#{whCode},
+			#{whName},
+			#{tel},
+			#{linkMan},
+			#{memo},
+			#{psnCode},
+			#{psnName},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status},
+			#{remarks}
+		)
+	</insert>
+
+    <!-- 更新数据 -->
+    <update id="update">
+		UPDATE ass_inout_bill SET 	
+			bill_code = #{billCode},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			dept_code = #{deptCode},
+			dept_name = #{deptName},
+			order_date = #{orderDate},
+			inout_flag = #{inoutFlag},
+			wh_code = #{whCode},
+			wh_name = #{whName},
+			tel = #{tel},
+			link_man = #{linkMan},
+			memo = #{memo},
+			psn_code = #{psnCode},
+			psn_name = #{psnName},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE sys_code = #{sysCode}
+	</update>
+    <!-- 物理删除数据 -->
+    <update id="delete">
+        <if test="dbName == 'oracle'">
+            DELETE ass_inout_bill
+            WHERE sys_code = #{sysCode}
+        </if>
+        <if test="dbName == 'mysql'">
+            DELETE FROM ass_inout_bill
+            WHERE sys_code = #{sysCode}
+        </if>
+    </update>
+</mapper>

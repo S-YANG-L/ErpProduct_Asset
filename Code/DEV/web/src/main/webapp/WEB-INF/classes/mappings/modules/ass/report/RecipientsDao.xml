@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.report.dao.RecipientsDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="RecipientsColumns">
+		a.sort_name AS sortName,
+		a.articles_name AS "articlesName",
+		b.outbound_code AS "sysId",
+		a.create_date AS "createDate",
+		a.office_code AS "officeCode",
+		a.office_name AS "officeName",
+		a.price AS "price",
+		b.outbound_code AS "outboundCode",
+		b.outbounder_name AS "outbounderName",
+		sum(a.outbound_number) AS "sumNumber",
+		ROUND(sum(a.sum_money),2) AS "sumMoney"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="RecipientsJoins">
+	</sql>
+
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="Recipients">
+		SELECT 
+			<include refid="RecipientsColumns"/>
+		FROM
+		ass_outbound_bill_dtl a left join ass_outbound_bill b on a.sys_code = b.sys_code
+		<where>
+			
+			<if test="beginDate != null and beginDate != '' ">
+				 <!-- MONTH(a.create_date) between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY) -->
+				  a.create_date between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+			</if>
+			<if test="officeName != null and officeName != '' ">
+				  AND a.office_name = #{officeName}
+			</if>
+		</where>
+		GROUP BY a.articles_code,MONTH(a.create_date)
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="Recipients">
+		SELECT 
+			<include refid="RecipientsColumns"/>
+		FROM
+		ass_outbound_bill_dtl a
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>	
+</mapper>

@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.assetdepre.dao.AssetDepreDtlDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="assetDepreDtlColumns">
+		a.id AS "id",
+		a.depre_code AS "depreCode",
+		a.finance_code AS "financeCode",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.top_sort_code AS "topSortCode",
+		a.top_sort_name AS "topSortName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.bar_code AS "barCode",
+		a.qr_code AS "qrCode",
+		a.version AS "version",
+		a.unit_price AS "unitPrice",
+		a.unit AS "unit",
+		a.sn_code AS "snCode",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.buy_date AS "buyDate",
+		a.use_date AS "useDate",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.duty_code AS "dutyCode",
+		a.duty_name AS "dutyName",
+		a.duty_office_code AS "dutyOfficeCode",
+		a.duty_office_name AS "dutyOfficeName",
+		a.residual_value AS "residualValue",
+		a.storage_place_code AS "storagePlaceCode",
+		a.storage_place AS "storagePlace",
+		a.supplier_code AS "supplierCode",
+		a.supplier AS "supplier",
+		a.occupancy AS "occupancy",
+		a.picture_path AS "picturePath",
+		a.age_limit AS "ageLimit",
+		a.curr_year AS "currYear",
+		a.curr_month AS "currMonth",
+		a.quantity AS "quantity",
+		a.clear_date AS "clearDate",
+		a.asset_status AS "assetStatus",
+		a.account_status AS "accountStatus",
+		a.submit_status AS "submitStatus",
+		a.account_quantity AS "accountQuantity",
+		a.account_com_status AS "accountComStatus",
+		a.net_price AS "netPrice",
+		a.account_this_month AS "accountThisMonth",
+		a.add_account AS "addAccount",
+		a.net_salvage AS "netSalvage",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o18.office_name AS "office.officeName",
+		u22.user_name AS "user.userName"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="assetDepreDtlJoins">
+<!-- 		LEFT JOIN ass_asset_depre b ON b.id = a.id -->
+		LEFT JOIN sys_office o18 ON o18.office_code = a.office_code
+		LEFT JOIN sys_user u22 ON u22.user_code = a.user_code
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetDepreDtl">
+		SELECT 
+			<include refid="assetDepreDtlColumns"/>
+		FROM ass_asset_depre_dtl a
+		<include refid="assetDepreDtlJoins"/>
+		WHERE a.id = #{id}
+	</select>
+    <!-- 查询数据子表列表 -->
+    <select id="findListDtl" resultType="AssetDepreDtl">
+        SELECT
+        <include refid="assetDepreDtlColumns"/>
+        FROM ass_asset_depre_dtl a
+        <include refid="assetDepreDtlJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="currYear != null ">
+                AND a.curr_year = #{currYear}
+            </if>
+            <if test="currMonth != null ">
+                AND a.curr_month = #{currMonth}
+            </if>
+            <if test="depreCode != null and depreCode != ''">
+                AND a.depre_code = #{depreCode}
+            </if>
+			<if test="submitStatus != null and submitStatus != ''">
+                AND a.submit_status = #{submitStatus}
+            </if>
+        </where>
+    </select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetDepreDtl">
+		SELECT 
+			<include refid="assetDepreDtlColumns"/>
+		FROM ass_asset_depre_dtl a
+		<include refid="assetDepreDtlJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="assetName != null and assetName != ''">
+				AND a.asset_name = #{assetName}
+			</if>
+			<if test="sortName != null and sortName != ''">
+				AND a.sort_name = #{sortName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetDepreDtl">
+		SELECT 
+			<include refid="assetDepreDtlColumns"/>
+		FROM ass_asset_depre_dtl a
+		<include refid="assetDepreDtlJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_depre_dtl(
+			id,
+			depre_code,
+			finance_code,
+			asset_code,
+			asset_name,
+			top_sort_code,
+			top_sort_name,
+			sort_code,
+			sort_name,
+			brand,
+			bar_code,
+			qr_code,
+			version,
+			unit_price,
+			unit,
+			sn_code,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			buy_date,
+			use_date,
+			user_code,
+			user_name,
+			region_code,
+			region_name,
+			duty_code,
+			duty_name,
+			duty_office_code,
+			duty_office_name,
+			residual_value,
+			storage_place_code,
+			storage_place,
+			supplier_code,
+			supplier,
+			occupancy,
+			picture_path,
+			age_limit,
+			curr_year,
+			curr_month,
+			quantity,
+			clear_date,
+			asset_status,
+			account_status,
+			submit_status,
+			account_quantity,
+		    account_com_status,
+		    net_price,
+		    account_this_month,
+	        add_account,
+		    net_salvage,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{depreCode},
+			#{financeCode},
+			#{assetCode},
+			#{assetName},
+			#{topSortCode},
+			#{topSortName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{barCode},
+			#{qrCode},
+			#{version},
+			#{unitPrice},
+			#{unit},
+			#{snCode},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{buyDate},
+			#{useDate},
+			#{user.userCode},
+			#{userName},
+			#{regionCode},
+			#{regionName},
+			#{dutyCode},
+			#{dutyName},
+			#{dutyOfficeCode},
+			#{dutyOfficeName},
+			#{residualValue},
+			#{storagePlaceCode},
+			#{storagePlace},
+			#{supplierCode},
+			#{supplier},
+			#{occupancy},
+			#{picturePath},
+			#{ageLimit},
+			#{currYear},
+			#{currMonth},
+			#{quantity},
+			#{clearDate},
+			#{assetStatus},
+			#{accountStatus},
+			#{submitStatus},
+			#{accountQuantity},
+			#{accountComStatus},
+			#{netPrice},
+			#{accountThisMonth},
+			#{addAccount},
+			#{netSalvage},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_depre_dtl SET
+			depre_code = #{depreCode},
+			finance_code = #{financeCode},
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			top_sort_code = #{topSortCode},
+			top_sort_name = #{topSortName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			bar_code = #{barCode},
+			qr_code = #{qrCode},
+			version = #{version},
+			unit_price = #{unitPrice},
+			unit = #{unit},
+			sn_code = #{snCode},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			buy_date = #{buyDate},
+			use_date = #{useDate},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			duty_code = #{dutyCode},
+			duty_name = #{dutyName},
+			duty_office_code = #{dutyOfficeCode},
+			duty_office_name = #{dutyOfficeName},
+			residual_value = #{residualValue},
+			storage_place_code = #{storagePlaceCode},
+			storage_place = #{storagePlace},
+			supplier_code = #{supplierCode},
+			supplier = #{supplier},
+			occupancy = #{occupancy},
+			picture_path = #{picturePath},
+			age_limit = #{ageLimit},
+			curr_year = #{currYear},
+			curr_month = #{currMonth},
+			quantity = #{quantity},
+			clear_date = #{clearDate},
+			asset_status = #{assetStatus},
+			account_status = #{accountStatus},
+			submit_status = #{submitStatus},
+			account_quantity = #{accountQuantity},
+			account_com_status = #{accountComStatus},
+			net_price = #{netPrice},
+			account_this_month = #{accountThisMonth},
+			add_account = #{addAccount},
+			net_salvage = #{netSalvage},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_asset_depre_dtl SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		<choose>
+			<when test="id != null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE id = #{id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

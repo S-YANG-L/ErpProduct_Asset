@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.assetdepre.dao.AssetDepreDao">
+
+    <!-- 输出字段列 -->
+    <sql id="assetDepreColumns">
+		a.sys_id AS "sysId",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.top_sort_code AS "topSortCode",
+		a.top_sort_name AS "topSortName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.dept_code AS "deptCode",
+		a.dept_name AS "deptName",
+		a.curr_year AS "currYear",
+		a.curr_month AS "currMonth",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.accrue_month AS "accrueMonth",
+		a.original_value AS "originalValue",
+		a.netsalvage_rate AS "netsalvageRate",
+		a.netsalvage_value AS "netsalvageValue",
+		a.depre_total AS "depreTotal",
+		a.mdepre_rate AS "mdepreRate",
+		a.mdepre_value AS "mdepreValue",
+		a.net_value AS "netValue",
+		a.work_amount AS "workAmount",
+		a.work_total AS "workTotal",
+		a.work_unit AS "workUnit",
+		a.begin_date AS "beginDate",
+		a.sys_code AS "sysCode",
+		a.asset_type AS "assetType"
+	</sql>
+
+    <!-- 输出字段关联表 -->
+    <sql id="assetDepreJoins">
+    </sql>
+
+    <!-- 获取单条数据 -->
+    <select id="get" resultType="AssetDepre">
+        SELECT
+        <include refid="assetDepreColumns"/>
+        FROM ass_asset_depre a
+        <include refid="assetDepreJoins"/>
+        WHERE a.sys_id = #{sysId}
+    </select>
+
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="AssetDepre">
+        SELECT
+        <include refid="assetDepreColumns"/>
+        FROM ass_asset_depre a
+        <include refid="assetDepreJoins"/>
+        <where>
+            <if test="topSortCode != null and topSortCode != '' ">
+                AND a.top_sort_code = #{topSortCode}
+            </if>
+            <if test="assetType != null and assetType != '' ">
+                AND a.asset_type = #{assetType}
+            </if>
+            <if test="currYear != null and currYear != '' ">
+                AND a.curr_year = #{currYear}
+            </if>
+            <if test="currMonth != null and currMonth != '' ">
+                AND a.curr_month = #{currMonth}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findListDepre" resultType="AssetDepre">
+    SELECT
+    b.sort_code AS "topSortCode",
+	b.sort_name AS "topSortName",
+	IFNULL(SUM(net_price), 0) AS "netsalvageValue",
+	IFNULL(SUM(unit_price), 0) as "originalValue",
+	IFNULL(SUM(unit_price) - SUM(net_price),0) as "depreTotal"
+    FROM
+	ass_asset_sort b
+    LEFT JOIN (
+	SELECT
+		*
+	FROM
+		ass_asset_info
+	WHERE
+		asset_status IN (0, 1, 5)
+	AND account_status = 0
+    ) a ON b.sort_code = a.top_sort_code
+    WHERE
+	b.sort_grade = 0
+    GROUP BY
+	b.sort_code,
+	b.sort_name
+    </select>
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findAllList" resultType="AssetDepre">
+        SELECT
+        <include refid="assetDepreColumns"/>
+        FROM ass_asset_depre a
+        <include refid="assetDepreJoins"/>
+        <where>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insert">
+		INSERT INTO ass_asset_depre(
+			sys_id,
+			corp_code,
+			corp_name,
+			top_sort_code,
+			top_sort_name,
+			sort_code,
+			sort_name,
+			company_code,
+			company_name,
+			dept_code,
+			dept_name,
+			curr_year,
+			curr_month,
+			asset_code,
+			asset_name,
+			accrue_month,
+			original_value,
+			netsalvage_rate,
+			netsalvage_value,
+			depre_total,
+			mdepre_rate,
+			mdepre_value,
+			net_value,
+			work_amount,
+			work_total,
+			work_unit,
+			begin_date,
+			sys_code,
+			asset_type
+		) VALUES (
+			#{sysId},
+			#{corpCode},
+			#{corpName},
+			#{topSortCode},
+			#{topSortName},
+			#{sortCode},
+			#{sortName},
+			#{companyCode},
+			#{companyName},
+			#{deptCode},
+			#{deptName},
+			#{currYear},
+			#{currMonth},
+			#{assetCode},
+			#{assetName},
+			#{accrueMonth},
+			#{originalValue},
+			#{netsalvageRate},
+			#{netsalvageValue},
+			#{depreTotal},
+			#{mdepreRate},
+			#{mdepreValue},
+			#{netValue},
+			#{workAmount},
+			#{workTotal},
+			#{workUnit},
+			#{beginDate},
+			#{sysCode},
+			#{assetType}
+		)
+	</insert>
+
+    <!-- 更新数据 -->
+    <update id="update">
+		UPDATE ass_asset_depre SET 	
+			top_sort_code = #{topSortCode},
+			top_sort_name = #{topSortName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			dept_code = #{deptCode},
+			dept_name = #{deptName},
+			curr_year = #{currYear},
+			curr_month = #{currMonth},
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			accrue_month = #{accrueMonth},
+			original_value = #{originalValue},
+			netsalvage_rate = #{netsalvageRate},
+			netsalvage_value = #{netsalvageValue},
+			depre_total = #{depreTotal},
+			mdepre_rate = #{mdepreRate},
+			mdepre_value = #{mdepreValue},
+			net_value = #{netValue},
+			work_amount = #{workAmount},
+			work_total = #{workTotal},
+			work_unit = #{workUnit},
+			begin_date = #{beginDate},
+			sys_code = #{sysCode},
+			asset_type = #{assetType}
+		WHERE sys_id = #{sysId}
+	</update>
+
+    <!-- 物理删除数据 -->
+    <update id="delete">
+		DELETE FROM ass_asset_depre
+		WHERE sys_id = #{sysId}
+	</update>
+
+</mapper>

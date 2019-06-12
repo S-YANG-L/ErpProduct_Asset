@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: cn.net.ecode:edp-gen:5.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-gen/5.0-SNAPSHOT/edp-gen-5.0-20181030.081708-5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-gen/5.0-SNAPSHOT/edp-gen-5.0-20181030.081708-5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-gen/5.0-SNAPSHOT/edp-gen-5.0-20181030.081708-5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

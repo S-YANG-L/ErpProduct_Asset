@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.approval.dao.FlowHelpDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="flowHelpColumns">
+		a.id AS "id",
+		a.flow_id AS "flowId",
+		a.step AS "step",
+		a.applicant_code AS "applicantCode",
+		a.applicant_name AS "applicantName",
+		a.status AS "status",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="flowHelpJoins">
+	</sql>
+
+    <!-- 获取单条数据 -->
+    <select id="getFlowren" resultType="FlowHelp">
+        SELECT
+        <include refid="flowHelpColumns"/>
+        FROM ass_flow_help a
+        <include refid="flowHelpJoins"/>
+        WHERE a.flow_id = #{flowId} and a.step = #{step}
+    </select>
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="FlowHelp">
+		SELECT 
+			<include refid="flowHelpColumns"/>
+		FROM ass_flow_help a
+		<include refid="flowHelpJoins"/>
+		WHERE a.id = #{id}
+	</select>
+    <!-- 查询数据列表 -->
+    <select id="findFlowId" resultType="FlowHelp">
+        SELECT
+        <include refid="flowHelpColumns"/>
+        FROM ass_flow_help a
+        <include refid="flowHelpJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            AND a.flow_id = #{flowId}
+            AND a.step = #{step}
+
+        </where>
+    </select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="FlowHelp">
+		SELECT 
+			<include refid="flowHelpColumns"/>
+		FROM ass_flow_help a
+		<include refid="flowHelpJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="flowId != null and flowId != ''">
+				AND a.flow_id = #{flowId}
+			</if>
+			<if test="step != null and step != ''">
+				AND a.step = #{step}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="FlowHelp">
+		SELECT 
+			<include refid="flowHelpColumns"/>
+		FROM ass_flow_help a
+		<include refid="flowHelpJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_flow_help(
+			id,
+			flow_id,
+			step,
+			applicant_code,
+			applicant_name,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks
+		) VALUES (
+			#{id},
+			#{flowId},
+			#{step},
+			#{applicantCode},
+			#{applicantName},
+			#{status},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{remarks}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_flow_help SET 	
+			flow_id = #{flowId},
+			step = #{step},
+			applicant_code = #{applicantCode},
+			applicant_name = #{applicantName},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		delete  from ass_flow_help
+		WHERE flow_id = #{flowId} and step = #{step} and  applicant_code = #{applicantCode}
+	</update>
+	
+</mapper>

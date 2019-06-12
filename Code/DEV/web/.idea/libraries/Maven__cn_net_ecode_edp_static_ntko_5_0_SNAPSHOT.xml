@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: cn.net.ecode:edp-static-ntko:5.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-static-ntko/5.0-SNAPSHOT/edp-static-ntko-5.0-20180606.070324-2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-static-ntko/5.0-SNAPSHOT/edp-static-ntko-5.0-20180606.070324-2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-static-ntko/5.0-SNAPSHOT/edp-static-ntko-5.0-20180606.070324-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

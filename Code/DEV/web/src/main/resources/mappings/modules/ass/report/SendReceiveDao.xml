@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.report.dao.SendReceiveDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="SendReceiveColumns">
+		c.bill_code AS "inoutOrder",
+		c.psn_name AS "inoutBy",
+		a.create_date AS "inoutDate",
+		ROUND(a.in_initial_qty,2) AS "inInitialQty",
+		ROUND(a.in_initial_price,2) AS "inInitialPrice",
+		ROUND(a.in_initial_money,2) AS "inInitialMoney",
+		a.qty AS "inoutQty",
+		a.price AS "inoutPrice",
+		ROUND(a.sum_money,2) AS "inoutMoney",
+		a.cost_price AS "costPrice",
+		a.tax_money	 AS "taxMoney",
+		ROUND(a.discount,2) AS "discount",
+		c.wh_code AS "whCode",
+		c.wh_name AS "whName",
+		a.articles_code AS "articlesCode",
+		a.articles_name AS "articlesName",
+		a.STATUS AS "inoutStatus",
+		(IFNULL(a.in_initial_qty, 0) + IFNULL(a.qty, 0) - IFNULL(a.cost_price, 0)) AS "balanceQty",
+		(ROUND(((IFNULL(a.in_initial_money, 0) + IFNULL(a.sum_money, 0))/(IFNULL(a.in_initial_qty, 0) + IFNULL(a.qty, 0))),2)) AS "balancePrice",
+		(IFNULL(a.in_initial_money, 0) + IFNULL(a.sum_money, 0) - IFNULL(a.discount, 0)) AS "balanceSumMoney"
+	</sql>
+	
+	<sql id="SendReceiveOut">
+		d.outbound_code AS "outOrder",
+		d.outbounder_name AS "outBy",
+		b.create_date AS "outDate",
+		ROUND(b.out_initial_qty,2) AS "outInitialQty",
+		ROUND(b.out_initial_price,2) AS "outInitialPrice",
+		ROUND(b.out_initial_money,2) AS "outInitialMoney",
+		b.psn_code AS "psnCode",
+		b.bill_code AS "billCode",
+		b.psn_name	AS "psnName",
+		ROUND(b.outbound_number,2) AS "outboundNumber",
+		ROUND(b.price,2) AS "outboundPrice",
+		ROUND(b.sum_money,2) AS "outboundMoney",
+		b.wh_code AS "whCode",
+		b.wh_name AS "whName",
+		b.articles_code AS "articlesCode",
+		b.articles_name AS "articlesName",
+		b.STATUS AS "outStatus",
+		(IFNULL(b.out_initial_qty, 0) + IFNULL(b.psn_code, 0) - IFNULL(b.outbound_number, 0)) AS "balancesQty",
+		ROUND(((IFNULL(b.out_initial_money, 0) + IFNULL(b.psn_name, 0) - IFNULL(b.sum_money, 0))/(IFNULL(b.out_initial_qty, 0) + IFNULL(b.psn_code, 0) - IFNULL(b.outbound_number, 0))),2) AS "balancesPrice",
+		(IFNULL(b.out_initial_money, 0) + IFNULL(b.psn_name, 0) - IFNULL(b.sum_money, 0)) AS "balancesSumMoney"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="SendReceiveJoins">
+	</sql>
+
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="SendReceive">
+		SELECT * from (SELECT 
+			<include refid="SendReceiveColumns"/>
+		FROM
+		ass_inout_bills a left join ass_inout_bill c on a.sys_code = c.sys_code
+		UNION ALL
+		SELECT
+			<include refid="SendReceiveOut"/>
+		FROM
+		ass_outbound_bill_dtl b left join ass_outbound_bill d on b.sys_code = d.sys_code) e
+		<where>
+			e.inoutStatus != #{STATUS_DELETE}
+			<if test="articlesName != null and articlesName != ''">
+				 AND e.articlesName like "%"#{articlesName}"%"
+			</if>
+			<if test="whCode != null and whCode != ''">
+				AND e.whCode = #{whCode}
+			</if>
+		<!-- 	<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+					AND e.inoutDate between #{beginDate} and #{endDate}
+			</if> -->
+			<if test="beginDate != null and beginDate != '' ">
+				 e.inoutDate between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+			</if>
+			
+		</where>
+		<choose>
+			
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="SendReceive">
+		SELECT * from (SELECT 
+			<include refid="SendReceiveColumns"/>
+		FROM
+		ass_inout_bills a left join ass_inout_bill c on a.sys_code = c.sys_code
+		UNION ALL
+		SELECT
+			<include refid="SendReceiveOut"/>
+		FROM
+		ass_outbound_bill_dtl b) e
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY e.inoutDate DESC
+			</otherwise>
+		</choose>
+	</select>	
+	
+	<!-- 查询数据列表 -->
+	<select id="findDetail" resultType="SendReceive">
+		SELECT * from (SELECT 
+			<include refid="SendReceiveColumns"/>
+		FROM
+		ass_inout_bills a left join ass_inout_bill c on a.sys_code = c.sys_code
+		UNION ALL
+		SELECT
+			<include refid="SendReceiveOut"/>
+		FROM
+		ass_outbound_bill_dtl b left join ass_outbound_bill d on b.sys_code = d.sys_code) e
+		<where>
+			e.inoutStatus != #{STATUS_DELETE}
+			AND e.articlesCode = #{warehouseArticlesCode}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+</mapper>

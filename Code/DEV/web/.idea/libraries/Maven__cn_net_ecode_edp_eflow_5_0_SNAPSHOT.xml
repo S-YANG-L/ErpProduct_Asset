@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: cn.net.ecode:edp-eflow:5.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-eflow/5.0-SNAPSHOT/edp-eflow-5.0-20190121.154514-9.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-eflow/5.0-SNAPSHOT/edp-eflow-5.0-20190121.154514-9-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-eflow/5.0-SNAPSHOT/edp-eflow-5.0-20190121.154514-9-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

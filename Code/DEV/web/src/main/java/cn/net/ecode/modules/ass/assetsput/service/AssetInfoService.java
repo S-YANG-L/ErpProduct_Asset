@@ -1,0 +1,221 @@
+/**
+ * Copyright &copy; 2013-2016 山东易科德软件有限公司   All rights reserved.
+ */
+package cn.net.ecode.modules.ass.assetsput.service;
+
+import java.util.List;
+
+import cn.net.ecode.modules.ass.assetcheck.entity.AssetCheckDtl;
+import cn.net.ecode.modules.ass.assetdepre.entity.AssetDepre;
+import cn.net.ecode.modules.ass.assetdepre.entity.AssetDepreDtl;
+import cn.net.ecode.modules.ass.assetsput.entity.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import cn.net.ecode.common.persistence.Page;
+import cn.net.ecode.common.service.CrudService;
+import cn.net.ecode.modules.ass.assetsput.dao.AssetInfoDao;
+
+/**
+ * 资产入库Service
+ *lo
+ * @author zhaohongbin
+ * @version 2018-09-11
+ */
+@Service
+@Transactional(readOnly = true)
+public class AssetInfoService extends CrudService<AssetInfoDao, AssetInfo> {
+
+    /**
+     * 获取单条数据
+     *
+     * @param assetInfo
+     * @return
+     */
+    public AssetInfo get(AssetInfo assetInfo) {
+        return super.get(assetInfo);
+    }
+
+    /**
+     * 查询列表数据
+     *
+     * @param assetInfo
+     * @return
+     */
+    public List<AssetInfo> findList(AssetInfo assetInfo) {
+        return super.findList(assetInfo);
+    }
+
+    /**
+     * 查询分页数据
+     *
+     * @param page      分页对象
+     * @param assetInfo
+     * @return
+     */
+    public Page<AssetInfo> findPage(Page<AssetInfo> page, AssetInfo assetInfo) {
+        return super.findPage(page, assetInfo);
+    }
+
+    /**
+     * 保存数据（插入或更新）
+     *
+     * @param assetInfo
+     */
+    @Transactional(readOnly = false)
+    public void save(AssetInfo assetInfo) {
+        if (assetInfo.getNetPrice() == null) {
+            assetInfo.setNetPrice(assetInfo.getUnitPrice());
+        }
+        if (assetInfo.getAccountQuantity() == null) {
+            assetInfo.setAccountQuantity(0);
+        }
+        if (assetInfo.getAccountComStatus() == null) {
+            assetInfo.setAccountComStatus("0");
+        }
+        super.save(assetInfo);
+    }
+
+    /**
+     * 删除数据
+     *
+     * @param assetInfo
+     */
+    @Transactional(readOnly = false)
+    public void delete(AssetInfo assetInfo) {
+        super.delete(assetInfo);
+    }
+
+
+    /**
+     * 领用时候的查询资产表数据,通过AssetCode字段每次查询一次数据,表格导入判断AssetCode是否唯一
+     *
+     * @param assetInfo
+     * @return
+     */
+    public AssetInfo getAssetCodesql(AssetInfo assetInfo) {
+        return dao.getAssetCodesql(assetInfo);
+    }
+
+    public AssetZheJiu findZheJiuSumData(AssetZheJiu assetZheJiu) {
+        return dao.findZheJiuSumData(assetZheJiu);
+    }
+
+    /**
+     * @param assetInfo
+     * @return
+     */
+    public List<AssetInfo> findListdtl(AssetInfo assetInfo) {
+        return dao.findListdtl(assetInfo);
+    }
+
+    /**
+     * 查询部门汇总
+     */
+    public List<AssetOffice> findOffice(AssetOffice assetOffice) {
+        return dao.findOffice(assetOffice);
+    }
+
+    /**
+     * 月增加对账
+     */
+    public List<AssetSum> findSumList(AssetSum assetSum) {
+        return dao.findSumList(assetSum);
+    }
+
+    /**
+     * 资产清理
+     */
+    public List<AssetListing> findAssetListing(AssetListing assetListing) {
+        return dao.findAssetListing(assetListing);
+    }
+
+    /**
+     * 过期资产
+     */
+    public List<AssetOverTime> findOverData(AssetOverTime assetOverTime) {
+        return dao.findOverData(assetOverTime);
+    }
+
+    /**
+     * 个人资产清单
+     */
+    public List<AssetPersonal> findPersonalData(AssetPersonal assetPersonal) {
+        return dao.findPersonalData(assetPersonal);
+    }
+
+    public List<AssetListing> findAllData1(AssetListing assetListing) {
+        return dao.findAllData1(assetListing);
+    }
+
+    public List<AssetListing> findAllData2(AssetListing assetListing) {
+        return dao.findAllData2(assetListing);
+    }
+
+    public List<AssetListing> findAllData3(AssetListing assetListing) {
+        return dao.findAllData3(assetListing);
+    }
+
+    public List<AssetListing> findAllData4(AssetListing assetListing) {
+        return dao.findAllData4(assetListing);
+    }
+
+
+    /**
+     * 资产折旧
+     */
+    public List<AssetZheJiu> findZheJiuData(AssetZheJiu assetZheJiu) {
+        return dao.findZheJiuData(assetZheJiu);
+    }
+
+    /**
+     * 改变状态跟使用人
+     *
+     * @param assetInfo
+     * @return
+     */
+    public void updatauserStatus(AssetInfo assetInfo) {
+        dao.updatauserStatus(assetInfo);
+    }
+
+    /**
+     * 实物变更走的upadata
+     *
+     * @param assetInfo
+     * @return
+     */
+    public void updataChange(AssetInfo assetInfo) {
+        dao.updataChange(assetInfo);
+    }
+
+    /**
+     * App端save
+     *
+     * @param page
+     * @param assetInfo
+     * @return
+     */
+    public Page<AssetInfo> findAssetList(Page<AssetInfo> page, AssetInfo assetInfo) {
+        assetInfo.setPage(page);
+        List<AssetInfo> list = dao.findAssetList(assetInfo);
+        page.setList(list);
+        return page;
+    }
+
+
+    public List<AssetCheckDtl> findListCheck(AssetInfo assetInfo) {
+        return dao.findListCheck(assetInfo);
+    }
+
+    public List<AssetInfo> findListPrint(AssetInfo assetInfo) {
+        return dao.findListPrint(assetInfo);
+    }
+
+    public List<AssetDepreDtl> findListDepre(AssetDepre asset) {
+        return dao.findListDepre(asset);
+    }
+
+    public List<AssetInfo> findListPrintlist(AssetInfo assetInfo) {
+        return dao.findListPrintlist(assetInfo);
+    }
+}

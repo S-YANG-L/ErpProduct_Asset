@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.test.dao.TestTreeDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="testTreeColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.parent_code AS "parentCode",
+		a.parent_codes AS "parentCodes",
+		a.sorts AS "sorts",
+		a.hasnext AS "hasnext",
+		a.sort_grade AS "sortGrade",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="testTreeJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="TestTree">
+		SELECT 
+			<include refid="testTreeColumns"/>
+		FROM test_tree a
+		<include refid="testTreeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+    <!-- 查询数据列表 -->
+    <select id="findListTree" resultType="TestTree">
+        SELECT
+        <include refid="testTreeColumns"/>
+        FROM test_tree a
+        <include refid="testTreeJoins"/>
+
+    </select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="TestTree">
+		SELECT 
+			<include refid="testTreeColumns"/>
+		FROM test_tree a
+		<include refid="testTreeJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="parentCode != null and parentCode != ''">
+				AND a.parent_code = #{parentCode}
+			</if>
+			<if test="parentCodes != null and parentCodes != ''">
+				AND (a.parent_codes LIKE #{parentCodes}
+					<if test="id != null and id != ''">
+						OR a.id = #{id}
+					</if>)
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.sorts
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="TestTree">
+		SELECT 
+			<include refid="testTreeColumns"/>
+		FROM test_tree a
+		<include refid="testTreeJoins"/>
+		<where>
+			a.status = #{STATUS_NORMAL}
+		</where>
+		ORDER BY a.sorts
+	</select>
+	
+	<!-- 根据父编号模糊查询数据 -->
+	<select id="findByParentCodesLike" resultType="TestTree">
+		SELECT
+			a.id AS "id",
+			a.parent_code AS "parentCode",
+			a.parent_codes AS "parentCodes",
+			a.sort_grade AS "sortGrade"
+		FROM test_tree a
+		WHERE a.status = #{STATUS_NORMAL}
+			AND a.parent_codes LIKE #{parentCodes}
+		ORDER BY a.sorts
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO test_tree(
+			id,
+			name,
+			parent_code,
+			parent_codes,
+			sorts,
+			hasnext,
+			sort_grade,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{name},
+			#{parentCode},
+			#{parentCodes},
+			#{sorts},
+			#{hasnext},
+			#{sortGrade},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE test_tree SET 	
+			name = #{name},
+			parent_code = #{parentCode},
+			parent_codes = #{parentCodes},
+			sorts = #{sorts},
+			hasnext = #{hasnext},
+			sort_grade = #{sortGrade},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE test_tree SET 
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE  id = #{id}
+			OR parent_codes LIKE
+				<if test="dbName == 'oracle'">'%,'||#{id}||',%'</if>
+				<if test="dbName == 'mssql'">'%,'+#{id}+',%'</if>
+				<if test="dbName == 'mysql'">concat('%,',#{id},',%')</if>
+	</update>
+	
+	<!-- 更新所有父编号 -->
+	<update id="updateParentCodes">
+		UPDATE test_tree a SET 
+			parent_code = #{parentCode}, 
+			parent_codes = #{parentCodes},
+			sort_grade = #{sortGrade}
+		WHERE a.id = #{id}
+	</update>
+	
+	<!-- 更新是否有下级字段 -->
+	<update id="updateHasnext">
+		UPDATE test_tree SET 
+			hasnext = (
+				SELECT (case when count(1) &gt; 0 then '1' else '0' end) hasnext
+				FROM (SELECT parent_code FROM test_tree WHERE status = '0') b
+				WHERE b.parent_code = #{id}
+			)
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 获取启用的数据列表 -->
+	<select id="getEnabledList" resultType="TestTree">
+		SELECT
+			<include refid="testTreeColumns"/>
+		FROM  test_tree a
+		<include refid="testTreeJoins"/>
+		WHERE a.status = #{STATUS_NORMAL} 
+			AND a.parent_codes LIKE 
+				<if test="dbName == 'oracle'">'%,'||#{id}||',%'</if>
+				<if test="dbName == 'mssql'">'%,'+#{id}+',%'</if>
+				<if test="dbName == 'mysql'">concat('%,',#{id},',%')</if>
+		ORDER BY  a.id,a.sorts  
+	</select>
+		
+	<!-- 停用数据  -->
+	<update id="disable">
+		UPDATE test_tree a SET 
+			status = #{STATUS_DISABLE}
+		WHERE a.id = #{id}
+	</update>
+	
+	<!-- 停用数据及子节点数据  -->
+	<update id="disableByGroup">
+		UPDATE test_tree a SET 
+			status = #{STATUS_DISABLE}
+		WHERE status = #{STATUS_NORMAL} 
+			AND (a.id = #{id} OR parent_codes LIKE 
+				<if test="dbName == 'oracle'">'%,'||#{id}||',%'</if>
+				<if test="dbName == 'mssql'">'%,'+#{id}+',%'</if>
+				<if test="dbName == 'mysql'">concat('%,',#{id},',%')</if>)
+	</update>
+	
+	<!-- 启用数据  -->
+	<update id="enable">
+		UPDATE test_tree a SET 
+			status = #{STATUS_NORMAL}
+		WHERE a.id = #{id}
+	</update>
+	
+	<!-- 启用数据及子节点数据  -->
+	<update id="enableByGroup">
+		UPDATE test_tree a SET 
+			status = #{STATUS_NORMAL}
+		WHERE status = #{STATUS_DISABLE} 
+			AND (a.id = #{id} OR parent_codes LIKE
+				<if test="dbName == 'oracle'">'%,'||#{id}||',%'</if>
+				<if test="dbName == 'mssql'">'%,'+#{id}+',%'</if>
+				<if test="dbName == 'mysql'">concat('%,',#{id},',%')</if>)
+	</update>
+	
+	<!-- 获取子节点中最大的排序号  -->
+	<select id="getMaxSort" resultType="int">
+		SELECT 
+			<if test="dbName == 'oracle'">nvl</if>
+			<if test="dbName == 'mssql'">isnull</if>
+			<if test="dbName == 'mysql'">ifnull</if>
+			(max(a.sorts),0) sorts
+		FROM test_tree a
+		WHERE a.status != #{STATUS_DELETE}
+			AND a.parent_code = #{parentCode}
+	</select>
+
+	<!-- 获取子节点最大个数  -->
+	<select id="getMaxSize" resultType="int">
+		SELECT count(1) 
+		FROM test_tree t 
+		WHERE t.parent_code= #{parentCode}
+	</select>
+	
+</mapper>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.ascheck.dao.AsCheckDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="asCheckColumns">
+		a.id AS "id",
+		a.check_code AS "checkCode",
+		a.check_name AS "checkName",
+		a.operator_name AS "operatorName",
+		a.operator_code AS "operatorCode",
+		a.wh_code AS "whCode",
+		a.wh_name AS "whName",
+		a.check_date AS "checkDate",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="asCheckJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AsCheck">
+		SELECT 
+			<include refid="asCheckColumns"/>
+		FROM ass_as_check a
+		<include refid="asCheckJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AsCheck">
+		SELECT 
+			<include refid="asCheckColumns"/>
+		FROM ass_as_check a
+		<include refid="asCheckJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="checkName != null and checkName != ''">
+				AND a.check_name like "%"#{checkName}"%"
+			</if>
+			<if test="operatorCode != null and operatorCode != ''">
+				AND a.operator_code = #{operatorCode}
+			</if>
+			<if test="whName != null and whName != ''">
+				AND a.wh_name = #{whName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AsCheck">
+		SELECT 
+			<include refid="asCheckColumns"/>
+		FROM ass_as_check a
+		<include refid="asCheckJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_as_check(
+			id,
+			check_code,
+			check_name,
+			operator_name,
+			operator_code,
+			wh_code,
+			wh_name,
+			check_date,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{checkCode},
+			#{checkName},
+			#{operatorName},
+			#{operatorCode},
+			#{whCode},
+			#{whName},
+			#{checkDate},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_as_check SET 	
+			check_code = #{checkCode},
+			check_name = #{checkName},
+			operator_name = #{operatorName},
+			operator_code = #{operatorCode},
+			wh_code = #{whCode},
+			wh_name = #{whName},
+			check_date = #{checkDate},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_as_check SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

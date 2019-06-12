@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.articlesfile.dao.ArticlesFileDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="articlesFileColumns">
+		a.id AS "id",
+		a.articles_code AS "articlesCode",
+		a.articles_name AS "articlesName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.bar_code AS "barCode",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit AS "unit",
+		a.unit_price AS "unitPrice",
+		a.upper_limit AS "upperLimit",
+		a.lower_limit AS "lowerLimit",
+		a.picture AS "picture",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="articlesFileJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="ArticlesFile">
+		SELECT 
+			<include refid="articlesFileColumns"/>
+		FROM ass_articles_file a
+		<include refid="articlesFileJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="ArticlesFile">
+		SELECT 
+			<include refid="articlesFileColumns"/>
+		FROM ass_articles_file a
+		<include refid="articlesFileJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="articlesName != null and articlesName != ''">
+				AND a.articles_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{articlesName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{articlesName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{articlesName},'%')</if>
+			</if>
+			<if test="sortCode != null and sortCode != ''">
+				AND a.sort_code = #{sortCode}
+			</if>
+			<if test="sortName != null and sortName != ''">
+				AND a.sort_name = #{sortName}
+			</if>
+			<if test="articlesCodes != null and articlesCodes.length != 0">
+                AND a.articles_code not in
+                <foreach collection="articlesCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="articleCodes != null and articleCodes.length != 0">
+                AND a.articles_code not in
+                <foreach collection="articleCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="ArticlesFile">
+		SELECT 
+			<include refid="articlesFileColumns"/>
+		FROM ass_articles_file a
+		<include refid="articlesFileJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_articles_file(
+			id,
+			articles_code,
+			articles_name,
+			sort_code,
+			sort_name,
+			bar_code,
+			brand,
+			version,
+			unit,
+			unit_price,
+			upper_limit,
+			lower_limit,
+			picture,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{articlesCode},
+			#{articlesName},
+			#{sortCode},
+			#{sortName},
+			#{barCode},
+			#{brand},
+			#{version},
+			#{unit},
+			#{unitPrice},
+			#{upperLimit},
+			#{lowerLimit},
+			#{picture},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_articles_file SET 	
+			articles_code = #{articlesCode},
+			articles_name = #{articlesName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			bar_code = #{barCode},
+			brand = #{brand},
+			version = #{version},
+			unit = #{unit},
+			unit_price = #{unitPrice},
+			upper_limit = #{upperLimit},
+			lower_limit = #{lowerLimit},
+			picture = #{picture},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		delete from ass_articles_file
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

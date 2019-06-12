@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="edp-asset:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>edp-asset</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="edp-asset.war">
+      <element id="artifact" artifact-name="edp-asset:war exploded" />
+    </root>
+  </artifact>
+</component>

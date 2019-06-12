@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: cn.net.ecode:edp-frwk:5.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-frwk/5.0-SNAPSHOT/edp-frwk-5.0-20190226.022540-51.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-frwk/5.0-SNAPSHOT/edp-frwk-5.0-20190226.022540-51-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-frwk/5.0-SNAPSHOT/edp-frwk-5.0-20190226.022540-51-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

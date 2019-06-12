@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WorkBook xmlVersion="20141222" releaseVersion="7.1.1">
+<TableDataMap>
+<TableData name="ds1" class="com.fr.data.impl.DBTableData">
+<Parameters/>
+<Attributes maxMemRowCount="-1"/>
+<Connection class="com.fr.data.impl.NameDatabaseConnection">
+<DatabaseName>
+<![CDATA[judp]]></DatabaseName>
+</Connection>
+<Query>
+<![CDATA[select a.id, a.category_code, a.title, a.image, a.create_by, a.create_date, 
+	b.content as content
+from cms_article a, cms_article_data b where a.id=b.id and a.id = '${id}']]></Query>
+</TableData>
+</TableDataMap>
+<ReportWebAttr>
+<ServerPrinter/>
+<WebPageContent>
+<ToolBars/>
+<WebPage isPage="false" isShowAsImage="false" isAutoScale="false" isTDHeavy="false"/>
+</WebPageContent>
+</ReportWebAttr>
+<Report class="com.fr.report.worksheet.WorkSheet" name="sheet1">
+<ReportPageAttr>
+<HR/>
+<FR/>
+<HC/>
+<FC/>
+</ReportPageAttr>
+<ColumnPrivilegeControl/>
+<RowPrivilegeControl/>
+<RowHeight defaultValue="723900">
+<![CDATA[1181100,723900,723900,723900,723900,723900,723900,723900,723900,723900,723900]]></RowHeight>
+<ColumnWidth defaultValue="2743200">
+<![CDATA[3276600,21183600,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200,2743200]]></ColumnWidth>
+<CellElementList>
+<C c="0" r="0" s="0">
+<O>
+<![CDATA[标题]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="0" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="TITLE"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="1" rs="8" s="0">
+<O>
+<![CDATA[内容]]></O>
+<PrivilegeControl/>
+<CellGUIAttr showAsDefault="true"/>
+<CellPageAttr repeat="false"/>
+<Expand/>
+</C>
+<C c="1" r="1" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<CellInsertPolicy/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="9" rs="8" s="0">
+<O>
+<![CDATA[内容2]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="9" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="17" rs="8" s="0">
+<O>
+<![CDATA[内容3]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="17" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="25" rs="8" s="0">
+<O>
+<![CDATA[内容4]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="25" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="33" rs="8" s="0">
+<O>
+<![CDATA[内容5]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="33" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="41" rs="8" s="0">
+<O>
+<![CDATA[内容6]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="41" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="49" rs="8" s="0">
+<O>
+<![CDATA[内容7]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="49" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="57" rs="8" s="0">
+<O>
+<![CDATA[内容8]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="57" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+<C c="0" r="65" rs="8" s="0">
+<O>
+<![CDATA[内容9]]></O>
+<PrivilegeControl/>
+<Expand/>
+</C>
+<C c="1" r="65" rs="8" s="1">
+<O t="DSColumn">
+<Attributes dsName="ds1" columnName="CONTENT"/>
+<Complex/>
+<RG class="com.fr.report.cell.cellattr.core.group.FunctionGrouper"/>
+<Parameters/>
+</O>
+<PrivilegeControl/>
+<CellGUIAttr showAsHTML="true"/>
+<CellPageAttr repeat="false"/>
+<Expand dir="0"/>
+</C>
+</CellElementList>
+<ReportAttrSet>
+<ReportSettings headerHeight="0" footerHeight="0">
+<PaperSetting/>
+</ReportSettings>
+<Header reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Header>
+<Footer reportPageType="0">
+<Background name="NullBackground"/>
+<LeftList/>
+<CenterList/>
+<RightList/>
+</Footer>
+</ReportAttrSet>
+<PrivilegeControl/>
+</Report>
+<ReportParameterAttr>
+<Attributes showWindow="true" delayPlaying="true" windowPosition="1" align="0"/>
+<PWTitle>
+<![CDATA[参数]]></PWTitle>
+<Parameter>
+<Attributes name="id"/>
+<O>
+<![CDATA[]]></O>
+</Parameter>
+</ReportParameterAttr>
+<StyleList>
+<Style horizontal_alignment="0" imageLayout="1">
+<FRFont name="SimSun" style="1" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+<Style imageLayout="1">
+<FRFont name="SimSun" style="0" size="72"/>
+<Background name="NullBackground"/>
+<Border>
+<Top style="1"/>
+<Bottom style="1"/>
+<Left style="1"/>
+<Right style="1"/>
+</Border>
+</Style>
+</StyleList>
+<DesignerVersion DesignerVersion="HBB"/>
+<PreviewType PreviewType="0"/>
+</WorkBook>

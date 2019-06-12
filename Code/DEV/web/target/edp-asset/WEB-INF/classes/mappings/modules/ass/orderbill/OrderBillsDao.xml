@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.orderbill.dao.OrderBillsDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="orderBillsColumns">
+		a.sys_id AS "sysId",
+		a.sys_code AS "sysCode",
+		a.bar_code AS "barCode",
+		a.articles_code AS "articlesCode",
+		a.articles_name AS "articlesName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.qty AS "qty",
+		a.price AS "price",
+		a.sum_money AS "sumMoney",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.unit AS "unit",
+		a.brand AS "brand",
+		a.version AS "version"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="orderBillsJoins">
+<!-- 		LEFT JOIN ass_order_bill b ON b.id = a.sys_code -->
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="OrderBills">
+		SELECT 
+			<include refid="orderBillsColumns"/>
+		FROM ass_order_bills a
+		<include refid="orderBillsJoins"/>
+		WHERE a.sys_id = #{sysId}
+	</select>
+    <!-- 获取子表数据 -->
+    <select id="findUsedCode" resultType="OrderBills">
+        SELECT
+        <include refid="orderBillsColumns"/>
+        FROM ass_order_bills a
+        <include refid="orderBillsJoins"/>
+        WHERE a.status != #{STATUS_DELETE} and  a.sys_code = #{sysCode}
+    </select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="OrderBills">
+		SELECT 
+			<include refid="orderBillsColumns"/>
+		FROM ass_order_bills a
+		<include refid="orderBillsJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="sysCode != null and sysCode != ''">
+				AND a.sys_code = #{sysCode}
+			</if>
+			<if test="articlesName != null and articlesName != ''">
+				AND a.articles_name = #{articlesName}
+			</if>
+			<if test="sortName != null and sortName != ''">
+				AND a.sort_name = #{sortName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="OrderBills">
+		SELECT 
+			<include refid="orderBillsColumns"/>
+		FROM ass_order_bills a
+		<include refid="orderBillsJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_order_bills(
+			sys_id,
+			sys_code,
+			bar_code,
+			articles_code,
+			articles_name,
+			sort_code,
+			sort_name,
+			qty,
+			price,
+			sum_money,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+			unit,
+			brand,
+			version
+		) VALUES (
+			#{sysId},
+			#{sysCode},
+			#{barCode},
+			#{articlesCode},
+			#{articlesName},
+			#{sortCode},
+			#{sortName},
+			#{qty},
+			#{price},
+			#{sumMoney},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status},
+			#{unit},
+			#{brand},
+			#{version}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_order_bills SET 	
+			sys_code = #{sysCode},
+			bar_code = #{barCode},
+			articles_code = #{articlesCode},
+			articles_name = #{articlesName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			qty = #{qty},
+			price = #{price},
+			sum_money = #{sumMoney},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			unit = #{unit},
+			brand = #{brand},
+			version = #{version}
+		WHERE sys_id = #{sysId}
+	</update>
+
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		delete from ass_order_bills
+        where sys_code = #{sysCode}
+	</update>
+
+</mapper>

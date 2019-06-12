@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.assetsclean.dao.AssetCleanDao">
+
+	<!-- 输出字段列 -->
+	<sql id="assetCleanColumns">
+		a.id AS "id",
+		a.clean_code AS "cleanCode",
+		a.cleaner_code AS "cleanerCode",
+		a.cleaner_name AS "cleanerName",
+		a.clean_date AS "cleanDate",
+		a.clean_status AS "cleanStatus",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	<!-- 输出字段列 -->
+	<sql id="assetCleanDtlColumns">
+		a.id AS "id",
+		a.clean_code AS "cleanCode",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.storage_place AS "storagePlace",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o12.office_name AS "office.officeName",
+		u14.user_name AS "user.userName"
+	</sql>
+
+	<!-- 输出字段关联表 -->
+	<sql id="assetCleanJoins">
+	</sql>
+
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetClean">
+		SELECT
+			<include refid="assetCleanColumns"/>
+		FROM ass_asset_clean a
+		<include refid="assetCleanJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 获取清理人数据 -->
+	<select id="assetCleanJilu" resultType="AssetCleanDtl">
+		SELECT
+		a.cleaner_code AS "cleanerCode",
+		a.cleaner_name AS "cleanerName",
+		a.clean_date AS "cleanDate"
+		FROM ass_asset_clean a
+		WHERE
+		 a.id = #{cleanCode}
+	</select>
+	<!-- 根据userCode获取公司编码 -->
+	<select id="getCompanyCode" resultType="String">
+		SELECT b.COMPANY_CODE FROM sys_user a
+        left join sys_employee b
+        on a.REF_CODE=b.EMP_CODE and b.`STATUS`='0'
+        where a.`STATUS`='0'
+        and a.USER_CODE=#{cleanerCode};
+	</select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetClean">
+		SELECT
+			<include refid="assetCleanColumns"/>
+		FROM ass_asset_clean a
+		<include refid="assetCleanJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="cleanStatus != null and cleanStatus != ''">
+				AND a.clean_status = #{cleanStatus}
+			</if>
+			<if test="cleanCode != null and cleanCode != ''">
+				AND a.clean_code = #{cleanCode}
+			</if>
+			<if test="beginDate != null and beginDate != '' ">
+				AND a.clean_date between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetClean">
+		SELECT
+			<include refid="assetCleanColumns"/>
+		FROM ass_asset_clean a
+		<include refid="assetCleanJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 插入数据 -->
+	<insert id="saveassetBorrowDtl">
+		INSERT INTO ass_asset_clean__dtl(
+			id,
+			clean_code,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			storage_place,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			user_code,
+			user_name,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			beginDate,
+			endDate,
+			status
+		) VALUES (
+			#{id},
+			#{cleanCode},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{storagePlace},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{user.userCode},
+			#{userName},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{beginDate},
+			#{endDate},
+			#{status}
+		)
+	</insert>
+	<!-- 插入数据 -->
+	<insert id="reduction">
+		INSERT INTO ass_asset_reduction__dtl(
+			id,
+			cleaner_name,
+			clean_date,
+			cleaner_code,
+			clean_code,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			storage_place,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			user_code,
+			user_name,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{cleanerName},
+			#{cleanDate},
+			#{cleanerCode},
+			#{cleanCode},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{storagePlace},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{user.userCode},
+			#{userName},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_clean(
+			id,
+			clean_code,
+			cleaner_code,
+			cleaner_name,
+			clean_date,
+			clean_status,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{cleanCode},
+			#{cleanerCode},
+			#{cleanerName},
+			#{cleanDate},
+			#{cleanStatus},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	<!-- 查询数据列表 -->
+	<select id="findListDtl" resultType="AssetCleanDtl">
+		SELECT
+		<include refid="assetCleanDtlColumns"/>
+		FROM ass_asset_clean__dtl a
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="assetStatus != null and assetStatus != ''">
+				AND a.asset_status = #{assetStatus}
+			</if>
+			<if test="id != null and id != ''">
+				and  a.id = #{id}
+			</if>
+		</where>
+	</select>
+	<select id="findListjilu" resultType="AssetCleanDtl">
+		SELECT a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.version AS "version",
+		a.brand AS "brand",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName"
+		FROM ass_asset_info a
+		where asset_code = #{assetCode}
+	</select>
+
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_clean SET 	
+			clean_code = #{cleanCode},
+			cleaner_code = #{cleanerCode},
+			cleaner_name = #{cleanerName},
+			clean_date = #{cleanDate},
+			clean_status = #{cleanStatus},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	<update id="deleteassetBorrowDtl">
+		DELETE from ass_asset_clean__dtl
+		WHERE id = #{id}
+	</update>
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_asset_clean SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	<!--分类汇总summaryData-->
+	<select id="summaryData" resultType="AssetClean">
+		SELECT
+		z.top_sort_code AS 'topSortCode',
+		z.top_sort_name AS 'topSortName',
+		CASE
+		WHEN xz.countxz  is NULL THEN
+		0
+		WHEN xz.countxz !='null' THEN
+		xz.countxz
+		END AS 'countxz',CASE
+		WHEN ly.countly  is NULL THEN
+		0
+		WHEN ly.countly !='null' THEN
+		ly.countly
+		END  AS 'countly',CASE
+		WHEN jy.countjy  is NULL THEN
+		0
+		WHEN jy.countjy !='null' THEN
+		jy.countjy
+		END
+		 AS 'countjy',CASE
+		WHEN bf.countbf  is NULL THEN
+		0
+		WHEN bf.countbf !='null' THEN
+		bf.countbf
+		END
+		 AS 'countbf',
+		CASE
+		WHEN db.countdb  is NULL THEN
+		0
+		WHEN db.countdb !='null' THEN
+		db.countdb
+		END
+		 AS 'countdb',CASE
+		WHEN jx.countjx  is NULL THEN
+		0
+		WHEN jx.countjx !='null' THEN
+		jx.countjx
+		END
+		 AS 'countjx',CASE
+		WHEN dw.countdw  is NULL THEN
+		0
+		WHEN dw.countdw !='null' THEN
+		dw.countdw
+		END
+		 AS 'countdw',
+		z.hj AS 'hj',
+		z.je AS 'je',
+		z.office_name AS 'officeName'
+		FROM
+		(
+			SELECT
+				COUNT(0) AS hj,
+				sum(a.unit_price) je,
+				a.top_sort_code,
+				a.top_sort_name,
+				a.office_name
+			FROM
+				ass_asset_info a
+		<where>
+			<if test="topSortName != null and topSortName != ''">
+				AND (a.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+			<if test="officeName != null and officeName != ''">
+				AND (office_name like concat('%' ,#{officeName},'%'))
+			</if>
+		</where>
+		GROUP BY
+				a.top_sort_code
+		  ) z
+LEFT JOIN (
+	SELECT
+		count(0) AS countxz,
+		b.top_sort_code
+	FROM
+		ass_asset_info b
+		<where>
+			b.asset_status = '0'
+			<if test="officeName != null and officeName != ''">
+				AND b.office_name = #{officeName}
+			</if>
+			<if test="topSortName != null and topSortName != ''">
+				AND (b.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+		</where>
+-- 		where b.asset_status = '0'
+	GROUP BY
+		b.top_sort_code
+) xz ON z.top_sort_code = xz.top_sort_code
+LEFT JOIN (
+	SELECT
+		count(0) AS countly,
+		b.top_sort_code
+	FROM
+		ass_asset_info b
+		<where>
+			b.asset_status = '1'
+			<if test="officeName != null and officeName != ''">
+				AND b.office_name = #{officeName}
+			</if>
+			<if test="topSortName != null and topSortName != ''">
+				AND (b.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+		</where>
+		/*where b.asset_status = '1'*/
+	GROUP BY
+		b.top_sort_code
+) ly ON z.top_sort_code = ly.top_sort_code
+LEFT JOIN (
+	SELECT
+		count(0) AS countjy,
+		b.top_sort_code
+	FROM
+		ass_asset_info b
+		<where>
+			b.asset_status = '2'
+			<if test="officeName != null and officeName != ''">
+				AND b.office_name = #{officeName}
+			</if>
+			<if test="topSortName != null and topSortName != ''">
+				AND (b.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+		</where>
+-- 		where b.asset_status = '2'
+	GROUP BY
+		b.top_sort_code
+) jy ON z.top_sort_code = jy.top_sort_code
+LEFT JOIN (
+	SELECT
+		count(0) AS countbf,
+		b.top_sort_code
+	FROM
+		ass_asset_info b
+		<where>
+			b.asset_status = '4'
+			<if test="officeName != null and officeName != ''">
+				AND b.office_name = #{officeName}
+			</if>
+			<if test="topSortName != null and topSortName != ''">
+				AND (b.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+		</where>
+-- 		where b.asset_status = '4'
+	GROUP BY
+		b.top_sort_code
+) bf ON z.top_sort_code = bf.top_sort_code
+		LEFT JOIN (
+		SELECT
+		count(0) AS countdb,
+		b.top_sort_code
+		FROM
+		ass_asset_info b
+		<where>
+			b.asset_status = '5'
+			<if test="officeName != null and officeName != ''">
+				AND b.office_name = #{officeName}
+			</if>
+			<if test="topSortName != null and topSortName != ''">
+				AND (b.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+		</where>
+-- 		where b.asset_status = '5'
+		GROUP BY
+		b.top_sort_code
+		) db ON z.top_sort_code = db.top_sort_code
+		LEFT JOIN (
+		SELECT
+		count(0) AS countjx,
+		b.top_sort_code
+		FROM
+		ass_asset_info b
+		<where>
+			b.asset_status = '6'
+			<if test="officeName != null and officeName != ''">
+				AND b.office_name = #{officeName}
+			</if>
+			<if test="topSortName != null and topSortName != ''">
+				AND (b.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+		</where>
+-- 		where b.asset_status = '6'
+		GROUP BY
+		b.top_sort_code
+		) jx ON z.top_sort_code = jx.top_sort_code
+		LEFT JOIN (
+		SELECT
+		count(0) AS countdw,
+		b.top_sort_code
+		FROM
+		ass_asset_info b
+		<where>
+			b.asset_status = '7'
+			<if test="officeName != null and officeName != ''">
+				AND b.office_name = #{officeName}
+			</if>
+			<if test="topSortName != null and topSortName != ''">
+				AND (b.top_sort_name like concat('%' ,#{topSortName},'%'))
+			</if>
+		</where>
+-- 		where b.asset_status = '7'
+		GROUP BY
+		b.top_sort_code
+		) dw ON z.top_sort_code = dw.top_sort_code
+	</select>
+
+</mapper>

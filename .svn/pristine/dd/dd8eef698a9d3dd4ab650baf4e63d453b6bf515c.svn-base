@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.report.dao.ReportDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="reportColumns">
+		a.wh_name AS "warehouseWhNames",
+		a.wh_code AS "warehouseWhCodes",
+		"0.0" as "initialQty",
+		"0.0" as "initialPrice",
+		"0.0" as "initialMoney",
+		a.articles_code AS "warehouseArticlesCode",
+		a.articles_name AS "warehouseArticlesName",
+		a.sort_code AS "warehouseSortCode",
+		a.sort_name AS "warehousesSortName",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.version AS "version",
+		a.unit AS "unit",
+		e.bqty,
+		e.bsumoney,
+		e.inoutPrice,
+		t.cqty,
+		t.outboundMoney,
+		t.outboundPrice,
+		ROUND(((IFNULL(e.bsumoney,0)-IFNULL(t.outboundMoney,0))/((IFNULL(e.bqty,0) - IFNULL(t.cqty, 0)))),2) AS "jieCunPrice",
+		(IFNULL(e.bqty,0) - IFNULL(t.cqty, 0)) AS "jieCunQTY",
+		ROUND(IFNULL(e.bsumoney,0)-IFNULL(t.outboundMoney,0),1) AS "jieCunMoney"
+	</sql>
+	<sql id="reportColumnTwo">
+		b1.WH_CODE AS "inoutBillWhCode",		
+		b1.WH_NAME	AS "inoutBillWhName",
+		b.sort_code	AS "inoutBillsSortCode",
+		b.sort_name	AS "inoutBillsSortName",
+		b.articles_code	AS "inoutBillsArticlesCode",
+		b.articles_name	AS "inoutBillsArticlesName",
+		ROUND(sum(b.QTY),1) AS "bqty",
+		ROUND((sum(b.SUM_MONEY)/sum(b.QTY)),2) AS "inoutPrice",
+		ROUND(SUM(b.SUM_MONEY),2) AS "bsumoney"
+	</sql>
+	
+	<sql id="reportColumnThree">
+		c.wh_code AS "outboundWhCode",
+		c.wh_name AS "outboundWhName",
+		c.sort_code AS "outboundDtlSortCode",
+		c.sort_name AS "outboundDtlSortName",
+		c.articles_code AS "outboundDtlArticlesCode",
+		c.articles_name AS "outboundDtlArticlesName",
+		ROUND(SUM(c.sum_money),2) AS "outboundMoney",
+		ROUND(c.price,1) AS "outboundPrice",
+		ROUND(SUM(c.outbound_number),1) AS cqty
+	</sql>
+	
+	<sql id="reportColumnFour">
+		d.SYS_CODE AS "outboundWhCodes",
+		d.approval_status AS "outboundApprovlsStatus"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="reportJoins">
+		
+	</sql>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="Report">
+		SELECT 
+			<include refid="reportColumns"/>
+		FROM
+		ass_warehouse_items a
+		left JOIN(
+			SELECT <include refid="reportColumnTwo"/>
+			FROM   ass_inout_bills	b
+			<where>
+				<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+					b.create_date between #{beginDate} and #{endDate}
+				</if>
+			</where>
+			JOIN   ass_inout_bill b1 ON b.SYS_CODE = b1.SYS_CODE 
+			GROUP BY
+			b.articles_code,
+			b1.WH_CODE
+		) e 
+			ON a.articles_code = e.inoutBillsArticlesCode
+			and a.wh_code = e.inoutBillWhCode
+		    left JOIN(
+		    	SELECT	<include refid="reportColumnThree"/>
+		    	FROM ass_outbound_bill_dtl c
+		    	<where>
+					<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+						c.create_date between #{beginDate} and #{endDate}
+					</if>
+				</where>
+		    	JOIN ass_outbound_bill c1 ON c.SYS_CODE = c1.SYS_CODE
+		    WHERE
+				c.sys_code IN(
+			SELECT	
+				d.SYS_CODE	FROM 
+				ass_outbound_bill d
+				WHERE 
+				d.APPROVAL_STATUS = '2'
+			)
+			GROUP BY
+				c.articles_code,
+				c.wh_code
+		 )
+		 t on a.articles_code = t.outboundDtlArticlesCode
+		 AND a.wh_code = t.outboundWhCode
+		<include refid="reportJoins"/>
+		<where>
+			AND a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="warehouseArticlesName != null and warehouseArticlesName != ''">
+				<!-- AND a.articles_name = #{warehouseArticlesName} -->
+				AND a.articles_name like "%"#{warehouseArticlesName}"%"
+			</if>
+			<if test="warehouseWhCodes != null and warehouseWhCodes != ''">
+				AND a.wh_code = #{warehouseWhCodes}
+			</if>
+		</where>
+		<choose>
+			
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+		<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="Report">
+		SELECT 
+			<include refid="reportColumns"/>
+		FROM
+		ass_warehouse_items a
+		left JOIN(
+			SELECT <include refid="reportColumnTwo"/>
+			FROM   ass_inout_bills	b
+			<where>
+				<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+					b.create_date between #{beginDate} and #{endDate}
+				</if>
+			</where>
+			JOIN   ass_inout_bill b1 ON b.SYS_CODE = b1.SYS_CODE 
+			GROUP BY
+			b.articles_code,
+			b1.WH_CODE
+			
+		) e 
+			ON a.articles_code = e.inoutBillsArticlesCode
+		    AND a.wh_code = e.inoutBillWhCode
+		    left JOIN(
+		    	SELECT	<include refid="reportColumnThree"/>
+		    	FROM ass_outbound_bill_dtl c
+		    	<where>
+					<if test="beginDate != null and beginDate != '' and endDate != null and endDate != ''">
+						c.create_date between #{beginDate} and #{endDate}
+					</if>
+				</where>
+		    	JOIN ass_outbound_bill c1 ON c.SYS_CODE = c1.SYS_CODE
+		    WHERE
+				c.sys_code IN(
+			SELECT	
+				d.SYS_CODE	FROM 
+				ass_outbound_bill d
+				WHERE 
+				d.APPROVAL_STATUS = '2'
+			)
+			GROUP BY
+				c.articles_code,
+				c1.wh_code
+		 )
+		 f on a.articles_code = f.outboundDtlArticlesCode
+		 AND a.wh_code = f.outboundWhCode
+		<include refid="reportJoins"/>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+</mapper>

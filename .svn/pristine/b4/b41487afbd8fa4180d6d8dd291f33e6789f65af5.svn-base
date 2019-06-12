@@ -1,0 +1,579 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.inout.dao.InoutBillsDao">
+    
+    <!-- 输出字段 列 -->
+	<sql id="inoutBillsColumns">
+		a.sys_id AS "sysId",
+		a.sys_code AS "sysCode",
+		a.serial_no AS "serialNo",
+		a.inv_code AS "invCode",
+		a.inv_name AS "invName",
+		a.batch_no AS "batchNo",
+		a.inv_color AS "invColor",
+		a.inv_size AS "invSize",
+		a.produce_date AS "produceDate",
+		a.valid_date AS "validDate",
+		a.qty AS "nowInQty",
+		a.price AS "price",
+		a.sum_money AS "sumMoney",
+		a.norm_price AS "normPrice",
+		a.cost_price AS "costPrice",
+		a.discount_rate AS "discountRate",
+		a.discount AS "discount",
+		a.tax_rate AS "taxRate",
+		a.tax_money AS "taxMoney",
+		a.grant_no AS "grantNo",
+		a.memo AS "memo",
+		a.rela_syscode AS "relaSyscode",
+		a.rela_serialno AS "relaSerialno",
+		a.is_billing AS "isBilling",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="inoutBillsJoins">
+	inner join mdm_inventory i on a.inv_code =i.inv_code 
+	</sql>
+    
+    <!-- 获取单行数据 -->
+	<select id="get" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+		FROM ass_inout_bills a
+		<include refid="inoutBillsJoins"/>
+		WHERE a.sys_id = #{sysId}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+			,i.inv_unit AS "invUnit",
+			i.PICTURE_PATH AS "picturePath"
+		FROM ass_inout_bills a
+		  inner join ass_inout_bill b on a.sys_code=b.sys_code
+  left join mdm_inventory i
+    on a.inv_code = i.inv_code and b.corp_code=i.corp_code
+
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="invCode != null and invCode != ''">
+				AND a.inv_code = #{invCode}
+			</if>
+			<if test="invColor != null and invColor != ''">
+				AND a.inv_color = #{invColor}
+			</if>
+			<if test="sysCode != null and sysCode != ''">
+				AND a.sys_code = #{sysCode}
+			</if>
+			<if test="relaSyscode != null and relaSyscode != ''">
+				AND a.rela_syscode = #{relaSyscode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+		FROM ass_inout_bills a
+		<include refid="inoutBillsJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_inout_bills(
+			sys_id,
+			sys_code,
+			serial_no,
+			inv_code,
+			inv_name,
+			batch_no,
+			inv_color,
+			inv_size,
+			produce_date,
+			valid_date,
+			qty,
+			price,
+			sum_money,
+			norm_price,
+			cost_price,
+			discount_rate,
+			discount,
+			tax_rate,
+			tax_money,
+			grant_no,
+			memo,
+			rela_syscode,
+			rela_serialno,
+			is_billing,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{sysId},
+			#{sysCode},
+			#{serialNo},
+			#{invCode},
+			#{invName},
+			#{batchNo},
+			#{invColor},
+			#{invSize},
+			#{produceDate},
+			#{validDate},
+			#{nowInQty},
+			#{price},
+			#{sumMoney},
+			#{normPrice},
+			#{costPrice},
+			#{discountRate},
+			#{discount},
+			#{taxRate},
+			#{taxMoney},
+			#{grantNo},
+			#{memo},
+			#{relaSyscode},
+			#{relaSerialno},
+			#{isBilling},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_inout_bills SET 	
+			sys_code = #{sysCode},
+			serial_no = #{serialNo},
+			inv_code = #{invCode},
+			inv_name = #{invName},
+			batch_no = #{batchNo},
+			inv_color = #{invColor},
+			inv_size = #{invSize},
+			produce_date = #{produceDate},
+			valid_date = #{validDate},
+			qty = #{nowInQty},
+			price = #{price},
+			sum_money = #{sumMoney},
+			norm_price = #{normPrice},
+			cost_price = #{costPrice},
+			discount_rate = #{discountRate},
+			discount = #{discount},
+			tax_rate = #{taxRate},
+			tax_money = #{taxMoney},
+			grant_no = #{grantNo},
+			memo = #{memo},
+			rela_syscode = #{relaSyscode},
+			rela_serialno = #{relaSerialno},
+			is_billing = #{isBilling},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE sys_id = #{sysId}
+	</update>
+	
+	<delete id="delete">
+		<if test="dbName == 'oracle'">
+			 delete ass_inout_bills
+			 WHERE sys_code = #{sysCode}
+		 </if>
+		 <if test="dbName == 'mysql'">
+		 	delete from ass_inout_bills
+			WHERE sys_code = #{sysCode}
+		 </if>
+	</delete>
+	<delete id="deleteDtl">
+		<if test="dbName == 'oracle'">
+			delete ass_inout_bills
+			WHERE sys_id = #{sysId}
+		 </if>
+		 <if test="dbName == 'mysql'">
+		 	delete from ass_inout_bills
+			WHERE sys_id = #{sysId}
+		 </if>
+	</delete>
+	
+	
+	
+	<!-- 查询数据列表 -->
+	<select id="findDetailList" resultType="InoutBills">
+		SELECT 
+			a.sys_id AS "sysId",
+			a.sys_code AS "sysCode",
+			a.serial_no AS "serialNo",
+			a.inv_code AS "invCode",
+			a.inv_name AS "invName",
+			a.batch_no AS "batchNo",
+			a.inv_color AS "invColor",
+			a.inv_size AS "invSize",
+			a.produce_date AS "produceDate",
+			a.valid_date AS "validDate",
+			a.qty AS "qty",
+			a.price AS "price",
+			a.sum_money AS "sumMoney",
+			a.norm_price AS "normPrice",
+			a.cost_price AS "costPrice", 
+			a.discount_rate AS "discountRate",
+			a.discount AS "discount",
+			a.tax_rate AS "taxRate",
+			a.tax_money AS "taxMoney",
+			a.grant_no AS "grantNo",
+			a.create_by AS "createBy.userCode",
+			a.create_date AS "createDate",
+			a.update_by AS "updateBy.userCode",
+			a.update_date AS "updateDate",
+			
+			i.inv_unit AS "invUnit",
+			i.invstd AS "invstd",
+			 
+			b.bill_code AS "billCode",
+			b.company_code AS "companyCode",
+			b.company_name AS "companyName",
+			b.dept_code AS "deptCode",
+			b.dept_name AS "deptName",
+			b.btype_code AS "btypeCode",
+			b.btype_name AS "btypeName",
+			b.order_date AS "orderDate",
+			b.ot_code AS "otCode",
+            b.ot_name AS "otName",
+            b.psn_code AS "psnCode",
+			b.psn_name AS "psnName",
+			b.ps_code AS "psCode",
+			b.ps_name AS "psName",
+			b.wh_code AS "whCode",
+			b.wh_name AS "whName",
+			b.INSPECTOR_NAME AS "inspectorName",
+			b.addr AS "addr",
+			b.memo AS "memo",
+			b.shs_code AS "shsCode",
+			b.shs_name AS "shsName",
+			b.WAY_BILLCODE AS "wayBillcode",
+			b.approval AS "approval",
+			b.billsort_code AS "billsortCode",
+			b.approval_name AS "approvalName",
+			b.custorder_code AS "custorderCode",
+			b.approval_status AS "approvalStatus",
+			DATE_FORMAT(b.DELIVERY_DATE,'%Y-%m-%d') AS "deliveryDate",
+			c.BTYPE_NAME AS "btypeName1",
+			c.CONTACT_ADDRESS AS "contactAddress1",
+			c.LINKMAN AS "linkMan1",
+			c.LINKMAN_TEL AS "linkManTel1",
+			c.REMARKS AS "remarks1"
+<!-- 			d.ZF_DEST_NAME AS "zfdn", -->
+<!-- 			d.CENTER_CODE AS "centerCode", -->
+<!-- 			d.REGION_NAME     AS "regionName" -->
+		FROM ass_inout_bills a
+		inner join mdm_inventory i on a.inv_code =i.inv_code 
+		left join ass_inout_bill b on b.sys_code =a.sys_code
+		left join mdm_btype_info c on b.btype_code =c.btype_code
+<!-- 		left join micac_config_company d on b.company_code =d.company_code -->
+		<where>
+			 b.company_code in
+			(
+			    select t.ctrl_data from sys_user_data_scope t
+				where t.ctrl_type='SYS_COMPANY' and t.user_code=#{currentUser.userCode}  
+			)  and a.status='0'
+			<!-- and b.dept_code in
+			(
+			    select t.ctrl_data from sys_user_data_scope t
+				where t.ctrl_type='SYS_OFFICE' and t.user_code=#{currentUser.userCode}  
+			) -->
+			<!-- 更改单号查询位模糊查询 2018/5/24 yuhuiliang add-->
+			<if test="billCode !=null and billCode !=''">
+				AND b.bill_code like
+							<if test="dbName == 'oracle'">'%'||#{billCode}||'%'</if>
+							<if test="dbName == 'mssql'">'%'+#{billCode}+'%'</if>
+							<if test="dbName == 'mysql'">concat('%',#{billCode},'%')</if>
+			</if>
+	 		<!-- <if test="billCode != null and billCode != ''">
+				AND b.bill_code = #{billCode}
+			</if> -->
+			<if test="companyCode != null and companyCode != ''">
+				AND b.company_code = #{companyCode}
+			</if>
+			<if test="beginDate !=null and beginDate !=''">
+				AND b.order_date<![CDATA[>=]]>#{beginDate}
+			</if>
+			<if test="endDate !=null and endDate !=''">
+				AND b.order_date<![CDATA[<=]]><if test="dbName == 'oracle'">#{endDate}+1</if><if test="dbName == 'mysql'">date_sub(#{endDate},interval -1 day)</if>
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+				AND b.dept_code = #{deptCode}
+			</if>
+			<if test="btypeCode != null and btypeCode != ''">
+				AND b.btype_code = #{btypeCode}
+			</if>
+			<if test="approvalStatus != null and approvalStatus != ''">
+				AND b.approval_status = #{approvalStatus}
+			</if>
+			<if test="custorderCode !=null and custorderCode !=''">
+				AND b.custorder_code like
+							<if test="dbName == 'oracle'">'%'||#{custorderCode}||'%'</if>
+							<if test="dbName == 'mssql'">'%'+#{custorderCode}+'%'</if>
+							<if test="dbName == 'mysql'">concat('%',#{custorderCode},'%')</if>
+			</if>
+			<if test="billsortCode != null and billsortCode != ''">
+				AND b.billsort_code = #{billsortCode}
+			</if>
+			<if test="whCode != null and whCode != ''">
+				AND b.wh_code = #{whCode}
+			</if>
+			<if test="otCode != null and otCode != ''">
+				AND b.ot_code = #{otCode}
+			</if>
+			<if test="invCode != null and invCode != ''">
+				AND a.inv_code like
+							<if test="dbName == 'oracle'">'%'||#{invCode}||'%'</if>
+							<if test="dbName == 'mssql'">'%'+#{invCode}+'%'</if>
+							<if test="dbName == 'mysql'">concat('%',#{invCode},'%')</if>
+			</if>
+	
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 确认可用库存数量销售单 -->
+	<select id="findQtyList" resultType="InoutBills">
+		SELECT sum(a.qty) as "qty",
+      b.company_code as "companyCode",
+      b.wh_code as "whCode",
+      b.corp_code as "corpCode",
+      a.inv_code as "invCode"
+	  FROM ass_lade_bills a
+	  inner join ass_lade_bill b
+	    on a.sys_code = b.sys_code
+		<where>
+	        a.status != #{STATUS_DELETE}
+			<if test="approvalStatus != null and approvalStatus != ''">
+				AND b.approval_status = #{approvalStatus}
+			</if>
+			<if test="sysCode != null and sysCode != ''">
+				AND a.sys_code = #{sysCode}
+			</if>
+	
+		</where>
+		 group by a.inv_code,b.company_code,b.wh_code,b.corp_code
+	</select>
+		<!-- 确认可用库存数量调拨单 -->
+	<select id="findDBQtyList" resultType="InoutBills">
+		SELECT sum(a.qty) as "qty",
+      b.company_code_from as "companyCode",
+      b.wh_code_from as "whCode",
+      b.corp_code as "corpCode",
+      a.inv_code as "invCode"
+	  FROM ass_transfer_bills a
+	  inner join ass_transfer_bill b
+	    on a.sys_code = b.sys_code
+		<where>
+	        a.status != #{STATUS_DELETE}
+			<if test="approvalStatus != null and approvalStatus != ''">
+				AND b.approval_status = #{approvalStatus}
+			</if>
+			<if test="sysCode != null and sysCode != ''">
+				AND a.sys_code = #{sysCode}
+			</if>
+	
+		</where>
+		 group by a.inv_code,b.company_code_from,b.wh_code_from,b.corp_code
+	</select>
+	<select id="sumDetailList" resultType="InoutBills">
+		SELECT 
+			
+			SUM(a.qty) AS "sumQty",
+		
+			SUM(a.sum_money) AS "sSumMoney"
+			
+		FROM ass_inout_bills a
+		inner join mdm_inventory i on a.inv_code =i.inv_code 
+		left join ass_inout_bill b on b.sys_code =a.sys_code
+		
+		<where>
+	 					 b.company_code in
+			(
+			    select t.ctrl_data from sys_user_data_scope t
+				where t.ctrl_type='SYS_COMPANY' and t.user_code=#{currentUser.userCode}  
+			)
+			<!-- and b.dept_code in -->
+			<!--( -->
+			<!--    select t.ctrl_data from sys_user_data_scope t -->
+			<!--	where t.ctrl_type='SYS_OFFICE' and t.user_code=#{currentUser.userCode}   -->
+			<!--)  --> and a.status='0'
+			<!-- 更改单号查询位模糊查询 2018/5/24 yuhuiliang add-->
+			<if test="billCode !=null and billCode !=''">
+				AND b.bill_code like
+							<if test="dbName == 'oracle'">'%'||#{billCode}||'%'</if>
+							<if test="dbName == 'mssql'">'%'+#{billCode}+'%'</if>
+							<if test="dbName == 'mysql'">concat('%',#{billCode},'%')</if>
+			</if>
+	 		<!-- <if test="billCode != null and billCode != ''">
+				AND b.bill_code = #{billCode}
+			</if> -->
+			<if test="companyCode != null and companyCode != ''">
+				AND b.company_code = #{companyCode}
+			</if>
+			<if test="beginDate !=null and beginDate !=''">
+				AND b.order_date<![CDATA[>=]]>#{beginDate}
+			</if>
+			<if test="endDate !=null and endDate !=''">
+				AND b.order_date<![CDATA[<=]]><if test="dbName == 'oracle'">#{endDate}+1</if><if test="dbName == 'mysql'">date_sub(#{endDate},interval -1 day)</if>
+			</if>
+			<if test="deptCode != null and deptCode != ''">
+				AND b.dept_code = #{deptCode}
+			</if>
+			<if test="btypeCode != null and btypeCode != ''">
+				AND b.btype_code = #{btypeCode}
+			</if>
+			<if test="approvalStatus != null and approvalStatus != ''">
+				AND b.approval_status = #{approvalStatus}
+			</if>
+			<if test="custorderCode !=null and custorderCode !=''">
+				AND b.custorder_code like
+							<if test="dbName == 'oracle'">'%'||#{custorderCode}||'%'</if>
+							<if test="dbName == 'mssql'">'%'+#{custorderCode}+'%'</if>
+							<if test="dbName == 'mysql'">concat('%',#{custorderCode},'%')</if>
+			</if>
+			<if test="billsortCode != null and billsortCode != ''">
+				AND b.billsort_code = #{billsortCode}
+			</if>
+			<if test="whCode != null and whCode != ''">
+				AND b.wh_code = #{whCode}
+			</if>
+			<if test="otCode != null and otCode != ''">
+				AND b.ot_code = #{otCode}
+			</if>
+			<if test="invCode != null and invCode != ''">
+				AND a.inv_code like
+							<if test="dbName == 'oracle'">'%'||#{invCode}||'%'</if>
+							<if test="dbName == 'mssql'">'%'+#{invCode}+'%'</if>
+							<if test="dbName == 'mysql'">concat('%',#{invCode},'%')</if>
+			</if>
+			
+		</where>
+		
+	</select>
+	
+	<select id="findinvList" resultType="InoutBills">
+		SELECT 
+			a.sys_code AS "sysCode",
+			a.serial_no AS "serialNo",
+			t.inv_code AS "invCode",
+       		t.inv_name AS "invName",
+      		 t.qty AS "nowInQty",
+			t.price AS "ladePrice",
+			t.sum_money AS"ladeSumMoney",
+			t.norm_price AS "ladeNormPrice",
+			t.REBATE_MONEY AS "rebateMoney"
+		FROM ass_inout_bills a
+		inner join ass_lade_bills t on a.rela_syscode=t.sys_code and a.rela_serialno=t.serial_no
+		WHERE a.sys_code in (${queryCodes}) 
+	</select>
+	
+	<select id="getinvList" resultType="InoutBills">
+		SELECT 
+			a.sys_code AS "sysCode",
+			a.serial_no AS "serialNo",
+			t.inv_code AS "invCode",
+       		t.inv_name AS "invName",
+      		 t.qty AS "nowInQty",
+			t.price AS "ladePrice",
+			t.sum_money AS"ladeSumMoney",
+			t.norm_price AS "ladeNormPrice"
+		FROM ass_inout_bills a
+		inner join ass_order_bills t on a.rela_syscode=t.sys_code and a.rela_serialno=t.serial_no
+		WHERE a.sys_code in (${queryCodes}) 
+	</select>
+	
+	
+	
+	<select id="checkInvalid" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+		FROM ass_inout_bills a
+		WHERE a.rela_syscode = #{relaSyscode}
+	</select>
+	
+	
+	
+	<select id="getOne" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+		FROM ass_inout_bills a
+		WHERE a.sys_id = #{sysId}
+	</select>
+	<!--获取单条数据  -->
+	<select id="getInoutbySysCode" resultType="InoutBills">
+			select a.sys_code as "sysCode",
+			   b.sys_id as "sysId",
+		       b.inv_code as "invCode",
+		       b.inv_name as "invName",
+		       b.serial_no as "serialNo",
+		       b.qty as "qty",
+		       b.price as "price",
+		       (case
+		         when c.qty is null then
+		          0
+		         else
+		          c.qty
+		       end) as "inQty",
+		       i.inv_unit as "invUnit"
+		  from ass_inout_bill a
+		  left join ass_inout_bills b
+		    on a.sys_code = b.sys_code
+		  left join (select t.rela_syscode, t.rela_serialno, sum(t.qty) as qty
+		               from ass_inout_bills t where t.status = '0'
+		              group by t.rela_syscode, t.rela_serialno) c
+		    on b.sys_code = c.rela_syscode
+		   and b.serial_no = c.rela_serialno
+		  inner join mdm_inventory i on b.inv_code =i.inv_code  
+			
+			<where>
+			<if test="serialNo != null and serialNo != ''">
+			 b.serial_no = #{serialNo} 
+			</if>
+			<if test="global.useCorpModel">
+		   	   AND a.corp_code = #{corpCode}
+  		    </if>
+			<if test="sysCode != null and sysCode != ''">
+				AND a.sys_code = #{sysCode}
+			</if>
+			</where>
+			
+	</select>
+</mapper>

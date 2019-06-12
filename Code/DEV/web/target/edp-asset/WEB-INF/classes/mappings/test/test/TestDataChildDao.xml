@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.test.dao.TestDataChildDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="testDataChildColumns">
+		a.id AS "id",
+		a.test_data_main_id AS "testDataMain.id",
+		a.name AS "name",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="testDataChildJoins">
+<!-- 		LEFT JOIN test_data_main b ON b.id = a.test_data_main_id -->
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="TestDataChild">
+		SELECT 
+			<include refid="testDataChildColumns"/>
+		FROM test_data_child a
+		<include refid="testDataChildJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="TestDataChild">
+		SELECT 
+			<include refid="testDataChildColumns"/>
+		FROM test_data_child a
+		<include refid="testDataChildJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="testDataMain != null and testDataMain.id != null and testDataMain.id != ''">
+				AND a.test_data_main_id = #{testDataMain.id}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="TestDataChild">
+		SELECT 
+			<include refid="testDataChildColumns"/>
+		FROM test_data_child a
+		<include refid="testDataChildJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO test_data_child(
+			id,
+			test_data_main_id,
+			name,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{testDataMain.id},
+			#{name},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE test_data_child SET 	
+			test_data_main_id = #{testDataMain.id},
+			name = #{name},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE test_data_child SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		<choose>
+			<when test="id != null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE test_data_main_id = #{testDataMain.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>

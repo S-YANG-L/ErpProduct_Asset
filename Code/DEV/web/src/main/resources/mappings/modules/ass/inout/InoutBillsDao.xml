@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.inout.dao.InoutBillsDao">
+    
+    <!-- 输出字段 列 -->
+	<sql id="inoutBillsColumns">
+		a.sys_id AS "sysId",
+		a.sys_code AS "sysCode",
+		a.serial_no AS "serialNo",
+		a.inv_code AS "invCode",
+		a.inv_name AS "invName",
+		a.batch_no AS "batchNo",
+		a.inv_color AS "invColor",
+		a.inv_size AS "invSize",
+		a.produce_date AS "produceDate",
+		a.valid_date AS "validDate",
+		a.qty AS "qty",
+		a.price AS "price",
+		a.sum_money AS "sumMoney",
+		a.norm_price AS "normPrice",
+		a.cost_price AS "costPrice",
+		a.discount_rate AS "discountRate",
+		a.discount AS "discount",
+		a.tax_rate AS "taxRate",
+		a.tax_money AS "taxMoney",
+		a.grant_no AS "grantNo",
+		a.memo AS "memo",
+		a.rela_syscode AS "relaSyscode",
+		a.rela_serialno AS "relaSerialno",
+		a.is_billing AS "isBilling",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.articles_name AS "articlesName",
+		a.articles_code AS "articleCode",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit	AS "unit",
+		a.in_initial_qty AS "inInitialQty",
+		a.in_initial_price AS "inInitialPrice",
+		a.in_initial_money AS "inInitialMoney"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="inoutBillsJoins">
+	inner join mdm_inventory i on a.inv_code =i.inv_code 
+	</sql>
+    
+    <!-- 获取单行数据 -->
+	<select id="get" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+		FROM ass_inout_bills a
+		<include refid="inoutBillsJoins"/>
+		WHERE a.sys_id = #{sysId}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="invCode != null and invCode != ''">
+				AND a.inv_code = #{invCode}
+			</if>
+			<if test="invColor != null and invColor != ''">
+				AND a.inv_color = #{invColor}
+			</if>
+			<if test="sysCode != null and sysCode != ''">
+				AND a.sys_code = #{sysCode}
+			</if>
+			<if test="relaSyscode != null and relaSyscode != ''">
+				AND a.rela_syscode = #{relaSyscode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="InoutBills">
+		SELECT 
+			<include refid="inoutBillsColumns"/>
+		FROM ass_inout_bills a
+		<include refid="inoutBillsJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_inout_bills(
+			sys_id,
+			sys_code,
+			serial_no,
+			inv_code,
+			inv_name,
+			batch_no,
+			inv_color,
+			inv_size,
+			produce_date,
+			valid_date,
+			qty,
+			price,
+			sum_money,
+			norm_price,
+			cost_price,
+			discount_rate,
+			discount,
+			tax_rate,
+			tax_money,
+			grant_no,
+			memo,
+			rela_syscode,
+			rela_serialno,
+			is_billing,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+			sort_code,
+			sort_name,
+			articles_name,
+			articles_code,
+			brand,
+			version,
+			unit,
+			in_initial_qty,
+			in_initial_price,
+			in_initial_money
+		) VALUES (
+			#{sysId},
+			#{sysCode},
+			#{serialNo},
+			#{invCode},
+			#{invName},
+			#{batchNo},
+			#{invColor},
+			#{invSize},
+			#{produceDate},
+			#{validDate},
+			#{qty},
+			#{price},
+			#{sumMoney},
+			#{normPrice},
+			#{costPrice},
+			#{discountRate},
+			#{discount},
+			#{taxRate},
+			#{taxMoney},
+			#{grantNo},
+			#{memo},
+			#{relaSyscode},
+			#{relaSerialno},
+			#{isBilling},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status},
+			#{sortCode},
+			#{sortName},
+			#{articlesName},
+			#{articleCode},
+			#{brand},
+			#{version},
+			#{unit},
+			#{inInitialQty},
+			#{inInitialPrice},
+			#{inInitialMoney}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_inout_bills SET 	
+			sys_code = #{sysCode},
+			serial_no = #{serialNo},
+			inv_code = #{invCode},
+			inv_name = #{invName},
+			batch_no = #{batchNo},
+			inv_color = #{invColor},
+			inv_size = #{invSize},
+			produce_date = #{produceDate},
+			valid_date = #{validDate},
+			qty = #{qty},
+			price = #{price},
+			sum_money = #{sumMoney},
+			norm_price = #{normPrice},
+			cost_price = #{costPrice},
+			discount_rate = #{discountRate},
+			discount = #{discount},
+			tax_rate = #{taxRate},
+			tax_money = #{taxMoney},
+			grant_no = #{grantNo},
+			memo = #{memo},
+			rela_syscode = #{relaSyscode},
+			rela_serialno = #{relaSerialno},
+			is_billing = #{isBilling},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			articles_name = #{articlesName},
+			articles_code = #{articleCode},
+			brand = #{brand},
+			version = #{version},
+			unit = #{unit},
+			in_initial_qty= #{iInitialQty},
+			in_initial_price= #{inInitialPrice},
+			in_initial_money= #{inInitialMoney}
+		WHERE sys_id = #{sysId}
+	</update>
+	<delete id="delete">
+		<if test="dbName == 'oracle'">
+			 delete ass_inout_bills
+			 WHERE sys_code = #{sysCode}
+		 </if>
+		 <if test="dbName == 'mysql'">
+		 	delete from ass_inout_bills
+			WHERE sys_code = #{sysCode}
+		 </if>
+	</delete>
+    <!-- 查询数据列表 -->
+    <select id="findInoutBillsDtl" resultType="InoutBills">
+        SELECT
+        <include refid="inoutBillsColumns"/>
+        FROM ass_inout_bills a
+        <where>
+            a.status != #{STATUS_DELETE}
+                AND a.sys_code = #{sysCode}
+            <if test="grantNo != null and grantNo != ''">
+                AND a.grant_no = #{grantNo}
+            </if>
+
+        </where>
+    </select>
+</mapper>

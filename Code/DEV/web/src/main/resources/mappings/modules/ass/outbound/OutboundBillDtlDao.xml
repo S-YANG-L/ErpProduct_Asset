@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.outbound.dao.OutboundBillDtlDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="outboundBillDtlColumns">
+		a.sys_id AS "sysId",
+		a.sys_code AS "sysCode",
+		a.bill_code AS "billCode",
+		a.outbound_code AS "outboundCode",
+		a.inout_order AS "inoutOrder",
+		a.order_date AS "orderDate",
+		a.psn_code AS "psnCode",
+		a.outbound_number AS "outboundNumber",
+		a.psn_name AS "psnName",
+		a.articles_name AS "articlesName",
+		a.articles_code AS "articlesCode",
+		a.wh_code AS "whCode",
+		a.wh_name AS "whName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.qty AS "qty",
+		a.price AS "price",
+		a.sum_money AS "sumMoney",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.userCode",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.userCode",
+		a.status AS "status",
+		a.remarks AS "remarks",
+		o20.office_name AS "office.officeName",
+		a.out_initial_qty AS "outInitialQty",
+		a.out_initial_price AS "outInitialPrice",
+		a.out_initial_money AS "outInitialMoney"
+	</sql>
+
+	
+	<!-- 输出字段关联表 -->
+	<sql id="outboundBillDtlJoins">
+<!-- 		LEFT JOIN ass_outbound_bill b ON b.id = a.sys_code -->
+		LEFT JOIN sys_office o20 ON o20.office_code = a.office_code
+	</sql>
+	
+	<!-- 获取入库子表数据 -->
+    <select id="findoutboundCode" resultType="OutboundBillDtl">
+        SELECT
+        <include refid="outboundBillDtlColumns"/>
+        FROM ass_outbound_bill_dtl a
+        <include refid="outboundBillDtlJoins"/>
+        <where>
+        	a.status != #{STATUS_DELETE}	AND a.sys_code = #{sysCode}
+        </where>
+    </select>
+
+
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="OutboundBillDtl">
+		SELECT 
+			<include refid="outboundBillDtlColumns"/>
+		FROM ass_outbound_bill_dtl a
+		<include refid="outboundBillDtlJoins"/>
+		WHERE a.sys_id = #{sysId}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="OutboundBillDtl">
+		SELECT 
+			<include refid="outboundBillDtlColumns"/>
+		FROM ass_outbound_bill_dtl a
+		<include refid="outboundBillDtlJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="sysCode != null and sysCode != ''">
+				AND a.sys_code = #{sysCode}
+			</if>
+			<if test="inoutOrder != null and inoutOrder != ''">
+				AND a.inout_order = #{inoutOrder}
+			</if>
+			<if test="orderDate != null ">
+				AND a.order_date = #{orderDate}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="OutboundBillDtl">
+		SELECT 
+			<include refid="outboundBillDtlColumns"/>
+		FROM ass_outbound_bill_dtl a
+		<include refid="outboundBillDtlJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_outbound_bill_dtl(
+			sys_id,
+			sys_code,
+			bill_code,
+			outbound_code,
+			inout_order,
+			order_date,
+			psn_code,
+			outbound_number,
+			psn_name,
+			articles_name,
+			articles_code,
+			wh_code,
+			wh_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			qty,
+			price,
+			sum_money,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			status,
+			remarks,
+			out_initial_qty,
+			out_initial_price,
+			out_initial_money
+		) VALUES (
+			#{sysId},
+			#{sysCode},
+			#{billCode},
+			#{outboundCode},
+			#{inoutOrder},
+			#{orderDate},
+			#{psnCode},
+			#{outboundNumber},
+			#{psnName},
+			#{articlesName},
+			#{articlesCode},
+			#{whCode},
+			#{whName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{qty},
+			#{price},
+			#{sumMoney},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{createDate},
+			#{createBy.userCode},
+			#{updateDate},
+			#{updateBy.userCode},
+			#{status},
+			#{remarks},
+			#{outInitialQty},
+			#{outInitialPrice},
+			#{outInitialMoney}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_outbound_bill_dtl SET 	
+			sys_code = #{sysCode},
+			bill_code = #{billCode},
+			outbound_code = #{outboundCode},
+			inout_order = #{inoutOrder},
+			order_date = #{orderDate},
+			psn_code = #{psnCode},
+			outbound_number = #{outboundNumber},
+			psn_name = #{psnName},
+			articles_name = #{articlesName},
+			articles_code = #{articlesCode},
+			wh_code = #{whCode},
+		    wh_name  = #{whName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			qty = #{qty},
+			price = #{price},
+			sum_money = #{sumMoney},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			update_date = #{updateDate},
+			update_by = #{updateBy.userCode},
+			remarks = #{remarks},
+			out_initial_qty = #{outInitialQty},
+			out_initial_price = #{outInitialPrice},
+			out_initial_money = #{outInitialMoney}
+		WHERE sys_id = #{sysId}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_outbound_bill_dtl SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		<choose>
+			<when test="sysId != null and sysId != ''">
+				WHERE sys_id = #{sysId}
+			</when>
+			<otherwise>
+				WHERE sys_code = #{sysCode}
+			</otherwise>
+		</choose>
+	</update>	
+
+</mapper>

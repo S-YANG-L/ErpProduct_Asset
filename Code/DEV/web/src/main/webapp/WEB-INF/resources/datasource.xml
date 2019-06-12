@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DatasourceManager xmlVersion="20151125" releaseVersion="8.0.0">
+<ConnectionMap>
+    <Connection name="Asset" class="com.fr.data.impl.JDBCDatabaseConnection">
+        <DatabaseAttr/>
+        <JDBCDatabaseAttr url="jdbc:mysql://219.147.28.114:33061/erp_ass_edp" driver="com.mysql.jdbc.Driver" user="root" password="___" encryptPassword="true">
+            <DBCPAttr/>
+        </JDBCDatabaseAttr>
+    </Connection>
+	<Connection name="judp" class="com.fr.data.impl.JDBCDatabaseConnection">
+		<DatabaseAttr/>
+		<JDBCDatabaseAttr url="jdbc:oracle:thin:@127.0.0.1:1521:orcl" driver="oracle.jdbc.driver.OracleDriver" 
+			user="judp" password="___0079003b006e007f" encryptPassword="true">
+			<DBCPAttr/>
+		</JDBCDatabaseAttr>
+	</Connection>
+
+</ConnectionMap>
+</DatasourceManager>

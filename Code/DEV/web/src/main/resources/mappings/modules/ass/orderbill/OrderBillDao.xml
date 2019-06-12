@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.orderbill.dao.OrderBillDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="orderBillColumns">
+		a.sys_code AS "sysCode",
+		a.bill_code AS "billCode",
+		a.cg_code AS "cgCode",
+		a.buyer_code AS "buyerCode",
+		a.buyer_name AS "buyerName",
+		a.inout_status AS "inoutStatus",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.order_date AS "orderDate",
+		a.billsort_code AS "billsortCode",
+		a.billsort_name AS "billsortName",
+		a.inout_flag AS "inoutFlag",
+		a.btype_code AS "btypeCode",
+		a.btype_name AS "btypeName",
+		a.wh_code AS "whCode",
+		a.wh_name AS "whName",
+		a.delivery_date AS "deliveryDate",
+		a.addr AS "addr",
+		a.tel AS "tel",
+		a.link_man AS "linkMan",
+		a.print_num AS "printNum",
+		a.approval_status AS "approvalStatus",
+		a.approval_date AS "approvalDate",
+		a.approval AS "approval",
+		a.approval_name AS "approvalName",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.project_code AS "projectCode",
+		a.project_name AS "projectName",
+		a.remarks AS "remarks",
+		o9.office_name AS "office.officeName"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="orderBillJoins">
+		LEFT JOIN sys_office o9 ON o9.office_code = a.office_code
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="OrderBill">
+		SELECT 
+			<include refid="orderBillColumns"/>
+		FROM ass_order_bill a
+		<include refid="orderBillJoins"/>
+		WHERE a.sys_code = #{sysCode}
+	</select>
+    <!-- 查询数据列表 -->
+    <select id="selectListData" resultType="OrderBill">
+        SELECT
+        <include refid="orderBillColumns"/>
+        FROM ass_order_bill a
+        <include refid="orderBillJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+
+            <if test="approvalStatus != null and approvalStatus != ''">
+                AND a.approval_status = #{approvalStatus}
+            </if>
+            <if test="inoutStatus != null and inoutStatus != ''">
+                AND a.inout_status = #{inoutStatus}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="OrderBill">
+		SELECT 
+			<include refid="orderBillColumns"/>
+		FROM ass_order_bill a
+		<include refid="orderBillJoins"/>
+		<where>
+            <if test="approvalStatus != null and approvalStatus != ''">
+                AND a.approval_status = #{approvalStatus}
+            </if>
+            <if test="inoutStatus != null and inoutStatus != ''">
+                AND a.inout_status = #{inoutStatus}
+            </if>
+			<if test="buyerName != null and buyerName != ''">
+				AND a.buyer_name = #{buyerName}
+			</if>
+			<if test="companyName != null and companyName != ''">
+				AND a.company_name = #{companyName}
+			</if>
+			<if test="sysCodes != null and sysCodes.length != 0">
+                AND a.sys_code not in
+                <foreach collection="sysCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="OrderBill">
+		SELECT 
+			<include refid="orderBillColumns"/>
+		FROM ass_order_bill a
+		<include refid="orderBillJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_order_bill(
+			sys_code,
+			bill_code,
+			cg_code,
+			buyer_code,
+			buyer_name,
+			inout_status,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			order_date,
+			billsort_code,
+			billsort_name,
+			inout_flag,
+			btype_code,
+			btype_name,
+			wh_code,
+			wh_name,
+			delivery_date,
+			addr,
+			tel,
+			link_man,
+			print_num,
+			approval_status,
+			approval_date,
+			approval,
+			approval_name,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+			project_code,
+			project_name,
+			remarks
+		) VALUES (
+			#{sysCode},
+			#{billCode},
+			#{cgCode},
+			#{buyerCode},
+			#{buyerName},
+			#{inoutStatus},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{orderDate},
+			#{billsortCode},
+			#{billsortName},
+			#{inoutFlag},
+			#{btypeCode},
+			#{btypeName},
+			#{whCode},
+			#{whName},
+			#{deliveryDate},
+			#{addr},
+			#{tel},
+			#{linkMan},
+			#{printNum},
+			#{approvalStatus},
+			#{approvalDate},
+			#{approval},
+			#{approvalName},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status},
+			#{projectCode},
+			#{projectName},
+			#{remarks}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_order_bill SET 	
+			bill_code = #{billCode},
+			cg_code = #{cgCode},
+			buyer_code = #{buyerCode},
+			buyer_name = #{buyerName},
+			inout_status = #{inoutStatus},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			order_date = #{orderDate},
+			billsort_code = #{billsortCode},
+			billsort_name = #{billsortName},
+			inout_flag = #{inoutFlag},
+			btype_code = #{btypeCode},
+			btype_name = #{btypeName},
+			wh_code = #{whCode},
+			wh_name = #{whName},
+			delivery_date = #{deliveryDate},
+			addr = #{addr},
+			tel = #{tel},
+			link_man = #{linkMan},
+			print_num = #{printNum},
+			approval_status = #{approvalStatus},
+			approval_date = #{approvalDate},
+			approval = #{approval},
+			approval_name = #{approvalName},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			project_code = #{projectCode},
+			project_name = #{projectName},
+			remarks = #{remarks}
+		WHERE sys_code = #{sysCode}
+	</update>
+    <!-- 改变采购状态 -->
+    <update id="updateOrderStatus">
+		UPDATE ass_order_bill SET
+		inout_status =1
+		WHERE sys_code = #{sysCode}
+	</update>
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		delete from  ass_order_bill
+		WHERE sys_code = #{sysCode}
+	</update>
+	
+</mapper>

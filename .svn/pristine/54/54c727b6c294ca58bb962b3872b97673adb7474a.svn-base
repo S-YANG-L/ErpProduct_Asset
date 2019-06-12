@@ -1,0 +1,744 @@
+<%@ page contentType="text/html;charset=UTF-8" trimDirectiveWhitespaces="true"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<c:set var="extLibs" value="validate,grid"/>
+<sys:header title="出入库主表管理 - 入库单" extLibs="${extLibs}"/>
+
+
+<div class="header scrolling-header">
+    <div id="nav" class="navbar navbar-default navbar-fixed-top judp-padding" role="navigation">
+        <div class="container judp-container relative-nav-container">
+            <div class="nav navbar-nav navbar-with-inside clearfix navbar-right with-border">
+                <button id="btnSave" type="button" style="margin-left: 10px;"
+							class="btn btn-default color: blue">
+							<i class="fa fa-save" class="#"></i>暂存
+						</button>					
+						<button id="btnIntroduce" type="button" style="margin-left: 10px;"
+							class="btn btn-default color: yellow">
+							<i class="fa fa-pencil-square-o" class="#"></i>引入
+						</button>
+						<button id="approval" type="button"
+							class="btn btn-default color: green">
+							<i class="fa fa-check" class="#"></i>提交
+						</button>
+						<button id="btnDelete" type="button" class="btn btn-danger">
+							<i class="fa fa-reply-all" class="#"></i>删除
+						</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="portlet box ${boxStyleColor} autoHeight">
+    <div class="portlet-body form">
+        <form:form id="inputForm" modelAttribute="inoutBill" action="${ctx}/scm/inout/inoutBill/materialStorageSave" method="post" class="form-horizontal">
+            <div class="form-body">
+               <form:hidden path="sysCode"/>
+				<form:hidden path="isNewRecord"/> 
+				<form:hidden path="approvalStatus"/>
+				<form:hidden path="falgSysCode"/>
+				<form:hidden path="inoutFlag" value="1"/>
+                <table class="table table-bordered">
+                    <tr>
+                        <td class="judp-width-11 judp-table-lable">单号	<span id="aa" style="color:#F00;"> 
+                            <c:choose>  
+							   <c:when  test="${inoutBill.approvalStatus==0}">
+							  	(待确认)
+							   </c:when> 
+							   <c:when  test="${inoutBill.approvalStatus==2}">
+							    (已确认)
+							   </c:when>  
+							</c:choose></td>
+                        <td class="judp-width-22 judp-table-content">
+                            <form:input path="billCode" htmlEscape="false" maxlength="50" class="form-control" readOnly="readOnly"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable"><span class="required starBold">* </span>公司</td>
+                        <td class="judp-width-22 judp-table-content">
+                            <sys:treeselect id="company" name="companyCode"
+									value="${inoutBill.companyCode}"
+									labelName="companyName"
+									labelValue="${inoutBill.companyName}" title="公司" cssClass="form-control required rightBorder"
+									url="/sys/company/treeData" controlSize="sm" allowClear="true"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable"><span class="required starBold">* </span>部门</td>
+                        <td class="judp-width-22 judp-table-content">
+                             <sys:treeselect id="dept" name="deptCode"
+									value="${inoutBill.deptCode}"
+									labelName="deptName"
+									labelValue="${inoutBill.deptName}" title="部门"
+									url="/sys/office/treeData"  allowClear="true" cssClass="form-control required rightBorder"
+									notAllowSelectParent="true" />
+								<span class="help-block">&nbsp;</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="judp-width-11 judp-table-lable"><span class="required starBold">* </span>订单日期</td>
+                        <td class="judp-width-22 judp-table-content">
+                            <input name="orderDate" type="text"
+                                       maxlength="20" class="form-control Wdate required"
+                                       value="<fmt:formatDate value="${inoutBill.orderDate}" pattern="yyyy-MM-dd"/>"
+                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable"><span class="required starBold">* </span>往来单位</td>
+                        <td class="judp-width-22 judp-table-content">
+                             <sys:listselect id="btype" name="btypeCode" value="${inoutBill.btypeCode}" labelName="btypeName" labelValue="${inoutBill.btypeName}"
+									title="往来单位" url="${ctx}/mdm/btypeInfo/listBox" multiple="false" cssClass="form-control required rightBorder"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable"><span class="required starBold">* </span>交货日期</td>
+                        <td class="judp-width-22 judp-table-content">
+                            <input name="startDate" type="text"
+                                       maxlength="20" class="form-control Wdate required"
+                                       value="<fmt:formatDate value="${inoutBill.deliveryDate}" pattern="yyyy-MM-dd"/>"
+                                       onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td class="judp-width-11 judp-table-lable"><span class="required starBold">* </span>仓库名称</td>
+                        <td class="judp-width-22 judp-table-content">
+                            <form:select path="whCode" multiple="false"
+									class="form-control required">
+									<form:options items="${warehouseList}" itemLabel="whName"
+										itemValue="whCode" htmlEscape="false" />
+								</form:select>
+								<form:hidden path="whName"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable">采购类别</td>
+                        <td class="judp-width-22 judp-table-content">
+                              <%-- <form:input path="otCode" htmlEscape="false"  class="form-control hidden"/>
+							<form:input path="inoutFlag" htmlEscape="false"  class="form-control hidden"/>--%> 
+							
+							<form:select path="otCode" multiple="false" 
+									class="form-control required">
+									<form:options items="${rdstyleList}" itemLabel="rdName"
+										itemValue="rdCode" htmlEscape="false" />
+							</form:select>
+							<form:input path="otName" type="hidden"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable">验收员</td>
+                        <td class="judp-width-22 judp-table-content">
+                            <sys:listselect id="inspector" name="inspectorCode"
+									value="${inoutBill.inspector}"
+									labelName="inspectorName"
+									labelValue="${inoutBill.inspectorName}" title="验收员" 
+									url="${ctx}/sys/employee/employeeSelect" multiple="false"
+									cssClass="form-control rightBorder" returnCodeAttr="empCode" returnNameAttr="empName"/>
+                        </td>
+                    </tr>
+                     <tr>
+                        <td class="judp-width-11 judp-table-lable">经办人</td>
+                        <td class="judp-width-22 judp-table-content">
+                            <sys:listselect id="psn" name="psnCode"
+									value="${inoutBill.psnCode}"
+									labelName="psnName"
+									labelValue="${inoutBill.psnName}" title="经办人" 
+									url="${ctx}/sys/employee/employeeSelect" multiple="false"
+									cssClass="form-control rightBorder" returnCodeAttr="empCode" returnNameAttr="empName"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable">运单号</td>
+                        <td class="judp-width-22 judp-table-content">
+                              <form:input path="wayBillcode" htmlEscape="false" maxlength="50" class="form-control"/>
+                        </td>
+                        <td class="judp-width-11 judp-table-lable">描述</td>
+                        <td class="judp-width-22 judp-table-content">
+                           <form:input path="memo" htmlEscape="false" maxlength="50" class="form-control"/>
+                        </td>
+                    </tr>
+                   <tr>
+                        <td colspan="6" class="judp-table-tab-content">
+                            <div id="myTabContent" class="judp-width-100 tab-content">
+                                <div class="tab-pane fade in active" id="home">
+                                    <div class="judp-table-button">
+                                        <a href="#" class="btn judp-btn-gray btn-sm" id="btnAddRow"
+                                           title="增行">增行</a>
+                                        <!-- <a href="#" class="btn judp-btn-gray btn-sm" id="btnDelRow"
+                                           title="其他菜单">其他菜单</a> -->
+                                    </div>
+                                    <div id="divBillDtl" class="hide">
+		                         </div>
+                                    <shiro:hasPermission name="inout:inoutBill:edit">
+				                 <!-- <a href="#" id="btnAddRow" class="btn btn-primary mt10 mb10"><i class="fa fa-plus"></i> 增行</a> -->
+			                       </shiro:hasPermission>
+                                    <table id="dataGrid"></table>
+                                </div>
+                               
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+               
+            </div>
+        </form:form>
+    </div>
+</div>
+<sys:footer extLibs="${extLibs}"/>
+<script src="${ctxStatic}/common/js/pubnew.js" type="text/javascript"></script>
+<script id="assetSortSelect" type="text/template">
+//<!--<div>
+<sys:treeselect id="{{id}}" name="sortCode" value="{{code}}" labelName="sortName" labelValue="{{name}}" 
+		title="资产类别" url="/ass/basic/assetsort/treeDataAll" cssClass="required" allowClear="true"/>
+${"<"}${"script>"}
+function {{id}}TreeselectCallBack(v, h, f) {
+			var id="{{id}}".split("_")[0];
+			if(v == "ok"){
+				sortCodeCallBack(id);
+			}};
+${"<"}${"/script>"}
+</div>//-->
+</script>
+<script type="text/javascript">
+
+
+	$("#inputForm").validate({
+		submitHandler: function(form){
+			ajaxSubmitForm($(form), function(data){
+				if(data.result == Global.TRUE){
+					var actTab = top.$('#tabpanel').tabPanel('getActiveTab');
+					var preTab = top.$('#' + actTab.preTabId + '-frame');
+					if (preTab.length > 0){
+						var contents = preTab.contents();
+						var contentWindow = preTab[0].contentWindow;
+
+			      //contentWindow.page();	
+			      //防止连续新增，点击保存，只会保存一条数据，继续点击，变为修改 
+					$("#isNewRecord").val(false);
+					$("#sysCode").val(data.sysCode);
+					$("#billCode").val(data.billCode);
+					$('#approval').show();
+					$('#btnDelete').show();
+					$('#').hide();
+					$("#approvalStatus").val(data.approvalStatus);
+					$("#btnIntroduce").hide();
+					} 
+					document.getElementById("aa").innerHTML="(待确认)";
+				}
+				//document.getElementById("code").innerHTML="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;单号："+data.billCode;
+				showMessage(data.message);
+			}, "json");
+	    }
+	});
+	// 增行
+	$("#btnAddRow").click(function(){
+		$('#dataGrid').dataGrid('getParam','onSelectRow')('new');
+	});
+	// 保存
+	$("#btnSave").click(function(){	
+		var flag=0;
+		var message="";
+		var dgIds = $("#dataGrid").getDataIDs();
+		for(var i=0;i<dgIds.length;i++){
+			var codes = [];
+			var barCodes = $("#"+dgIds[i]).find("input[name$='barCode']").val();
+			var nowInQty = $("#"+dgIds[i]).find("input[name$='nowInQty']").val();
+			if(undefined != barCodes){
+				codes = barCodes.split(",");
+			}
+			if(codes.length == nowInQty ){
+				flag+=1;
+			}else{
+				message=message+[$("#"+dgIds[i]).find("input[name$='invCode']").val()]+" ";
+			}
+		}
+		//if(flag==dgIds.length){
+			var dg = $('#dataGrid');
+			if (lastSelection){
+				dg.dataGrid('saveRow', lastSelection);
+				dg.dataGrid('restoreRow', lastSelection);
+			}
+			
+			var rows = dg.dataGrid('getRowData');
+			
+			updateListFieldName(dg, 'inoutBillsList', 'sortCode');
+			updateListFieldName(dg, 'inoutBillsList', 'sortName');
+			updateListFieldName(dg, 'inoutBillsList', 'assetName');
+			updateListFieldName(dg, 'inoutBillsList', 'invUnit');
+			updateListFieldName(dg, 'inoutBillsList', 'price');
+			updateListFieldName(dg, 'inoutBillsList', 'nowInQty');
+			updateListFieldName(dg, 'inoutBillsList', 'barCode');
+			updateListFieldName(dg, 'inoutBillsList', 'invCode');
+			updateListFieldName(dg, 'inoutBillsList', 'assetType');
+			// 赋值仓库名称
+			$("#whName").val($("#whCode").select2("data").text); 
+			
+			$("#inputForm").submit();
+	});
+	
+	//提交前更新列表字段名字，以方便后台接受
+	function updateListFieldName(dg, listName, fieldName){
+		dg.find('[name$="'+fieldName+'"]:not(div):not(a)').each(function(key, val){
+			$(this).attr('name',listName + '['+key+'].' + fieldName);
+		});
+	}
+	
+	var dataArr=${fns:toJson(orderBillsList)};
+	if(dataArr==null||dataArr==''){
+		dataArr=[];
+	}
+	var lastSelection;
+
+	$('#dataGrid').dataGrid({
+		// 当前页签编号
+			tabPageId: '${param.tabPageId}',
+			datatype: "local",
+			data: dataArr,
+			shrinkToFit: false,//按百分比自动调整列宽
+			showRownum: true,
+			frozenCols: false, 	// 冻结列，在colModel指定frozen: true
+		 	/* showFooter: true,	// 是否显示底部合计行  */
+			columnModel: [
+				 {header:'资产类别', name:'sortName',  width:180,
+		            	formatter: function(val, obj, row, act){            		
+							return getVal(row, 'sortCode')+'|'+getVal(row, 'sortName');
+						},
+		                editable: true, edittype: "custom", editoptions: {
+		                    custom_element: function(val, editOptions) {
+		                    	var html = [];
+		        				html.push(templateRender(getTemplateData('assetSortSelect'), {
+		        					id: editOptions.id, code: val.split('|')[0], name: val.split('|')[1]}));
+		        				return html.join('');
+		                    }
+		                } 
+		            }, 
+		         {header:'计提类型', name:'assetType', index:'inv_code', width:150, hidden: true,editable: true },   
+		         {header:'商品名称', name:'invCode', index:'inv_code', width:150, hidden: true },   
+				 {header:'资产名称', name:'assetName', index:'asset_name', width:150, editable: true },
+				 {header:'系统编号', name:'sysId', index:'sys_id', width:80,align:"right",hidden:true},
+				 /* {header:'商品编码', name:'invCode', index:'inv_code', width:80,align:"right",formatter: function(val, obj, row, act){
+						var actions = [];				
+						actions.push('<input type="hidden" name="invCode" value="'+val+'" />');
+						actions.push(val);
+						return actions.join('');
+				   }}, 
+				  {header:'商品名称', name:'invName', index:'inv_name', width:150,align:"right",formatter: function(val, obj, row, act){
+						var actions = [];				
+						actions.push('<input type="hidden" name="invName" value="'+val+'" />');
+						actions.push(val);
+						return actions.join('');
+				   }}, 
+				   {header:'商品名称', name:'invName', index:'inv_name',required: true, width:150, editable: true ,
+			        	edittype: "custom",		
+						editoptions:{
+							custom_element: function(value, options){  
+								var html = [];
+								html.push('<input type="text" readonly="true" class="required" style="width: 90%;" value="'+value+'" />');
+								html.push('<a  onclick="selectInvWindow(\''+options.id+'\');"  style="width: 10%;"><i class="fa fa-search "></i></a>');
+								return html.join('');
+						    },   
+						    custom_value:function(elem, operation, value){ 			    	
+						    	if (operation === "set") {
+						    		$(elem).eq(0).val(value);
+			                    }
+			                    if (operation === "get") {
+			                    	return $(elem).eq(0).val();
+			                    }
+						    },
+			                dataEvents: [
+			                    //{type: 'focus',fn: selectInvWindow}
+			                ]
+						}
+			     },*/
+			     {header:'单位', name:'invUnit', index:'inv_unit',width:80,align:'center',editable:true, editoptions:{'class':'form-control required',}},
+			     {header:'价格', name:'price',width:100, align:"right",hidden:false, editable: true, editoptions:{'class':'form-control required number',}}, 
+			     {header:'本次入库数量', name:'nowInQty',width:100, editable: true, align:"right",editoptions:{
+	        		 'class':'number required',
+					 /* dataEvents: [
+	                   {
+	                       type: 'blur',     //blur,focus,change........焦点失去事件
+	                       fn: calcSumMoney  
+	                   }
+				     ] */
+				}},
+			     {header:'行序号', name:'serialNo',  width:100,hidden:true,formatter: function(val, obj, row, act){
+						var actions = [];				
+						actions.push('<input type="hidden" name="serialNo" value="'+val+'" />');
+						actions.push(val);
+						return actions.join('');
+				   }},
+			     {header:'条形码', name:'barCode',  width:100,hidden:false,editable:true},
+			     {header:'操作', name:'actions', width:60,align:'center', fixed:true, sortable:false, formatter: function(val, obj, row, act){
+						var actions = [];//<shiro:hasPermission name="inout:inoutBill:edit">
+						actions.push('<a href="#" onclick="confirmx(\'你确认要删除这条数据吗？\', function(){$(\'#dataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+						if (row.status == Global.STATUS_NORMAL){
+// 							actions.push('<a href="${ctx}/scm/inout/inoutBillsBarcode/form?sysCode='+row.sysCode+'&invCode='+row.invCode+'&invName='+row.invName+'&relaSysid='+row.sysId+'&nowInQty='+row.nowInQty+'&price='+row.price+'" class="btnList" title="条形码"><i class="fa fa-pencil"></i></a>&nbsp;');
+					//		actions.push('<a  onclick="selectWindow($(\'#dataGrid\').dataGrid(\'getRowData\',\''+obj.rowId+'\'));"  style="width: 10%;"><i class="fa fa-search"></i></a>');
+						}//</shiro:hasPermission>
+						return actions.join('');
+					}}
+					
+			],
+			onSelectRow: function(id) {
+				if (id){
+		        	var dg = $('#dataGrid');
+					// 按回车焦点向下获取，到最后一列时，调用此方法新增一行空数据，若不需要新增行，则不需要此代码
+		        	if (id == 'new'){
+		            	var dg = $('#dataGrid');
+		            	dg.dataGrid('addRow', { position: 'last', 
+		            		addRowParams: { keys: true, focusField: true}
+		            	});
+		            }						
+		        }
+			},
+			ajaxSuccess: function(data){ // 加载成功后执行方法
+				if(data!=null && data.total!=0){//判断是否有数据（判断的方法可以跟踪console.log(data)来决定）
+					var dg = $("#dataGrid");
+					var ids = dg.dataGrid('getDataIDs');
+					for (var i = 0; i < ids.length; i++) {
+						dg.dataGrid('editRow', ids[i], {keys:true,focusField:true});					
+					}	
+				}else{//没有数据默认新增一行
+					$('#dataGrid').dataGrid('getParam','onSelectRow')('new');
+					/* var date = new Date().format("yyyy-MM-dd");
+					$("#orderDate").val(date);  */
+				}
+				//新增隐藏确认
+				if(${inoutBill.isNewRecord}){
+					$('#approval').hide();
+					$('#btnDelete').hide();
+// 					$('#cancelApproval').hide();
+				}
+				
+			    //确认通过后不让其保存
+				if($('#approvalStatus').val()=="2"){
+					$('#btnSave').hide();
+					$('#btnDelete').hide();
+// 					$('#cancelApproval').show();
+				}else if($('#approvalStatus').val()=="0"){
+// 					$('#cancelApproval').hide();
+				}
+				/* if(${inoutBill.qtype}=="1"){//编辑状态下
+					$('#btnSave').hide();
+					
+					if($('#approvalStatus').val()=="0"){//未确认
+						$('#approval').show();
+						$('#btnDelete').show();
+// 						$('#cancelApproval').hide();
+						
+					}else if($('#approvalStatus').val()=="2"){//已确认
+						$('#approval').hide();
+						$('#btnDelete').hide();
+// 						$('#cancelApproval').show();
+					}
+				} */
+			} 
+		});
+	
+	
+	function selectWindow(rowData){
+		var sysId=rowData.sysId;
+		var barCode=$("#"+sysId).find("input[name$='barCode']").val();
+		var invCode=$("#"+sysId).find("input[name$='invCode']").val();
+		var invName=$("#"+sysId).find("input[name$='invName']").val();
+		var nowInQty=$("#"+sysId).find("input[name$='nowInQty']").val();
+		var price=$("#"+sysId).find("input[name$='price']").val();
+		var $jBox = getJBox();
+		$jBox.open("iframe:${ctx}/scm/inout/inoutBillsBarcode/form","条形码",$(window).width() - 100, $(window).height() - 100,
+		{
+			ajaxData:{invCode:invCode,invName:invName,relaSysid:sysId,nowInQty:nowInQty,price:price,barCode:barCode},
+	        buttons: {
+	        	"<i class=\"glyphicon glyphicon-ok\"></i>&nbsp;确定":"ok",
+	        	/* "<i class=\"fa fa-eraser\"></i>&nbsp;清除":"clear", */
+	        	'<i class=\'glyphicon glyphicon-remove\'></i>&nbsp;关闭': "close" 
+	        }, 
+	        submit:function(v, h, f){ // v表示所点的按钮的返回值，h表示窗口内容的jQuery对象，f表示窗口内容里的form表单键值
+	        	if(v=="ok"){            		
+	        		var w = h.find("iframe")[0].contentWindow;
+	        		var dataMap = w.getDataMap();
+	        		var codes = [], names = [], units=[];
+	        		$.each(dataMap, function(key, value){
+						codes.push(value.barCode);
+	        		});        		
+	        		var selRow=$("#dataGrid").dataGrid("getSelectRow");
+	        		$("#dataGrid").dataGrid("setRowData",selRow,{barCode:codes});
+	        	}
+	        }, 
+	        loaded:function(h){
+	        	$(".jbox-content", $jBox.getBox()).css("overflow-y","hidden");
+			}
+		});	
+	}
+	
+	// 往来单位回调
+	function btypeCallbackForMap(dataMap, v, h, f){
+		var codes = [], names = [];
+	$.each(dataMap, function(key, value){
+		codes.push(value.btypeCode);
+		names.push(value.btypeName);
+	});
+	$('#btypeCode').val(codes.join(','));
+	$('#btypeName').val(names.join(','));
+	}
+	
+	
+	//确认按钮
+	$("#approval").click(function(){
+			var sysCode=$("#sysCode").val();
+			var approvalStatus=$("#approvalStatus").val();
+				var url="${ctx}/scm/inout/inoutBill/approval?sysCode="+sysCode;
+				if(approvalStatus=="2"){
+					showTip("该单已确认");
+					return;	
+				}else{
+					jBox.confirm('你真的确定要确认吗？', '提示', function (v, h, f) {
+			            if (v == 'ok') {
+						$.post(url,function(data){
+							if(data.result == Global.TRUE){
+								/* closeCurrentTabPage('${param.parentTabPageId}', function(contents, contentWindow){
+									contentWindow.page();
+									showTip(data.message);
+								}); */
+								var actTab = top.$('#tabpanel').tabPanel('getActiveTab');
+								var preTab = top.$('#' + actTab.preTabId + '-frame');
+								if (preTab.length > 0){
+									var contents = preTab.contents();
+									var contentWindow = preTab[0].contentWindow;
+									
+									 try{
+										 contentWindow.page();	
+										}catch(e){
+											console.log("没有上一个页面");
+										} 
+								showTip(data.message);
+								$("#approvalStatus").val(data.approvalStatus);
+// 								$('#cancelApproval').show();
+								$('#approval').hide();
+								$('#btnDelete').hide();
+								$('#btnSave').hide();
+								}
+								document.getElementById("aa").innerHTML="(已确认)";
+								//location.reload();
+							}
+						},"json");
+					return true; 
+			            }
+					});
+				}
+	});
+	
+	//删除按钮
+	$("#btnDelete").click(function(){
+			var sysCode=$("#sysCode").val();
+			var falgSysCode = $("#falgSysCode").val();
+			var approvalStatus=$("#approvalStatus").val();
+				var url="${ctx}/scm/inout/inoutBill/btnDelete?sysCode="+sysCode+"&falgSysCode="+falgSysCode;
+				if(approvalStatus=="2"){
+					showTip("无法删除已确认如可单");
+					return;	
+				}else{
+					jBox.confirm('你真的确定要删除吗?', '提示', function (v, h, f) {
+			            if (v == 'ok') {  
+						$.post(url,function(data){
+							if(data.result == Global.TRUE){
+								 closeCurrentTabPage('${param.parentTabPageId}', function(contents, contentWindow){
+									contentWindow.page();
+									showTip(data.message);
+								});
+							}
+						},"json");
+						return true; 
+					
+					   }
+					});
+				}
+	});
+	//取消确认
+	$("#cancelApproval").click(function(){
+			var sysCode=$("#sysCode").val();
+			var approvalStatus=$("#approvalStatus").val();
+				var url="${ctx}/scm/inout/inoutBill/cancelApproval?sysCode="+sysCode;
+				if(approvalStatus=="0"){
+					showTip("该订单已取消确认");
+					return;	
+				}else{
+					jBox.confirm('你真的确定要取消确认吗？', '提示', function (v, h, f) {
+			            if (v == 'ok') {  
+						 $.post(url,function(data){
+							if(data.result == Global.TRUE){
+								var actTab = top.$('#tabpanel').tabPanel('getActiveTab');
+								var preTab = top.$('#' + actTab.preTabId + '-frame');
+								if (preTab.length > 0){
+									var contents = preTab.contents();
+									var contentWindow = preTab[0].contentWindow;
+									 try{
+										 contentWindow.page();	
+										}catch(e){
+											console.log("没有上一个页面");
+										} 
+								showTip(data.message);
+								$("#approvalStatus").val(data.approvalStatus);
+								$('#cancelApproval').hide();
+								$('#approval').show();
+								$('#btnDelete').show();
+								}
+								document.getElementById("aa").innerHTML="(待确认)";
+								//location.reload();
+							}
+						},"json"); 
+					return true; 
+					
+					   }
+					});
+				}
+	});
+	
+	// 商品选择事件
+	function selectInvWindow(id){	
+		var selectData = "";
+		var $jBox = getJBox();
+		var companyCode=$("#companyCode").val();
+		var btypeCode=$("#btypeCode").val();
+		var orderDate=$("#orderDate").val();
+		if(companyCode==""){
+			showTip("请选择公司！");
+			return;
+		}else{
+			$jBox.open("iframe:${ctx}/mdm/mdmInventory/inventorySelect?flag=1"+'&&companyCode='+companyCode+'&&btypeCode='+btypeCode+'&&orderDate='+orderDate,"选择商品",$(window).width() - 100, $(window).height() - 100,
+					{
+						ajaxData:{selectData:selectData},
+				        buttons: {
+				        	"<i class=\"glyphicon glyphicon-ok\"></i>&nbsp;确定":"ok",
+				        	/* "<i class=\"fa fa-eraser\"></i>&nbsp;清除":"clear", */
+				        	'<i class=\'glyphicon glyphicon-remove\'></i>&nbsp;关闭': "close" 
+				        }, 
+				        submit:function(v, h, f){ // v表示所点的按钮的返回值，h表示窗口内容的jQuery对象，f表示窗口内容里的form表单键值
+				        	if(v=="ok"){            		
+				        		var w = h.find("iframe")[0].contentWindow;
+				        		var dataMap = w.getDataMap();
+				        		var codes = [], names = [], units=[],prices=[];
+				        		$.each(dataMap, function(key, value){
+				        			codes.push(value.invCode);
+				        			names.push(value.invName);
+				        			units.push(value.invUnit);
+				        			prices.push(value.price);
+				        		});    
+				        		var selRow=$("#dataGrid").dataGrid("getSelectRow");
+				        		$("#"+id).eq(0).val(names);
+				        		$("#dataGrid").dataGrid("setRowData",selRow,{invCode:codes});
+				        		$("#dataGrid").dataGrid("setRowData",selRow,{invUnit:units});
+				        		//$("#dataGrid").dataGrid("setRowData",selRow,{invPrices:prices[0]});
+				        		$("#"+selRow+"_invPrice").val(prices);
+				        	}
+				        }, 
+				        loaded:function(h){
+				        	$(".jbox-content", $jBox.getBox()).css("overflow-y","hidden");
+						}
+					});		
+		}
+		
+	}
+	
+	// 引入功能
+	$("#btnIntroduce").click(function(){
+		var $jBox = getJBox();
+		$jBox.confirm("引入数据会清空界面数据并且只能选择相同公司、部门、往来单位、仓库的数据，确认要引入吗？","系统提示",function(v,h,f){			
+			if(v=="ok"){
+				$jBox.open("iframe:${ctx}/purchase/orderBills/materialStorageList","物资采购单",$(window).width() - 100, $(window).height() - 100,
+						{
+							//ajaxData:{selectData:selectData},
+					        buttons: {
+					        	"<i class=\"glyphicon glyphicon-ok\"></i>&nbsp;确定":"ok",
+					        	/* "<i class=\"fa fa-eraser\"></i>&nbsp;清除":"clear", */
+					        	'<i class=\'glyphicon glyphicon-remove\'></i>&nbsp;关闭': "close" 
+					        }, 
+					        submit:function(v, h, f){ // v表示所点的按钮的返回值，h表示窗口内容的jQuery对象，f表示窗口内容里的form表单键值
+					        	if(v=="ok"){            		
+					        		var w = h.find("iframe")[0].contentWindow;
+					        		var dataMap = w.getDataMap();
+					        		// 赋值主表信息
+					        		$("#companyCode").val(dataMap.companyCode);
+					        		$("#companyName").val(dataMap.companyName);
+					        		$("#deptCode").val(dataMap.deptCode);
+					        		$("#deptName").val(dataMap.deptName);
+					        		$("#btypeCode").val(dataMap.btypeCode);
+					        		$("#btypeName").val(dataMap.btypeName);
+					        		$('input[name="orderDate"]').val(dataMap.orderDate);
+					        		// 赋值子表信息
+					        		var sortCode=[] ,sortName=[] ,invName=[] ,invUnit=[] ,price=[] ,krQty=[];
+					        		sortCode = dataMap.sortCode.split(',');
+					        		sortName = dataMap.sortName.split(',');
+					        		invName = dataMap.invName.split(',');
+					        		invUnit = dataMap.invUnit.split(',');
+					        		price = dataMap.price.split(',');
+					        		krQty = dataMap.krQty.split(',');
+					        		for(var i=0; i<sortCode.length-1; i++){  
+				        				var selRow = $("#dataGrid").dataGrid("getSelectRow");				        										        		
+				        				$("#"+selRow+"_sortNameCode").val(sortCode[i]);
+				        				$("#"+selRow+"_sortNameName").val(sortName[i]);
+				        				$("#"+selRow+"_assetName").val(invName[i]);
+				        				$("#"+selRow+"_invUnit").val(invUnit[i]);
+				        				$("#"+selRow+"_price").val(price[i]);
+				        				$("#"+selRow+"_nowInQty").val(krQty[i]);
+				        				// 调用ajax获取库存数量
+				        				$.ajax({ 
+				        					async: false, 
+				        					type : "POST", 
+				        					url : "${ctx}/ass/basic/assetsort/findAssetTypeBySortCode", 
+				        					dataType : 'json', 
+				        					data: {sortCode:sortCode[i]},
+				        					success :function(data){
+				        						if(data.result == Global.TRUE){
+				        							// 计提类型(1:实物 入库数量默认为1，可以录入条形码2：摊销入库数据手动输入，无法录入条形码)
+				        							var assetType = data.message;
+				        							$("#"+selRow+"_assetType").val(assetType);// 计提类型赋值
+				        							if("1" == assetType){
+				        				        		$("#"+selRow+"_nowInQty").val(1);
+				        				        		$("#"+selRow+"_nowInQty").attr("readOnly","readOnly");
+				        							}else if("2" == assetType){
+				        								$("#"+selRow+"_barCode").val("");
+				        								$("#"+selRow+"_barCode").attr("readOnly","readOnly");
+				        							}
+				        		 	        	}else{
+				        		 	        		showTip(data.message);
+				        		 	        		return false;
+				        		 	        	}        						
+				        				}},"json");
+				        				if(sortCode.length-2 != i){
+							        		$('#dataGrid').dataGrid('getParam','onSelectRow')('new');
+				        				}
+					        		}
+					        	}
+					        }, 
+					        loaded:function(h){
+					        	$(".jbox-content", $jBox.getBox()).css("overflow-y","hidden");
+							}
+						});		
+			}
+		},{buttonsFocus:1});
+		top.$('.jbox-body .jbox-icon').css('top','55px');
+	})
+	
+	// 资产类别回调函数
+	function sortCodeCallBack(id){
+		var sortCode = $("#"+id+"_sortNameCode").val();
+		if(sortCode != "" && sortCode != "undefind"){
+			// 调用ajax获取库存数量
+			$.ajax({ 
+				async: false, 
+				type : "POST", 
+				url : "${ctx}/ass/basic/assetsort/findAssetTypeBySortCode", 
+				dataType : 'json', 
+				data: {sortCode:sortCode},
+				success :function(data){
+					if(data.result == Global.TRUE){
+						// 计提类型(1:实物 入库数量默认为1，可以录入条形码2：摊销入库数据手动输入，无法录入条形码)
+						var assetType = data.message;
+						var selectRow = $('#dataGrid').dataGrid('getSelectRow');
+						$("#"+selectRow+"_assetType").val(assetType);// 计提类型赋值
+						if("1" == assetType){
+							showTip("计提类型为:实物   入库数量默认为1不可更改，可以录入条形码");
+			        		$("#"+selectRow+"_nowInQty").val(1);
+			        		$("#"+selectRow+"_nowInQty").attr("readOnly","readOnly");
+						}else if("2" == assetType){
+							showTip("计提类型为：摊销   入库数量手动输入，无法录入条形码");
+							$("#"+selectRow+"_barCode").val("");
+							$("#"+selectRow+"_barCode").attr("readOnly","readOnly");
+							/* $("#dataGrid").dataGrid("setRowData",selectRow,
+			        				{barCode:""}); */
+						}
+	 	        	}else{
+	 	        		showTip(data.message);
+	 	        		return false;
+	 	        	}        						
+			}},"json");
+		}else{
+			showTip("获取分类编码为空！");
+		}
+	}
+</script>

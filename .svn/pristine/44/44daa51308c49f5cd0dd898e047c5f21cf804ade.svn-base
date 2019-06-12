@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.codingrule.dao.CodeRulesDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="codeRulesColumns">
+		a.id AS "id",
+		a.rules_item_code AS "rulesItemCode",
+		a.rules_item_name AS "rulesItemName",
+		a.code_format AS "codeFormat",
+		a.code_format_content AS "codeFormatContent",
+		a.code_len AS "codeLen",
+		a.rules_remarks AS "rulesRemarks",
+		a.code_sort AS "codeSort",
+		a.category_1 AS "category1",
+		a.category_2 AS "category2",
+		a.last_max AS "lastMax",
+		a.flow_complement AS "flowComplement",
+		a.flow_complement_mode AS "flowComplementMode",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.code_id AS "codeId"
+	</sql>
+    <!--更新最大值-->
+    <update id="updateCodeRules">
+		UPDATE ass_code_rules SET
+			last_max = #{lastMax}
+		WHERE code_id = #{codeId}
+	</update>
+	<!-- 输出字段关联表 -->
+	<sql id="codeRulesJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="CodeRules">
+		SELECT 
+			<include refid="codeRulesColumns"/>
+		FROM ass_code_rules a
+		<include refid="codeRulesJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="CodeRules">
+		SELECT 
+			<include refid="codeRulesColumns"/>
+		FROM ass_code_rules a
+		<include refid="codeRulesJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="rulesItemName != null and rulesItemName != ''">
+				AND a.rules_item_name = #{rulesItemName}
+			</if>
+			<if test="codeFormat != null and codeFormat != ''">
+				AND a.code_format = #{codeFormat}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="CodeRules">
+		SELECT 
+			<include refid="codeRulesColumns"/>
+		FROM ass_code_rules a
+		<include refid="codeRulesJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_code_rules(
+			id,
+			rules_item_code,
+			rules_item_name,
+			code_format,
+			code_format_content,
+			code_len,
+			rules_remarks,
+			code_sort,
+			category_1,
+			category_2,
+			last_max,
+			flow_complement,
+			flow_complement_mode,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+			code_id
+		) VALUES (
+			#{id},
+			#{rulesItemCode},
+			#{rulesItemName},
+			#{codeFormat},
+			#{codeFormatContent},
+			#{codeLen},
+			#{rulesRemarks},
+			#{codeSort},
+			#{category1},
+			#{category2},
+			#{lastMax},
+			#{flowComplement},
+			#{flowComplementMode},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status},
+			#{codeId}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_code_rules SET 	
+			rules_item_code = #{rulesItemCode},
+			rules_item_name = #{rulesItemName},
+			code_format = #{codeFormat},
+			code_format_content = #{codeFormatContent},
+			code_len = #{codeLen},
+			rules_remarks = #{rulesRemarks},
+			code_sort = #{codeSort},
+			category_1 = #{category1},
+			category_2 = #{category2},
+			last_max = #{lastMax},
+			flow_complement = #{flowComplement},
+			flow_complement_mode = #{flowComplementMode},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			code_id = #{codeId}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_code_rules SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

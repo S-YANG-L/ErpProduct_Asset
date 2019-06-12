@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.wareitems.dao.WarehouseItemsDao">
+
+    <!-- 输出字段列 -->
+    <sql id="warehouseItemsColumns">
+		a.id AS "id",
+		a.articles_code AS "articlesCode",
+		a.articles_name AS "articlesName",
+		a.wh_code AS "whCode",
+		a.wh_name AS "whName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit AS "unit",
+		ROUND(a.price,2) AS "price",
+		a.qty AS "qty",
+		ROUND(a.sum_money,2) AS "sumMoney",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.status AS "status",
+		a.remarks AS "remarks",
+		a.upper_limit AS "upperLimit",
+		a.lower_limit  AS "lowerLimit"
+	</sql>
+
+    <!-- 输出字段关联表 -->
+    <sql id="warehouseItemsJoins">
+    </sql>
+
+	<!-- 获取单条数据 -->
+	<select id="getWhcode" resultType="WarehouseItems">
+		SELECT
+		<include refid="warehouseItemsColumns"/>
+		FROM ass_warehouse_items a
+		<include refid="warehouseItemsJoins"/>
+		WHERE
+	    a.wh_code = #{whCode}
+
+	</select>
+    <!-- 获取单条数据 -->
+    <select id="getQty" resultType="WarehouseItems">
+        SELECT
+        <include refid="warehouseItemsColumns"/>
+        FROM ass_warehouse_items a
+        <include refid="warehouseItemsJoins"/>
+        WHERE
+        a.articles_code = #{articlesCode}
+        AND a.wh_code = #{whCode}
+
+    </select>
+    <!-- 获取单条数据 -->
+    <select id="get" resultType="WarehouseItems">
+        SELECT
+        <include refid="warehouseItemsColumns"/>
+        FROM ass_warehouse_items a
+        <include refid="warehouseItemsJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="WarehouseItems">
+        SELECT
+        <include refid="warehouseItemsColumns"/>
+        FROM ass_warehouse_items a
+        <include refid="warehouseItemsJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+			<if test="articlesCode != null and articlesCode != ''">
+				AND a.articles_code = #{articlesCode}
+			</if>
+            <if test="articlesName != null and articlesName != ''">
+                AND a.articles_name like "%"#{articlesName}"%"
+            </if>
+            <if test="whName != null and whName != ''">
+                AND a.wh_name = #{whName}
+            </if>
+            <if test="whCode != null and whCode != ''">
+                AND a.wh_code = #{whCode}
+            </if>
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="ids != null and ids.length != 0">
+                AND a.id not in
+                <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="articlesCodes != null and articlesCodes.length != 0">
+                AND a.articles_code not in
+                <foreach collection="articlesCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findAllList" resultType="WarehouseItems">
+        SELECT
+        <include refid="warehouseItemsColumns"/>
+        FROM ass_warehouse_items a
+        <include refid="warehouseItemsJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insert">
+		INSERT INTO ass_warehouse_items(
+			id,
+			articles_code,
+			articles_name,
+			wh_code,
+			wh_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			unit,
+			price,
+			qty,
+			sum_money,
+			update_by,
+			update_date,
+			create_by,
+			create_date,
+			status,
+			remarks,
+			upper_limit,
+			lower_limit
+		) VALUES (
+			#{id},
+			#{articlesCode},
+			#{articlesName},
+			#{whCode},
+			#{whName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{unit},
+			#{price},
+			#{qty},
+			#{sumMoney},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{createBy.userCode},
+			#{createDate},
+			#{status},
+			#{remarks},
+			#{upperLimit},
+			#{lowerLimit}
+		)
+	</insert>
+
+    <!-- 更新数据 -->
+    <update id="update">
+		UPDATE ass_warehouse_items SET 	
+			articles_code = #{articlesCode},
+			articles_name = #{articlesName},
+			wh_code = #{whCode},
+			wh_name = #{whName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			unit = #{unit},
+			price = #{price},
+			qty = #{qty},
+			sum_money = #{sumMoney},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			upper_limit = #{upperLimit},
+			lower_limit = #{lowerLimit}
+		WHERE id = #{id}
+	</update>
+
+    <!-- 逻辑删除数据 -->
+    <update id="delete">
+		UPDATE ass_warehouse_items SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.assetsput.dao.AssetInfoDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="assAssetInfoColumns">
+		a.id AS "id",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit_price AS "unitPrice",
+		a.unit AS "unit",
+		a.sn_code AS "snCode",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.buy_date AS "buyDate",
+		a.use_date AS "useDate",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.duty_code AS "dutyCode",
+		a.duty_name AS "dutyName",
+		a.storage_place AS "storagePlace",
+		a.storage_place_code AS "storagePlaceCode",
+		a.supplier AS "supplier",
+		a.occupancy AS "occupancy",
+		a.picture_path AS "picturePath",
+		a.age_limit AS "ageLimit",
+		a.clear_date AS "clearDate",
+		a.asset_status AS "assetStatus",
+		a.account_status AS "accountStatus",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o13.office_name AS "office.officeName",
+		u17.user_name AS "user.userName"
+	</sql>
+
+
+
+
+	<!-- 输出字段关联表 -->
+	<sql id="assAssetInfoJoins">
+		LEFT JOIN sys_office o13 ON o13.office_code = a.office_code
+		LEFT JOIN sys_user u17 ON u17.user_code = a.user_code
+	</sql>
+    <!-- 获取单条数据 -->
+    <select id="getid" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 获取单条数据 -->
+    <select id="getAssetCodesql" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        WHERE a.asset_code = #{assetCode}
+    </select>
+
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetInfo">
+		SELECT 
+			<include refid="assAssetInfoColumns"/>
+		FROM ass_asset_info a
+		<include refid="assAssetInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+    <!-- 查询数据列表 -->
+    <select id="findListdtl" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status =0
+            <if test="assetStatus != null and assetStatus != ''">
+                AND a.asset_status = #{assetStatus}
+            </if>
+            <if test="user != null and user.userCode != null and user.userCode != ''">
+                AND a.user_code = #{user.userCode},
+            </if>
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+        </where>
+    </select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetInfo">
+		SELECT 
+			<include refid="assAssetInfoColumns"/>
+		FROM ass_asset_info a
+		<include refid="assAssetInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetInfo">
+		SELECT 
+			<include refid="assAssetInfoColumns"/>
+		FROM ass_asset_info a
+		<include refid="assAssetInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_info(
+			id,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			unit_price,
+			unit,
+			sn_code,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			buy_date,
+			use_date,
+			user_code,
+			user_name,
+			region_code,
+			region_name,
+			duty_code,
+			duty_name,
+			storage_place,
+			storage_place_code,
+			supplier,
+			occupancy,
+			picture_path,
+			age_limit,
+			clear_date,
+			asset_status,
+			account_status,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{unitPrice},
+			#{unit},
+			#{snCode},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{buyDate},
+			#{useDate},
+			#{user.userCode},
+			#{userName},
+			#{regionCode},
+			#{regionName},
+			#{dutyCode},
+			#{dutyName},
+			#{storagePlace},
+			#{storagePlaceCode},
+			#{supplier},
+			#{occupancy},
+			#{picturePath},
+			#{ageLimit},
+			#{clearDate},
+			#{assetStatus},
+			#{accountStatus},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+    <!-- 更新数据 -->
+    <update id="updataChange">
+		UPDATE ass_asset_info SET
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			unit_price = #{unitPrice},
+			unit = #{unit},
+			sn_code = #{snCode},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			buy_date = #{buyDate},
+			use_date = #{useDate},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			duty_code = #{dutyCode},
+			duty_name = #{dutyName},
+			storage_place = #{storagePlace},
+			storage_place_code = #{storagePlaceCode},
+			supplier = #{supplier},
+			occupancy = #{occupancy},
+			picture_path = #{picturePath},
+			age_limit = #{ageLimit},
+			clear_date = #{clearDate},
+			asset_status = #{assetStatus},
+			account_status = #{accountStatus},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE asset_code = #{assetCode}
+	</update>
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_info SET 	
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			unit_price = #{unitPrice},
+			unit = #{unit},
+			sn_code = #{snCode},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			buy_date = #{buyDate},
+			use_date = #{useDate},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			duty_code = #{dutyCode},
+			duty_name = #{dutyName},
+			storage_place = #{storagePlace},
+			storage_place_code = #{storagePlaceCode},
+			supplier = #{supplier},
+			occupancy = #{occupancy},
+			picture_path = #{picturePath},
+			age_limit = #{ageLimit},
+			clear_date = #{clearDate},
+			asset_status = #{assetStatus},
+			account_status = #{accountStatus},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+    <!-- 改变状态 -->
+    <update id="updatauserStatus">
+		UPDATE ass_asset_info SET
+			   use_date = #{useDate},
+			   user_code = #{user.userCode},
+			   user_name = #{userName},
+			   asset_status = #{assetStatus}
+		WHERE asset_code = #{assetCode}
+	</update>
+
+    <!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_asset_info SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

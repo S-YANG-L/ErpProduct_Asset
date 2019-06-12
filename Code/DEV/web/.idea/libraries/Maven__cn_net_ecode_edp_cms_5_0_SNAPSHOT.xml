@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: cn.net.ecode:edp-cms:5.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-cms/5.0-SNAPSHOT/edp-cms-5.0-20180829.051533-3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-cms/5.0-SNAPSHOT/edp-cms-5.0-20180829.051533-3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-cms/5.0-SNAPSHOT/edp-cms-5.0-20180829.051533-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

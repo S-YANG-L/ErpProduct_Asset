@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.mdm.dao.BtypeAttrDao">
+    
+    <!-- 输出字段列 -->
+	<sql id="btypeAttrColumns">
+		a.id AS "id",
+		a.btype_code AS "btypeCode",
+		a.btype_name AS "btypeName",
+		a.attribute_sort AS "attributeSort",
+		a.attribute_code AS "attributeCode",
+		a.attribute_value AS "attributeValue",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="btypeAttrJoins">
+	</sql>
+    
+    <!-- 获取单行数据 -->
+	<select id="get" resultType="BtypeAttr">
+		SELECT 
+			<include refid="btypeAttrColumns"/>
+		FROM ass_btype_attr a
+		<include refid="btypeAttrJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="BtypeAttr">
+		SELECT 
+			<include refid="btypeAttrColumns"/>
+		FROM ass_btype_attr a
+		<include refid="btypeAttrJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="btypeCode != null and btypeCode != ''">
+				AND a.btype_code = #{btypeCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="BtypeAttr">
+		SELECT 
+			<include refid="btypeAttrColumns"/>
+		FROM ass_btype_attr a
+		<include refid="btypeAttrJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_btype_attr(
+			id,
+			btype_code,
+			btype_name,
+			attribute_sort,
+			attribute_code,
+			attribute_value,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			status
+		) VALUES (
+			#{id},
+			#{btypeCode},
+			#{btypeName},
+			#{attributeSort},
+			#{attributeCode},
+			#{attributeValue},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{remarks},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_btype_attr SET 	
+			btype_code = #{btypeCode},
+			btype_name = #{btypeName},
+			attribute_sort = #{attributeSort},
+			attribute_code = #{attributeCode},
+			attribute_value = #{attributeValue},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_btype_attr SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 删除  -->
+	<delete id="deleteBtypeAttr">
+	  delete from ass_btype_attr
+	  where btype_code = #{btypeCode}
+	</delete>
+	
+	<!-- 根据名称查编码 -->
+	<select id="findAttrCodeByName" resultType="java.lang.String">
+		SELECT value AS "attributeCode" 
+		FROM sys_dict t
+	    WHERE t.name=#{attributeValue} AND t.type='btype_attr_3'
+	</select>
+	
+</mapper>

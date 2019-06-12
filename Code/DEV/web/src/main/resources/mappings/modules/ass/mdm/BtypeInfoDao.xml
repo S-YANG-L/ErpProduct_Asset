@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.mdm.dao.BtypeInfoDao">
+	<!-- 输出字段列 -->
+	<sql id="btypeInfoColumns">
+		a.btype_code AS "btypeCode",
+		a.btype_name AS "btypeName",
+		a.short_name AS "shortName",
+		a.reg_code AS "regCode",
+		a.org_code AS "orgCode",
+		a.btype_sort_code AS "btypeSortCode",
+		a.btype_sort_name AS "btypeSortName",
+		a.register_date AS "registerDate",
+		a.admin_btype_code AS "adminBtypeCode",
+		a.admin_btype_name AS "adminBtypeName",
+		a.lager_person_name AS "lagerPersonName",
+		a.lager_person_id_no AS "lagerPersonIdNo",
+		a.lager_person_tel AS "lagerPersonTel",
+		a.lager_office_tel AS "lagerOfficeTel",
+		a.lager_person_email AS "lagerPersonEmail",
+		a.linkman AS "linkman",
+		a.linkman_tel AS "linkmanTel",
+		a.linkman_mobile AS "linkmanMobile",
+		a.linkman_email AS "linkmanEmail",
+		a.post_code AS "postCode",
+		a.fax AS "fax",
+		a.register_addr AS "registerAddr",
+		a.work_address AS "workAddress",
+		a.contact_address AS "contactAddress",
+		a.bank AS "bank",
+		a.bank_account AS "bankAccount",
+		a.approve_status AS "approveStatus",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.status AS "status",
+		a.is_admin AS "isAdmin",
+		b.property_code AS "propertyCode",
+		b.property_name AS "propertyName",
+		b.country_code AS "countryCode",
+		b.country_name AS "countryName",
+		b.trade_sort_code AS "tradeSortCode",
+		b.trade_sort_name AS "tradeSortName",
+		b.garden_code AS "gardenCode",
+		b.garden_name AS "gardenName",
+		b.btype_sorts AS "btypeSortsList",
+		b.market_sort_code AS "marketSortCode",
+		b.market_sort_name AS "marketSortName",
+		a.ERP_KH_STATUS AS "khStatus"
+	</sql>
+
+	<!-- 输出字段关联表 -->
+	<sql id="btypeInfoJoins">
+	</sql>
+
+	<!-- 获取单行数据 -->
+	<!--<select id="get" resultType="BtypeInfo">
+		SELECT
+		<include refid="btypeInfoColumns" />
+		FROM ass_btype_info a
+		<include refid="btypeInfoJoins" />
+		left join ass_btype_ext b ON a.btype_code=b.btype_code
+		WHERE
+		a.btype_code = #{btypeCode}
+		<if test="global.useCorpModel">
+			AND a.corp_code = #{corpCode}
+		</if>
+	</select>-->
+	<select id="get" resultType="BtypeInfo">
+		SELECT
+		a.btype_code AS "btypeCode",
+		a.btype_name AS "btypeName",
+		a.short_name AS "shortName",
+		a.reg_code AS "regCode",
+		a.org_code AS "orgCode",
+		a.btype_sort_code AS "btypeSortCode",
+		a.btype_sort_name AS "btypeSortName",
+		a.register_date AS "registerDate",
+		a.admin_btype_code AS "adminBtypeCode",
+		a.admin_btype_name AS "adminBtypeName",
+		a.lager_person_name AS "lagerPersonName",
+		a.lager_person_id_no AS "lagerPersonIdNo",
+		a.lager_person_tel AS "lagerPersonTel",
+		a.lager_office_tel AS "lagerOfficeTel",
+		a.lager_person_email AS "lagerPersonEmail",
+		a.linkman AS "linkman",
+		a.linkman_tel AS "linkmanTel",
+		a.linkman_mobile AS "linkmanMobile",
+		a.linkman_email AS "linkmanEmail",
+		a.post_code AS "postCode",
+		a.fax AS "fax",
+		a.register_addr AS "registerAddr",
+		a.work_address AS "workAddress",
+		a.contact_address AS "contactAddress",
+		a.bank AS "bank",
+		a.bank_account AS "bankAccount",
+		a.approve_status AS "approveStatus",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.status AS "status",
+		a.is_admin AS "isAdmin",
+		a.ERP_KH_STATUS AS "khStatus"
+		FROM ass_btype_info a
+		WHERE
+		a.btype_code = #{btypeCode}
+	</select>
+	<!-- 获取所有客户信息数据 -->
+	<select id="getKhList" resultType="BtypeInfo">
+		SELECT
+		<include refid="btypeInfoColumns" />
+		FROM ass_btype_info a
+		<include refid="btypeInfoJoins" />
+		left join ass_btype_ext b ON a.btype_code=b.btype_code
+		<if test="btypeCode != null and btypeCode != ''">
+			WHERE a.btype_code = #{btypeCode}
+		</if>
+		<if test="global.useCorpModel">
+			AND a.corp_code = #{corpCode}
+		</if>
+	</select>
+
+	<select id="getKhCount" resultType="int">
+		SELECT
+		count(A.BTYPE_CODE) AS "COUNT"
+		FROM
+		ass_btype_info a
+		<if test="loginCode != null and loginCode != ''">
+			right join crm_btype_manager cbm on
+			cbm.BTYPE_CODE=a.BTYPE_CODE
+		</if>
+		where 1=1
+		<if test="loginCode != null and loginCode != ''">
+			and cbm.user_code=#{loginCode}
+		</if>
+		<if test="btypeName != null and btypeName != ''">
+			<if test="dbName == 'oracle'"> and a.btype_name LIKE '%'||#{btypeName}||'%'</if>
+			<if test="dbName == 'mysql'"> and a.btype_name LIKE '%' #{btypeName} '%'  </if>
+		</if>
+	</select>
+	<select id="companyList" resultType="BtypeInfo">
+		SELECT
+		COMPANY_CODE AS
+		'companyCode',
+		COMPANY_NAME AS 'companyName'
+		FROM
+		sys_company
+	</select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="BtypeInfo">
+		SELECT
+		<if test="linkman != null and linkman != ''">
+			distinct
+		</if>
+		a.btype_code AS "btypeCode",
+		a.btype_name AS "btypeName",
+		a.short_name
+		AS "shortName",
+		a.btype_sort_code AS "btypeSortCode",
+		a.btype_sort_name
+		AS "btypeSortName",
+		b.trade_sort_code AS "btypeExt.tradeSortCode",
+		b.trade_sort_name AS "btypeExt.tradeSortName",
+		a.CONTACT_ADDRESS AS "contactAddress",
+		a.create_date as"createDate",
+		concat(b.province_name,b.city_name,b.district_name) AS "btypeExt.areaCode",
+		b.btype_sorts AS "btypeExt.btypeSorts",
+		b.property_code AS "propertyCode",
+		b.property_name AS "propertyName",
+		a.status AS "status",
+		a.ERP_KH_STATUS AS "khStatus",
+		case a.is_admin
+		when '1' then '是' else '否' end AS "isAdmin"
+		FROM
+		ass_btype_info a
+		LEFT
+		JOIN ass_btype_ext b on a.btype_code=b.btype_code
+		<if test="linkman != null and linkman != ''">
+			left join rwgl_sys_kh_lxr rskl on
+			a.BTYPE_CODE=rskl.KH_CODE
+		</if>
+		<if test="loginCode != null and loginCode != ''">
+			right join crm_btype_manager cbm on
+			cbm.BTYPE_CODE=a.BTYPE_CODE
+		</if>
+		<!-- LEFT JOIN ass_btype_attr c ON a.btype_code=c.btype_code -->
+		<where>
+			<!-- a.status != #{STATUS_DELETE} -->
+			<!-- <if test="status != null and status != ''"> AND a.status = #{status} 
+				</if> -->
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="btypeCode != null and btypeCode != ''">
+				AND a.btype_code = #{btypeCode}
+			</if>
+			<if test="linkman != null and linkman != ''">
+				and rskl.KH_LXR_ID=#{linkman}
+			</if>
+			<if test="loginCode != null and loginCode != ''">
+				AND cbm.USER_CODE = #{loginCode}
+			</if>
+			<if test="btypeName != null and btypeName != ''">
+				<if test="dbName == 'oracle'">AND a.btype_name LIKE '%'||#{btypeName}||'%'</if>
+				<if test="dbName == 'mysql'">AND a.btype_name LIKE '%' #{btypeName} '%'  </if>
+			</if>
+			<if test="tradeSortCode !=null and tradeSortCode !=''">
+				AND b.trade_sort_code = #{tradeSortCode}
+			</if>
+			<!-- <if test="btypeExt.areaCode != null and btypeExt.areaCode !=''"> -->
+			<!-- AND b.province_code||'/'||b.city_code||'/'||b.district_code=#{btypeExt.areaCode} -->
+			<!-- </if> -->
+			<if test="btypeSorts != null and btypeSorts !=''">
+				<if test="dbName == 'oracle'">AND b.btype_sorts LIKE '%'||#{btypeSorts}||'%'</if>
+				<if test="dbName == 'mysql'"> AND b.btype_sorts LIKE '%' #{btypeSorts} '%'  </if>
+
+			</if>
+			<if test="propertyCode != null and propertyCode !=''">
+				<if test="dbName == 'oracle'">AND b.property_code LIKE '%'||#{propertyCode}||'%'</if>
+				<if test="dbName == 'mysql'"> AND b.property_code LIKE '%' #{propertyCode} '%' </if>
+
+			</if>
+
+			<if test="global.useCorpModel">
+				AND a.corp_code = #{corpCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="BtypeInfo">
+		SELECT
+		<include refid="btypeInfoColumns" />
+		FROM ass_btype_info a
+		<include refid="btypeInfoJoins" />
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="global.useCorpModel">
+				AND a.corp_code = #{corpCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_btype_info(
+		btype_code,
+		btype_name,
+		short_name,
+		reg_code,
+		org_code,
+		btype_sort_code,
+		btype_sort_name,
+		register_date,
+		admin_btype_code,
+		admin_btype_name,
+		lager_person_name,
+		lager_person_id_no,
+		lager_person_tel,
+		lager_office_tel,
+		lager_person_email,
+		linkman,
+		linkman_tel,
+		linkman_mobile,
+		linkman_email,
+		post_code,
+		fax,
+		register_addr,
+		work_address,
+		contact_address,
+		bank,
+		bank_account,
+		approve_status,
+		corp_code,
+		corp_name,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		status,
+		is_admin,
+		ERP_KH_STATUS,
+		COMPANY_CODE,
+		COMPANY_NAME,
+		IS_CUST,
+		IS_VENDOR
+		) VALUES (
+		#{btypeCode},
+		#{btypeName},
+		#{shortName},
+		#{regCode},
+		#{orgCode},
+		#{btypeSortCode},
+		#{btypeSortName},
+		#{registerDate},
+		#{adminBtypeCode},
+		#{adminBtypeName},
+		#{lagerPersonName},
+		#{lagerPersonIdNo},
+		#{lagerPersonTel},
+		#{lagerOfficeTel},
+		#{lagerPersonEmail},
+		#{linkman},
+		#{linkmanTel},
+		#{linkmanMobile},
+		#{linkmanEmail},
+		#{postCode},
+		#{fax},
+		#{registerAddr},
+		#{workAddress},
+		#{contactAddress},
+		#{bank},
+		#{bankAccount},
+		#{approveStatus},
+		#{corpCode},
+		#{corpName},
+		#{createBy.userCode},
+		#{createDate},
+		#{updateBy.userCode},
+		#{updateDate},
+		#{remarks},
+		#{status},
+		#{isAdmin},
+		#{khStatus},
+		'',
+		'',
+		'',
+		''
+		)
+	</insert>
+
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_btype_info SET
+		btype_name = #{btypeName},
+		short_name = #{shortName},
+		reg_code = #{regCode},
+		org_code = #{orgCode},
+		btype_sort_code = #{btypeSortCode},
+		btype_sort_name = #{btypeSortName},
+		register_date = #{registerDate},
+		admin_btype_code = #{adminBtypeCode},
+		admin_btype_name = #{adminBtypeName},
+		lager_person_name = #{lagerPersonName},
+		lager_person_id_no = #{lagerPersonIdNo},
+		lager_person_tel = #{lagerPersonTel},
+		lager_office_tel = #{lagerOfficeTel},
+		lager_person_email = #{lagerPersonEmail},
+		linkman = #{linkman},
+		linkman_tel = #{linkmanTel},
+		linkman_mobile = #{linkmanMobile},
+		linkman_email = #{linkmanEmail},
+		post_code = #{postCode},
+		fax = #{fax},
+		register_addr = #{registerAddr},
+		work_address = #{workAddress},
+		contact_address = #{contactAddress},
+		bank = #{bank},
+		bank_account = #{bankAccount},
+		approve_status = #{approveStatus},
+		update_by = #{updateBy.userCode},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		ERP_KH_STATUS = #{khStatus}
+		WHERE btype_code = #{btypeCode}
+		<if test="global.useCorpModel">
+			AND corp_code = #{corpCode}
+		</if>
+	</update>
+
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_btype_info SET
+		update_by = #{updateBy.userCode},
+		update_date
+		= #{updateDate},
+		status = #{STATUS_DELETE}
+		WHERE btype_code =
+		#{btypeCode}
+		<if test="global.useCorpModel">
+			AND corp_code = #{corpCode}
+		</if>
+	</update>
+
+	<!-- 停用数据 -->
+	<update id="disable">
+		UPDATE ass_btype_info SET
+		status = #{STATUS_DISABLE}
+		WHERE btype_code =
+		#{btypeCode}
+		<if test="global.useCorpModel">
+			AND corp_code = #{corpCode}
+		</if>
+	</update>
+
+	<!-- 启用数据 -->
+	<update id="enable">
+		UPDATE ass_btype_info SET
+		status = #{STATUS_NORMAL}
+		WHERE btype_code =
+		#{btypeCode}
+		<if test="global.useCorpModel">
+			AND corp_code = #{corpCode}
+		</if>
+	</update>
+
+	<!-- 设置主管单位 -->
+	<update id="isAdmin">
+		UPDATE ass_btype_info SET
+		is_admin = #{STATUS_DELETE}
+		WHERE btype_code =
+		#{btypeCode}
+		<if test="global.useCorpModel">
+			AND corp_code = #{corpCode}
+		</if>
+	</update>
+
+	<!-- 取消主管单位 -->
+	<update id="isNotAdmin">
+		UPDATE ass_btype_info SET
+		is_admin = #{STATUS_NORMAL}
+		WHERE btype_code =
+		#{btypeCode}
+		<if test="global.useCorpModel">
+			AND corp_code = #{corpCode}
+		</if>
+	</update>
+
+	<!-- 查询客户信息 liuchangmei 2016.06.12 -->
+	<select id="findBtypeInfo" resultType="BtypeInfo">
+		SELECT a.btype_code AS "btypeCode",
+			   a.btype_name AS "btypeName"
+		FROM ass_btype_info a
+		WHERE
+		a.status ='0'
+	</select>
+	<!-- 根据id查询客户信息 -->
+	<select id="findBtypeInfoByCode" resultType="BtypeInfo">
+		SELECT 
+			a.btype_code AS "btypeCode",
+			a.btype_name AS "btypeName"
+		FROM ass_btype_info a
+		WHERE
+		a.status ='0' and
+		a.btype_code=#{Code}
+	</select>
+	<select id="getUserCode" resultType="String">
+		SELECT
+		u4.USER_CODE AS
+		"userCode"
+		FROM sys_employee a
+		LEFT JOIN sys_office o2 ON o2.office_code
+		= a.office_code
+		LEFT JOIN sys_company c3 ON c3.company_code =
+		a.company_code
+		LEFT JOIN (select distinct b.ref_code,
+		b.corp_code,b.USER_CODE,b.USER_NAME
+		FROM sys_user b WHERE b.user_type =
+		'1') u4 on a.emp_code =
+		u4.ref_code
+		where
+		a.status = 0
+		AND a.EMP_CODE =
+		#{empCode}
+	</select>
+	<select id="findBtypeInfoByProjectCode" resultType="BtypeInfo">
+		SELECT
+		a.btype_code AS "btypeCode",
+		a.btype_name AS "btypeName",
+		a.short_name AS "shortName",
+		a.reg_code AS "regCode",
+		a.org_code AS "orgCode",
+		a.btype_sort_code AS "btypeSortCode",
+		a.btype_sort_name AS "btypeSortName",
+		a.register_date AS "registerDate",
+		a.admin_btype_code AS "adminBtypeCode",
+		a.admin_btype_name AS "adminBtypeName",
+		a.lager_person_name AS "lagerPersonName",
+		a.lager_person_id_no AS "lagerPersonIdNo",
+		a.lager_person_tel AS "lagerPersonTel",
+		a.lager_office_tel AS "lagerOfficeTel",
+		a.lager_person_email AS "lagerPersonEmail",
+		a.linkman AS "linkman",
+		a.linkman_tel AS "linkmanTel",
+		a.linkman_mobile AS "linkmanMobile",
+		a.linkman_email AS "linkmanEmail",
+		a.post_code AS "postCode",
+		a.fax AS "fax",
+		a.register_addr AS "registerAddr",
+		a.work_address AS "workAddress",
+		a.contact_address AS "contactAddress",
+		a.bank AS "bank",
+		a.bank_account AS "bankAccount",
+		a.approve_status AS "approveStatus",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a. STATUS AS "status",
+		a.is_admin AS "isAdmin",
+		b.PROJECT_CODE as "projectCode"
+		FROM
+		ass_btype_info a
+		left JOIN
+		ppm_project_info b ON b.CUSTOMER_CODE = a.BTYPE_CODE
+		WHERE
+		b.PROJECT_CODE =#{projectCode}
+	</select>
+	<!--查询下拉菜单 -->
+	<select id="btypeInfos" resultType="BtypeInfo">
+		select distinct
+		m.btype_code,m.btype_name
+		from ass_btype_info m
+		where m.status='0'
+	</select>
+
+
+	<select id="checkName" resultType="BtypeInfo">
+		SELECT
+		<include refid="btypeInfoColumns" />
+		FROM ass_btype_info a
+		<include refid="btypeInfoJoins" />
+		left join ass_btype_ext b ON a.btype_code=b.btype_code
+		<where>
+			(a.btype_name = #{btypeName} or a.short_name = #{shortName})
+			<if test="global.useCorpModel">
+				AND a.corp_code = #{corpCode}
+			</if>
+			<if test="btypeCode != null and btypeCode != ''">
+			AND a.btype_code not in (#{btypeCode})
+		</if>
+		</where>
+	</select>
+	<!--根据单位机构全称查寻单位机构编码 -->
+	<select id="chcode" parameterType="String"   resultType="String">
+		select a.BTYPE_CODE 
+		from ass_btype_info a
+		where a.BTYPE_NAME=#{btypeName}
+	</select>
+</mapper>

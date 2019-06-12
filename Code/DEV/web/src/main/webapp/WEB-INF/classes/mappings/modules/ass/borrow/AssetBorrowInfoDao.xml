@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.borrow.dao.AssetBorrowInfoDao">
+
+	<!-- 输出字段列 -->
+	<sql id="assetBorrowInfoColumns">
+		a.id AS "id",
+		a.sys_id AS "sysId",
+		a.borrow_code AS "borrowCode",
+		a.borrower_code AS "borrowerCode",
+		a.borrower_name AS "borrowerName",
+		a.borrow_date AS "borrowDate",
+		a.expected_return_date AS "expectedReturnDate",
+		a.fact_return_date AS "factReturnDate",
+		a.restituer_code AS "restituerCode",
+		a.restituer_name AS "restituerName",
+		a.approval_status AS "approvalStatus",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.asset_class_code AS "assetClassCode",
+		a.asset_class AS "assetClass",
+		a.number_recipients AS "numberRecipients",
+		a.status AS "status"
+	</sql>
+	<!-- 输出字段列 -->
+	<sql id="assetBorrowDtlColumns">
+		a.id AS "id",
+		a.borrow_code AS "borrowCode",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.storage_place AS "storagePlace",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o12.office_name AS "office.officeName",
+		a.asset_class_code AS "assetClassCode",
+		a.asset_class AS "assetClass",
+		a.number_recipients AS "numberRecipients",
+		u14.user_name AS "user.userName"
+	</sql>
+	<!-- 输出字段列 -->
+	<sql id="assAssetInfoColumns">
+		a.id AS "id",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit_price AS "unitPrice",
+		a.unit AS "unit",
+		a.sn_code AS "snCode",
+		a.bar_code AS "barCode",
+		a.qr_code AS "qrCode",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.buy_date AS "buyDate",
+		a.use_date AS "useDate",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.duty_code AS "dutyCode",
+		a.duty_name AS "dutyName",
+		a.storage_place AS "storagePlace",
+		a.storage_place_code AS "storagePlaceCode",
+		a.supplier AS "supplier",
+		a.occupancy AS "occupancy",
+		a.picture_path AS "picturePath",
+		a.age_limit AS "ageLimit",
+		a.clear_date AS "clearDate",
+		a.asset_status AS "assetStatus",
+		a.account_status AS "accountStatus",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o13.office_name AS "office.officeName",
+		u17.user_name AS "user.userName"
+	</sql>
+	<!-- 输出字段关联表 -->
+	<sql id="assAssetInfoJoins">
+		LEFT JOIN sys_office o13 ON o13.office_code = a.office_code
+		LEFT JOIN sys_user u17 ON u17.user_code = a.user_code
+	</sql>
+
+	<!-- 输出字段关联表 -->
+	<sql id="assetBorrowInfoJoins">
+
+	</sql>
+
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetBorrowInfo">
+		SELECT
+		<include refid="assetBorrowInfoColumns"/>
+		FROM ass_asset_borrow_info a
+		<include refid="assetBorrowInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+
+
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetBorrowInfo">
+		SELECT
+		<include refid="assetBorrowInfoColumns"/>
+		FROM ass_asset_borrow_info a
+		<include refid="assetBorrowInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="approvalStatus != null and approvalStatus != ''">
+				<if test="approvalStatus == 1">
+					AND a.approval_status in (0,1,3)
+				</if>
+				<if test="approvalStatus == 2">
+					AND a.approval_status = #{approvalStatus}
+				</if>
+			</if>
+			<if test="borrowerCode != null and borrowerCode != ''">
+				AND a.borrower_code = #{borrowerCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查询子表数据列表 -->
+	<select id="findListDtl" resultType="AssetBorrowDtl">
+		SELECT
+		<include refid="assetBorrowDtlColumns"/>
+		FROM ass_asset_borrow__dtl a
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="id != null and id != ''">
+				and  a.id = #{id}
+			</if>
+		</where>
+	</select>
+	<!-- 查询资产表数据列表 -->
+	<select id="findAssetInfo" resultType="AssetInfo">
+		SELECT
+		<include refid="assAssetInfoColumns"/>
+		FROM ass_asset_info a
+		<include refid="assAssetInfoJoins"/>
+		<where>
+			a.status =0 and a.asset_status in (0,1)
+
+			<if test="user != null and user.userCode != null and user.userCode != ''">
+				AND a.user_code = #{user.userCode}
+			</if>
+			<if test="sortCode != null and sortCode != ''">
+				AND a.sort_code = #{sortCode}
+			</if>
+			<if test="sortName != null and sortName != ''">
+				AND a.sort_name = #{sortName}
+			</if>
+		</where>
+	</select>
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetBorrowInfo">
+		SELECT
+		<include refid="assetBorrowInfoColumns"/>
+		FROM ass_asset_borrow_info a
+		<include refid="assetBorrowInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!--//获取部门信息-->
+	<select id="getOffice" resultType="AssetBorrowInfo">
+		select t.office_code as "officeCode",
+		       a.office_name as "officeName",
+		       c.company_name as "companyName",
+		       c.company_code as "companyCode"
+	    from sys_employee t
+		left join sys_office a on t.office_code=a.office_code
+		left join sys_company c
+		on t.company_code=c.company_code
+		where t.emp_code=#{borrowerCode}
+		and t.status='0'
+	</select>
+
+	<!-- 根据userCode获取公司编码 -->
+	<select id="getCompanyCode" resultType="String">
+		SELECT b.COMPANY_CODE FROM sys_user a
+        left join sys_employee b
+        on a.REF_CODE=b.EMP_CODE and b.`STATUS`='0'
+        where a.`STATUS`='0'
+        and a.USER_CODE=#{borrowerCode};
+	</select>
+	<!-- 插入数据 -->
+	<insert id="saveassetBorrowDtl">
+		INSERT INTO ass_asset_borrow__dtl(
+			id,
+			asset_status,
+			borrow_code,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			storage_place,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			user_code,
+			user_name,
+			yuanuser_name,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{assetStatus},
+			#{borrowCode},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{storagePlace},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{user.userCode},
+			#{userName},
+			#{yuanuserName},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+
+
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_borrow_info(
+			id,
+			sys_id,
+			office_code,
+			borrow_code,
+			borrower_code,
+			borrower_name,
+			borrow_date,
+			expected_return_date,
+			fact_return_date,
+			restituer_code,
+			restituer_name,
+			approval_status,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			asset_class_code,
+		    asset_class,
+		    number_recipients,
+			status
+		) VALUES (
+			#{id},
+			#{sysId},
+			#{officeCode},
+			#{borrowCode},
+			#{borrowerCode},
+			#{borrowerName},
+			#{borrowDate},
+			#{expectedReturnDate},
+			#{factReturnDate},
+			#{restituerCode},
+			#{restituerName},
+			#{approvalStatus},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{assetClassCode},
+			#{assetClass},
+			#{numberRecipients},
+			#{status}
+		)
+	</insert>
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_borrow_info SET
+			borrow_code = #{borrowCode},
+			office_code = #{officeCode},
+			borrower_code = #{borrowerCode},
+			borrower_name = #{borrowerName},
+			borrow_date = #{borrowDate},
+			expected_return_date = #{expectedReturnDate},
+			fact_return_date = #{factReturnDate},
+			restituer_code = #{restituerCode},
+			restituer_name = #{restituerName},
+			approval_status = #{approvalStatus},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			asset_class_code=#{assetClassCode},
+		    asset_class=#{assetClass},
+		    number_recipients=#{numberRecipients},
+		    sys_id = #{sysId}
+		WHERE id = #{id}
+	</update>
+	<!-- 逻辑删除数据 -->
+	<update id="deleteassetBorrowDtl">
+		DELETE from ass_asset_borrow__dtl
+		WHERE id = #{id}
+	</update>
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_asset_borrow_info SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	<!-- 改变状态 -->
+	<update id="updatauserStatus">
+		UPDATE ass_asset_info SET
+			   use_date = #{useDate},
+			   user_code = #{user.userCode},
+			   user_name = #{userName},
+			   asset_status = #{assetStatus}
+		WHERE asset_code = #{assetCode}
+	</update>
+</mapper>

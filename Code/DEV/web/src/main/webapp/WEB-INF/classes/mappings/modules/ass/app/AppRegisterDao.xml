@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.app.dao.AppRegisterDao">
+   <!-- 获取最大集团号 -->
+	<select id="getMaxCorp" resultType="AppRegister">
+	
+	    <if test="dbName == 'oracle'">
+		 SELECT nvl(max(a.CORP_CODE),0)+1 as"corpCode" 
+		</if>
+		<if test="dbName == 'mysql'">
+		 SELECT IFNULL(max(a.CORP_CODE),0)+1 as"corpCode" 
+		</if>
+		FROM sys_company a
+	</select>
+	<!-- 更新确认用户 -->
+	<update id="updateExtendS5">
+	update sys_user  set
+	extend_s5=0
+	where extend_s5='1' and login_code=#{loginCode}
+	</update>
+	<!-- 查找待确认用户 -->
+	<select id="findUserList" resultType="AppRegister">
+	select * from sys_user a
+	where a.extend_s5='1' and corp_code=#{corpCode}
+	    
+	</select>
+	<!-- 查询手机用户是否存在 -->
+		<select id="findLoginCode" resultType="AppRegister">
+	select * from sys_user a
+	where  a.login_code=#{loginCode} 
+<!-- 	or a.mobile=#{mobile} -->
+<!-- 	         <if test="corpCode != null and corpCode != ''"> -->
+<!-- 				AND a.corp_code = #{corpCode} -->
+<!-- 			</if> -->
+	    
+	</select>
+<!-- 	<update id="update"> -->
+<!-- 	update sys_user  set -->
+<!-- 	id_card=#{idCard} -->
+<!-- 	where user_code=#{userCode} -->
+<!-- 	</update> -->
+	<select id="findList" resultType="AppRegister">
+	select a.user_name as "userName" ,
+	       a.login_code as "loginCode",
+	       a.email as "email",
+	       a.phone as "phone",
+	       a.mobile as "mobile",
+	       a.status as "status",
+	       a.corp_code as "corpCode"
+	       from sys_user a
+	   <where>
+			a.status != #{STATUS_DELETE}
+<!-- 			and a.EXTEND_S5='1' -->
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="loginCode != null  and loginCode != ''">
+				AND a.login_code = #{loginCode}
+			</if>
+			<if test="corpCode != null  and corpCode != ''">
+				AND a.corp_code = #{corpCode}
+			</if>
+			<if test="extendS5 != null  and extendS5 != ''">
+				AND a.extend_s5 = #{extendS5}
+			</if>
+			<if test="userName != null  and userName != ''">
+				AND a.user_name LIKE #{userName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	       
+	
+	</select>
+	<!-- 查询集团 -->
+	<select id="findCorpUserList" resultType="AppRegister">
+	select a.corp_code AS "jtCode",
+		   a.corp_name AS "jtName"
+	       from sys_user a
+	   <where>
+			a.status != #{STATUS_DELETE}
+			and a.user_type='0'
+			and a.mgr_type='1'
+		</where>
+	       GROUP BY
+			a.corp_code,
+			a.corp_name
+		   ORDER BY
+			a.corp_code,
+			a.corp_name
+	
+	</select>
+	<!-- 查找企业码 -->
+	<select id="findCorpCode" resultType="AppRegister">
+<!-- 	   <if test="dbName == 'oracle'"> -->
+<!-- 		 SELECT * as "corpNum" -->
+<!-- 		</if> -->
+<!-- 		<if test="dbName == 'mysql'"> -->
+<!-- 		 SELECT IFNULL(count(*),0) as "corpNum" -->
+<!-- 		</if> -->
+SELECT *
+		from sys_company a
+	   <where>
+			a.status != #{STATUS_DELETE}
+			and a.corp_code=#{corpCode}
+		</where>
+	</select>
+	
+	
+	<insert id="loadOfficeTable">
+	INSERT INTO sys_office(
+			office_code,
+			office_name,
+			parent_code, 
+			parent_codes, 
+			sorts,
+			hasnext,
+			sort_grade,
+			view_code,
+			full_name,
+			type, 
+			address, 
+			zip_code, 
+			leader,
+			phone, 
+			fax, 
+			email, 
+			create_by, 
+			create_date, 
+			update_by, 
+			update_date, 
+			remarks, 
+			status,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			extend_s4,
+			extend_s5,
+			extend_i1,
+			extend_i2,
+			extend_i3,
+			extend_f1,
+			extend_f2,
+			extend_f3,
+			extend_d1,
+			extend_d2,
+			extend_d3,
+	    	corp_code,
+	    	corp_name
+		)
+		select LEFT(MD5(RAND()),10),
+    	
+		a.office_name,
+		a.parent_code,
+		a.parent_codes,
+		a.sorts,
+		a.sort_grade,
+		a.hasnext,
+		a.view_code,
+		a.full_name,
+		a.type,
+		a.address, 
+		a.zip_code, 
+		a.leader,
+		a.phone, 
+		a.fax, 
+		a.email,
+		#{userCode},
+		now(),
+		#{userCode},
+		now(),
+		a.remarks,
+		a.status,
+		a.extend_s1,
+		a.extend_s2,
+		a.extend_s3,
+		a.extend_s4,
+		a.extend_s5,
+		a.extend_i1,
+		a.extend_i2,
+		a.extend_i3,
+		a.extend_f1,
+		a.extend_f2,
+		a.extend_f3,
+		a.extend_d1,
+		a.extend_d2,
+		a.extend_d3,
+	    #{corpCode},
+		#{corpName}
+	     from sys_office a
+	    where a.CORP_CODE='0'
+	</insert>
+	<insert id="loadPostTable">
+	INSERT INTO sys_post(
+			post_code,
+			post_name,
+			sorts,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+    		corp_code,
+	    	corp_name
+		) 
+		select LEFT(MD5(RAND()),10),
+    	a.post_name,
+		a.sorts ,
+		a.remarks,
+		#{userCode},
+		now(),
+		#{userCode},
+		now(),
+		a.status,
+	    #{corpCode},
+		#{corpName}
+	     from sys_post a
+	    where a.CORP_CODE='0'
+	</insert>
+	<select id="findRoleCode" resultType="AppRegister">
+	SELECT role_code FROM sys_role
+	where role_name='默认' 
+	and corp_code=#{corpCode}
+	</select>
+</mapper>

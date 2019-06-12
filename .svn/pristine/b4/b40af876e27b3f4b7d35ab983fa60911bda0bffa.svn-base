@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.warehouse.dao.WarehouseInfoDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="WarehouseInfoColumns">
+		a.id AS "id",
+		a.warehouse_code AS "warehouseCode",
+		a.warehouse_name AS "warehouseName",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="WarehouseInfoJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="WarehouseInfo">
+		SELECT 
+			<include refid="WarehouseInfoColumns"/>
+		FROM ass_warehouse_info a
+		<include refid="WarehouseInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+    <!-- 获取单条数据 -->
+    <select id="getIsWarehouse" resultType="WarehouseInfo">
+        SELECT
+        <include refid="WarehouseInfoColumns"/>
+        FROM ass_warehouse_info a
+        <include refid="WarehouseInfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="WarehouseInfo">
+		SELECT 
+			<include refid="WarehouseInfoColumns"/>
+		FROM ass_warehouse_info a
+		<include refid="WarehouseInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="warehouseCode != null and warehouseCode != ''">
+				AND a.warehouse_code = #{warehouseCode}
+			</if>
+			<if test="warehouseName != null and warehouseName != ''">
+				AND a.warehouse_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{warehouseName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{warehouseName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{warehouseName},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="WarehouseInfo">
+		SELECT 
+			<include refid="WarehouseInfoColumns"/>
+		FROM ass_warehouse_info a
+		<include refid="WarehouseInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_warehouse_info(
+			id,
+			warehouse_code,
+			warehouse_name,
+			extend_s1,
+			extend_s2,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{warehouseCode},
+			#{warehouseName},
+			#{extendS1},
+			#{extendS2},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_warehouse_info SET
+			warehouse_code = #{warehouseCode},
+			warehouse_name = #{warehouseName},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+    <!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_warehouse_info SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update> 
+	
+	<!-- 物理 删除数据 -->
+	<update id="deleteDtl">
+		DELETE from ass_warehouse_info
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 停用 -->
+	<update id="disable">
+		UPDATE ass_warehouse_info SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DISABLE}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 启用 -->
+	<update id="normal">
+		UPDATE ass_warehouse_info SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_NORMAL}
+		WHERE id = #{id}
+	</update>
+</mapper>

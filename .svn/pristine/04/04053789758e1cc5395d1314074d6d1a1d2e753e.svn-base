@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.allotinfo.dao.AssetAllotInfoDao">
+
+    <!-- 输出字段列 -->
+    <sql id="assetAllotInfoColumns">
+		a.id AS "id",
+		a.allot_code AS "allotCode",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.operator_code AS "operatorCode",
+		a.operator_name AS "operatorName",
+		a.allot_date AS "allotDate",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.allot_user_code AS "allotUserCode",
+		a.allot_user_name AS "allotUserName",
+		a.allot_type_code AS "allotTypeCode",
+		a.allot_type_name AS "allotTypeName",
+		a.allot_company_code AS "allotCompanyCode",
+		a.allot_company_name AS "allotCompanyName",
+		a.allot_office_code AS "allotOfficeCode",
+		a.allot_office_name AS "allotOfficeName",
+		a.storage_place AS "storagePlace",
+		a.storage_place_code AS "storagePlaceCode",
+		a.approval_memo AS "approvalMemo",
+		a.approval_status AS "approvalStatus",
+		a.age_limit AS "ageLimit",
+		a.status AS "status",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		o4.office_name AS "office.officeName"
+	</sql>
+
+    <!-- 输出字段关联表 -->
+    <sql id="assetAllotInfoJoins">
+		LEFT JOIN sys_office o4 ON o4.office_code = a.office_code
+	</sql>
+
+    <!-- 获取单条数据 -->
+    <select id="get" resultType="AssetAllotInfo">
+        SELECT
+        <include refid="assetAllotInfoColumns"/>
+        FROM ass_asset_allot_info a
+        <include refid="assetAllotInfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="AssetAllotInfo">
+        SELECT
+        <include refid="assetAllotInfoColumns"/>
+        FROM ass_asset_allot_info a
+        <include refid="assetAllotInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND a.company_name = #{companyName}
+            </if>
+            <if test="beginDate != null and beginDate != '' ">
+                AND a.allot_date between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+            </if>
+            <if test="officeName != null and officeName != ''">
+                AND a.office_name = #{officeName}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findAllList" resultType="AssetAllotInfo">
+        SELECT
+        <include refid="assetAllotInfoColumns"/>
+        FROM ass_asset_allot_info a
+        <include refid="assetAllotInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insert">
+		INSERT INTO ass_asset_allot_info(
+			id,
+			allot_code,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			operator_code,
+		    operator_name,
+		    allot_date,
+			region_code,
+			region_name,
+			allot_user_code,
+		    allot_user_name,
+			allot_type_code,
+		    allot_type_name,
+		    allot_company_code,
+		    allot_company_name,
+			allot_office_code,
+		    allot_office_name,
+			storage_place,
+			storage_place_code,
+			approval_memo,
+			approval_status,
+			age_limit,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks
+		) VALUES (
+			#{id},
+			#{allotCode},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{operatorCode},
+		    #{operatorName},
+		    #{allotDate},
+			#{regionCode},
+			#{regionName},
+			#{allotUserCode},
+		    #{allotUserName},
+			#{allotTypeCode},
+		    #{allotTypeName},
+			#{allotCompanyCode},
+			#{allotCompanyName},
+	        #{allotOfficeCode},
+			#{allotOfficeName},
+			#{storagePlace},
+			#{storagePlaceCode},
+			#{approvalMemo},
+			#{approvalStatus},
+			#{ageLimit},
+			#{status},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{remarks}
+		)
+	</insert>
+
+    <!-- 更新数据 -->
+    <update id="update">
+		UPDATE ass_asset_allot_info SET
+		    allot_code=#{allotCode},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			operator_code= #{operatorCode},
+		    operator_name= #{operatorName},
+		    allot_date= #{allotDate},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			allot_user_code = #{allotUserCode},
+		    allot_user_name = #{allotUserName},
+			allot_type_code= #{allotTypeCode},
+		    allot_type_name= #{allotTypeName},
+			allot_company_code = #{allotCompanyCode},
+			allot_company_name = #{allotCompanyName},
+		    allot_office_code= #{allotOfficeCode},
+		    allot_office_name = #{allotOfficeName},
+			storage_place = #{storagePlace},
+			storage_place_code = #{storagePlaceCode},
+			approval_memo  = #{approvalMemo},
+			approval_status =#{approvalStatus},
+			age_limit = #{ageLimit},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+
+    <!-- 逻辑删除数据 -->
+    <update id="delete">
+		delete
+		FROM ass_asset_allot_info
+		WHERE id = #{id};
+	</update>
+    <!-- 逻辑删除流程日志数据 -->
+    <update id="deleteFlowLog">
+	DELETE
+	FROM sys_flow_log
+	WHERE biz_key = #{id}
+	</update>
+</mapper>

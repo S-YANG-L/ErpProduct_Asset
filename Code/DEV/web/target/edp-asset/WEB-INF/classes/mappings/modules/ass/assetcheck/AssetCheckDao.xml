@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.assetcheck.dao.AssetCheckDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="assetCheckColumns">
+		a.id AS "id",
+		a.chack_code AS "chackCode",
+		a.chack_name AS "chackName",
+		a.handle_name AS "handleName",
+		a.handle_code AS "handleCode",
+		a.handle_time AS "handleTime",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.submit_status AS "submitStatus",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o7.office_name AS "office.officeName"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="assetCheckJoins">
+		LEFT JOIN sys_office o7 ON o7.office_code = a.office_code
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetCheck">
+		SELECT 
+			<include refid="assetCheckColumns"/>
+		FROM ass_asset_check a
+		<include refid="assetCheckJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetCheck">
+		SELECT 
+			<include refid="assetCheckColumns"/>
+		FROM ass_asset_check a
+		<include refid="assetCheckJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="chackName != null and chackName != ''">
+				AND a.chack_name = #{chackName}
+			</if>
+			<if test="handleName != null and handleName != ''">
+				AND a.handle_name = #{handleName}
+			</if>
+            <if test="beginDate != null and beginDate != '' ">
+                <!-- MONTH(a.create_date) between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY) -->
+                AND a.handle_time between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+            </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetCheck">
+		SELECT 
+			<include refid="assetCheckColumns"/>
+		FROM ass_asset_check a
+		<include refid="assetCheckJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_check(
+			id,
+			chack_code,
+			chack_name,
+			handle_name,
+			handle_code,
+			handle_time,
+			office_code,
+			office_name,
+			sort_code,
+			sort_name,
+			region_code,
+			region_name,
+			submit_status,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{chackCode},
+			#{chackName},
+			#{handleName},
+			#{handleCode},
+			#{handleTime},
+			#{office.officeCode},
+			#{officeName},
+			#{sortCode},
+			#{sortName},
+			#{regionCode},
+			#{regionName},
+			#{submitStatus},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_check SET 	
+			chack_code = #{chackCode},
+			chack_name = #{chackName},
+			handle_name = #{handleName},
+			handle_code = #{handleCode},
+			handle_time = #{handleTime},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			submit_status =#{submitStatus},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_asset_check SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

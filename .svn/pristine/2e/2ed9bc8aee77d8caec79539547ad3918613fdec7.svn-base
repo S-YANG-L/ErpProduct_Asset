@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+        <groupId>cn.net.ecode</groupId>
+        <artifactId>edp-parent</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>../parent/pom.xml</relativePath>
+    </parent>
+	
+	<artifactId>edp-asset</artifactId>
+	<packaging>war</packaging>
+	
+	<name>Ecode EDP Web</name>
+	<url>http://www.ecode.net.cn</url>
+	<inceptionYear>2013-2018</inceptionYear>
+	
+	<!-- 项目属性 -->
+	<properties>
+	    
+		<start-class>cn.net.ecode.modules.config.Application</start-class>
+		
+		<!-- environment setting -->
+		<java.version>1.8</java.version>
+		<downloadSources>false</downloadSources>
+		<downloadJavadocs>false</downloadJavadocs>
+		
+	</properties>
+	
+	<!-- 资源库定义 -->
+	<repositories>
+	
+		<repository>
+			<id>ecode-repos</id>
+			<name>Ecode Repository</name>
+			<url>http://124.128.62.162:8081/nexus/content/groups/public</url>
+		</repository>
+		
+	</repositories>
+	
+	<!-- 设定插件仓库 -->
+	<pluginRepositories>
+	
+		<pluginRepository>
+            <id>ecode-repos</id>
+			<name>Ecode Repository</name>
+			<url>http://124.128.62.162:8081/nexus/content/groups/public</url>
+        </pluginRepository>
+        
+	</pluginRepositories>
+    
+	<!-- 依赖项定义 -->
+	<dependencies>
+		
+		<!-- Spring Boot -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- 核心模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-core</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<!-- 消息处理模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-msg</artifactId>
+			<version>${project.parent.version}</version>
+ 		</dependency>
+		
+		<!-- 消息处理IM模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-msgim</artifactId>
+			<version>${project.parent.version}</version>
+ 		</dependency>
+		
+		<!-- 代码生成模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-gen</artifactId>
+			<version>${project.parent.version}</version>
+ 		</dependency>
+		
+		<!-- 内容管理模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-cms</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<!-- 自定义表单模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-form</artifactId>
+			<version>${project.parent.version}</version>
+ 		</dependency>
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-formtable</artifactId>
+			<version>${project.parent.version}</version>
+ 		</dependency>
+		
+ 		<!-- Ecode简易工作流模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-eflow</artifactId>
+			<version>${project.parent.version}</version>
+ 		</dependency>
+		
+		<!-- 睿思模块 
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-rsbi</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>-->
+		
+		<!-- 微信模块 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-weixin</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<!-- 静态资源-核心包 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-static-core</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<!-- 静态资源-ACE主题 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-static-themes-ace</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- 静态资源-Ecode新主题 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-static-themes-ecode</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<!-- 静态资源-在线Office控件 -->
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>edp-static-ntko</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		
+		<!-- 帆软报表 begin -->
+		<dependency>
+			<groupId>com.fr-8.0_20170605</groupId>
+			<artifactId>fr-all-8.0</artifactId>
+			<version>20170605</version>
+			<type>pom</type>
+		</dependency>
+		<!-- 帆软报表 end -->
+		
+		<!-- 自定义jar依赖包演示-->
+		
+		
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>JNative</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/JNative.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>cn.net.ecode</groupId>
+			<artifactId>jna</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/jna-4.1.0.jar</systemPath>
+		</dependency>
+		
+	</dependencies>
+	
+	<!-- 编译插件 -->
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<outputDirectory>${project.basedir}/src/main/webapp/WEB-INF/classes/</outputDirectory>
+		<plugins>
+			
+			<!-- Spring Boot -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			
+			<!-- WAR打包插件, 设定war包名称不带版本号 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<packagingExcludes>
+					</packagingExcludes>
+					<warSourceExcludes>
+						WEB-INF/classes/org/apache/ibatis/**,
+						WEB-INF/classes/org/mybatis/spring/**,
+						userfiles/**,
+						test/**
+					</warSourceExcludes>
+					<webappDirectory>${project.build.directory}/${project.artifactId}</webappDirectory> 
+					<!-- <webXml>${project.basedir}/target/jspweb.xml</webXml> -->
+					<warName>${project.artifactId}</warName>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+					</archive>
+				</configuration>
+			</plugin>
+			
+			<!-- Eclipse插件 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<configuration>
+					<downloadSources>${downloadSources}</downloadSources>
+					<downloadJavadocs>${downloadJavadocs}</downloadJavadocs>
+					<wtpContextName>${project.artifactId}</wtpContextName>
+					<wtpversion>2.0</wtpversion>
+					<jeeversion>6.0</jeeversion>
+				</configuration>
+			</plugin>
+			
+		</plugins>
+	</build>
+	
+	<!-- 开发者信息 -->
+	<developers>  
+		<developer>
+			<id>thinkgem</id>
+			<name>WangZhen</name>
+			<email>thinkgem at 163.com</email>
+			<roles><role>Project lead</role></roles>
+			<timezone>+8</timezone>  
+		</developer>
+	</developers>
+	
+	<organization>
+		<name>Shandong Ecode</name>
+		<url>http://www.ecode.net.cn</url>
+	</organization>
+	
+</project>

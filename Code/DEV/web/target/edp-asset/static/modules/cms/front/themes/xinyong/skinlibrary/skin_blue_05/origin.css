@@ -1,0 +1,100 @@
+﻿/*@charset "UTF-8";*/
+
+
+/*初始化bootstrap*/
+.row {padding-right:0;padding-left:0;margin:0;}
+
+.container{padding-left:0;padding-right:0;}
+/*大屏下固定内容宽度*/
+ .container { width: 1100px!important;}
+
+.container-fluid{padding-left:0;padding-right:0;/*margin:0 -10px;*/margin:0}
+	
+.col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-xs-1, .col-xs-10, .col-xs-11, .col-xs-12, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9 {    
+/*padding-right:10px; padding-left:10px;*/padding-right:0;padding-left:0;}
+
+
+/*手机端导航*/
+nav.widget-menu:not(.mm-menu) {display: none;}
+
+.header-bg{position:relative;width:100%;}
+.header-bg a{background: center center no-repeat transparent;display: block;position: absolute;}
+
+/*===========多级导航菜单===========*/
+
+.skin_blue_05 ul.widget-nav li {float: left;vertical-align: middle;zoom: 1;}
+.skin_blue_05 .widget-header li a{ display:inline-block;}
+.skin_blue_05 ul.widget-nav li.hover,
+.skin_blue_05 ul.widget-nav li:hover {position: relative;z-index: 599;cursor: pointer; text-decoration:none;}
+.skin_blue_05 ul.widget-nav ul {visibility:hidden;position: absolute;top: 100%;left: 0;z-index: 598;width: 100%;}
+.skin_blue_05 ul.widget-nav ul.subnav li {float: none;}
+.skin_blue_05 ul.widget-nav ul.subnav ul {top: 1px;left: 100%;}
+.skin_blue_05 ul.widget-nav li:hover > ul {visibility: visible;}
+/*有分级显示三角符号*/
+.skin_blue_05 ul.widget-nav ul *.dir {background-repeat: no-repeat;background-position:95% 50%;}
+
+/*===========普通面板===========*/
+
+/*标题*/
+.skin_blue_05 .widget-heading{overflow:hidden;}
+.skin_blue_05 .widget-heading h3{margin:0;display:inline-block }
+/*更多*/
+.skin_blue_05 a.widget-more{cursor:pointer; text-decoration:none }
+
+/*列表链接*/
+.skin_blue_05 .widget-list-item a:link,.skin_blue_05 .widget-list-item a:visited,.skin_blue_05 .widget-list-item a:active{text-decoration:none;outline:0}
+.skin_blue_05 .widget-list-item a:hover{outline:0}
+
+
+/*===========选项卡===========*/
+
+/*常规tab*/
+.skin_blue_05 .widget-tabs{position:relative}
+.skin_blue_05 .widget-tabs  .tab-title{z-index:999}
+.skin_blue_05 .widget-tabs  .tab-title > li {float: left;position: relative;display: block;}
+/*默认状态*/
+.skin_blue_05 .widget-tabs  .tab-title>li > a{display:inline-block;text-decoration:none}
+.skin_blue_05 .widget-tabs  .tab-title>li:last-child > a{margin-right:0}
+/*划过状态*/
+.skin_blue_05 .widget-tabs .tab-title > li > a:hover{text-decoration:none}
+/*选中状态*/
+.skin_blue_05 .widget-tabs .tab-title > li.active > a, .skin_blue_05 .widget-tabs .tab-title > li.active > a:focus,.skin_blue_05 .widget-tabs .tab-title > li.active > a:hover {outline:none}
+
+/*单独定义面板，默认值为普通面板*/
+.skin_blue_05 .widget-tabs .widget-heading{overflow:hidden;}
+
+
+
+
+/*图钉tab*/
+.skin_blue_05 .widget-pills{position:relative}
+.skin_blue_05 .widget-pills  .tab-title{z-index:999}
+.skin_blue_05 .widget-pills  .tab-title > li {float: left;position: relative;display: block;overflow:hidden}
+/*默认状态*/
+.skin_blue_05 .widget-pills  .tab-title>li > a{display:inline-block;text-decoration:none}
+.skin_blue_05 .widget-pills  .tab-title>li:last-child > a{margin-right:0}
+/*划过状态*/
+.skin_blue_05 .widget-pills .tab-title > li > a:hover{text-decoration:none}
+/*选中状态*/
+.skin_blue_05 .widget-pills .tab-title > li.active > a, .skin_blue_05 .widget-tabs .tab-pills > li.active > a:focus,.skin_blue_05 .widget-pills .tab-title > li.active > a:hover {color: #fff!important;font-weight:normal;outline:none;background-color:#045faf;border-bottom:1px solid #045faf}
+
+/*单独定义面板，默认值为普通面板*/
+.skin_blue_05 .widget-pills .widget-heading{overflow:hidden;}
+.skin_blue_05 .widget-pills .widget-body{padding:8px;border:1px solid #216eb6;background-color:#fff;border-top-color:#f00;border-top:0;}
+
+
+
+/*===========辅助预设===========*/
+/*列表小图标*/
+.skin_blue_05 .widget-list-icon {background-position: 0px 55%;background-repeat: no-repeat;}
+/*标题不换行*/
+.skin_blue_05 .widget-title-nowrap{text-overflow:ellipsis; white-space:nowrap; overflow:hidden;display:block;zoom:1;}
+
+
+/*清除样式*/
+.skin_blue_05 .widget-padding-clear{padding:0!important}
+.skin_blue_05 .widget-margin-clear{margin:0!important}
+.skin_blue_05 .widget-bgimg-clear{background-image:none!important}
+.skin_blue_05 .widget-border-clear{border-top-width:0!important;border-bottom-width:0!important;border-left-width:0!important;border-right-width:0!important;}
+.skin_blue_05 .widget-radius-clear{border-bottom-right-radius:0!important;border-bottom-left-radius:0!important;border-top-right-radius:0!important;border-top-left-radius:0!important;}
+.skin_blue_05 .widget-shadow-clear{box-shadow:none;}

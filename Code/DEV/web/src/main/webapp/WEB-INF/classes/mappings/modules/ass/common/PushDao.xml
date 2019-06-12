@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.common.dao.PushDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="pushColumns">
+		a.id AS "id",
+		a.originate_code AS "originateCode",
+		a.originate_name AS "originateName",
+		a.receiver_code AS "receiverCode",
+		a.receiver_name AS "receiverName",
+		a.receiver_date AS "receiverDate",
+		a.receiver_content AS "receiverContent",
+		a.is_push AS "isPush",
+		a.biz_key AS "bizKey",
+		a.biz_type AS "bizType",
+		a.biz_name AS "bizName",
+		a.msg_type AS "msgType",
+		a.receiver_type AS "receiverType",
+		a.push_param AS "pushParam",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.push_cycle as "pushCycle"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="pushJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="Push">
+		SELECT 
+			<include refid="pushColumns"/>
+		FROM app_push a
+		<include refid="pushJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="Push">
+		SELECT 
+			<include refid="pushColumns"/>
+		FROM app_push a
+		<include refid="pushJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="originateCode != null and originateCode != ''">
+				AND a.originate_code = #{originateCode}
+			</if>
+			<if test="originateName != null and originateName != ''">
+				AND a.originate_name LIKE #{originateName}
+			</if>
+			<if test="receiverCode != null and receiverCode != ''">
+				AND a.receiver_code = #{receiverCode}
+			</if>
+			<if test="receiverName != null and receiverName != ''">
+				AND a.receiver_name LIKE #{receiverName}
+			</if>
+			<if test="receiverDate != null ">
+				AND a.receiver_date <![CDATA[ <= ]]> #{receiverDate}
+				AND a.receiver_date <![CDATA[ >= ]]> #{receiverBeforeDate}
+			</if>
+			<if test="isPush != null and isPush != ''">
+				AND a.is_push = #{isPush}
+			</if>
+			<if test="pushCycle != null and pushCycle != ''">
+				AND a.push_cycle = #{pushCycle}
+			</if>
+			<if test="msgType != null and msgType != ''">
+				AND a.msg_type = #{msgType}
+			</if>
+			<if test="bizKey != null and bizKey != ''">
+				AND a.biz_key = #{bizKey}
+			</if>
+			<if test="bizType != null and bizType != ''">
+				AND a.biz_type = #{bizType}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="Push">
+		SELECT 
+			<include refid="pushColumns"/>
+		FROM app_push a
+		<include refid="pushJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO app_push(
+			id,
+			originate_code,
+			originate_name,
+			receiver_code,
+			receiver_name,
+			receiver_date,
+			receiver_content,
+			is_push,
+			biz_key,
+			biz_type,
+			biz_name,
+			msg_type,
+			receiver_type,
+			push_param,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status,
+			corp_code,
+			corp_name,
+			push_cycle
+		) VALUES (
+			#{id},
+			#{originateCode},
+			#{originateName},
+			#{receiverCode},
+			#{receiverName},
+			#{receiverDate},
+			#{receiverContent},
+			#{isPush},
+			#{bizKey},
+			#{bizType},
+			#{bizName},
+			#{msgType},
+			#{receiverType},
+			#{pushParam},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status},
+			#{corpCode},
+			#{corpName},
+			#{pushCycle}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE app_push SET 	
+			originate_code = #{originateCode},
+			originate_name = #{originateName},
+			receiver_code = #{receiverCode},
+			receiver_name = #{receiverName},
+			receiver_date = #{receiverDate},
+			receiver_content = #{receiverContent},
+			push_cycle=#{pushCycle},
+			is_push = #{isPush},
+			biz_key = #{bizKey},
+			biz_type = #{bizType},
+			biz_name = #{bizName},
+			msg_type = #{msgType},
+			receiver_type = #{receiverType},
+			push_param = #{pushParam},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE app_push SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="deleteByBizkey">
+		delete from app_push 
+		WHERE biz_key=#{bizKey} and biz_type=#{bizType}
+	</update>
+</mapper>

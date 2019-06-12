@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.common.dao.MaxBillCodeDao">
+
+	<insert id="insert">
+		insert into as_max_billcode
+		(sys_id,
+		corp_code,
+		corp_name,
+		company_code,
+		company_name,
+		account_year,
+		billsort_code,
+		billsort_name,
+		max_code)
+		values
+		(#{sysId},
+		#{corpCode},
+		#{corpName},
+		#{companyCode},
+		#{companyName},
+		#{accountYear},
+		#{billsortCode},
+		#{billsortName},
+		#{maxCode})
+	</insert>
+
+	<select id="get" resultType="MaxBillCode">
+		select
+		sys_id as "sysId",
+		corp_code as"corpCode",
+		corp_name as"corpName",
+		company_code as"companyCode",
+		company_name as"companyName",
+		billsort_code as"billsortCode",
+		billsort_name as"billsortName",
+		account_year as"accountYear",
+		max_code as"maxCode"
+		from as_max_billcode t
+		<where>
+			t.corp_code=#{corpCode}
+			and t.billsort_code=#{billsortCode}
+			and t.account_year=#{accountYear}
+			<if test="companyCode!=null and companyCode!=''">
+				and t.company_code=#{companyCode}
+			</if>
+			<if test="companyCode==null or companyCode==''">
+				and t.company_code is null
+			</if>
+		</where>
+	</select>
+	
+	<update id="update">
+		update as_max_billcode
+		   set max_code = #{maxCode}
+		where sys_id = #{sysId}
+	</update>
+
+</mapper>

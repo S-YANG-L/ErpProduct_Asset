@@ -1,0 +1,1144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.common.dao.AppMessageDao">
+
+	<!-- 输出字段列 -->
+	<sql id="appMessageColumns">
+		a.id AS "id",
+		a.type AS "type",
+		a.content_title AS
+		"contentTitle",
+		a.content_level AS "contentLevel",
+		a.content_type AS
+		"contentType",
+		a.content_text AS "contentText",
+		a.receiver_type AS
+		"receiverType",
+		a.receiver_codes AS "receiverCodes",
+		a.receiver_names AS
+		"receiverNames",
+		a.sender AS "sender",
+		a.sender_name AS "senderName",
+		a.send_date AS "sendDate",
+		a.biz_key AS "bizKey",
+		a.buttons AS
+		"buttons",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS
+		"createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS
+		"updateDate",
+		a.remarks AS "remarks",
+		a.status AS "status",
+		a.biz_type AS
+		"bizType",
+		a.email_cc AS "emailCc",
+		a.email_bcc AS "emailBcc",
+		a.send_result AS "sendResult",
+		a.corp_code AS "corpCode",
+		a.corp_name AS
+		"corpName"
+	</sql>
+	<!-- 输出字段列 -->
+	<sql id="flowBusinessColumns">
+		a.id AS "id",
+		a.approval_obj_code AS "approvalObjCode",
+		a.approval_obj_name AS "approvalObjName",
+		a.step AS "step",
+		a.step_name AS "stepName",
+		a.is_end AS "isEnd",
+		a.approval_code AS "approvalCode",
+		a.approval_name AS "approvalName",
+		a.approval_status AS "approvalStatus",
+		a.approval_date AS "approvalDate",
+		a.approval_memo AS "approvalMemo",
+		a.link_url_pc AS "linkUrlPc",
+		a.link_url_app AS "linkUrlApp",
+		a.biz_key AS "bizKey",
+		a.billtype_code AS "billtypeCode",
+		a.billtype_name AS "billtypeName",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "officeCode",
+		a.office_name AS "officeName",
+		a.bill_date AS "billDate",
+		a.applicant_code AS "applicantCode",
+		a.applicant_name AS "applicantName",
+		a.content AS "content",
+		a.flow_id AS "flowId",
+		a.arrive_date AS "arriveDate",
+		a.back_flag AS "backFlag",
+		a.next_step AS "nextStep",
+		a.approval_type AS "approvalType",
+		a.approval_obj_type AS "approvalObjType",
+		a.next_flow_business_id AS "nextFlowBusinessId",
+		a.is_csign AS "isCsign",
+		a.is_joint AS "isJoint",
+		a.is_notify AS "isNotify",
+		a.joint_pass_type AS "jointPassType",
+		a.joint_pass_num AS "jointPassNum",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		a.agent_approval_code AS "agentApprovalCode",
+		a.agent_approval_name AS "agentApprovalName"
+		<if test="global.useCorpModel">,
+			a.corp_code AS "corpCode",
+			a.corp_name AS "corpName"
+		</if>
+	</sql>
+
+	<!-- 输出字段关联表 -->
+	<sql id="appMessageJoins">
+	</sql>
+
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AppMessage">
+		SELECT
+		<include refid="appMessageColumns" />
+		FROM msg_message a
+		<include refid="appMessageJoins" />
+		WHERE a.id = #{id}
+		
+		<if test="corpCode != null and corpCode != ''">
+			AND a.corp_code = #{corpCode}
+		</if>
+
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AppMessage">
+		SELECT
+		<include refid="appMessageColumns" />
+		FROM msg_message a
+		<include refid="appMessageJoins" />
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="receiverNames != null  and receiverNames != ''">
+				AND a.receiver_names LIKE #{receiverNames}
+			</if>
+			<if test="senderName != null  and senderName != ''">
+				AND a.sender_name LIKE #{senderName}
+			</if>
+			<if test="corpCode != null and corpCode != ''">
+				AND a.corp_code = #{corpCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AppMessage">
+		SELECT
+		<include refid="appMessageColumns" />
+		FROM msg_message a
+		<include refid="appMessageJoins" />
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="corpCode != null and corpCode != ''">
+				AND a.corp_code = #{corpCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查询已办数据列表 -->
+	<select id="findFinishList" resultType="FlowLog">
+		select
+		a.id,
+		a.biz_key AS "bizKey",
+		a.billtype_code AS "billtypeCode",
+		a.billtype_name AS "billtypeName",
+		a.applicant_name AS "applicantName",
+		a.content AS "content",
+		a.bill_date AS "billDate",
+		a.link_url_pc AS "linkUrlPc",
+		a.link_url_app AS "linkUrlApp",
+		a.action_type AS "actionType",
+		a.arrive_date AS "arriveDate",
+		a.stepName AS "stepName",
+		a.step AS "step",
+		a.approval_code AS "approvalCode",
+		a.approval_name AS "approvalName",
+		a.approval_status AS "approvalStatus",
+		a.approval_date AS "approvalDate",
+		a.approval_memo AS "approvalMemo",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "officeCode",
+		a.office_name AS "officeName",
+		a.applicant_code AS "applicantCode",
+		a.flow_id AS "flowId",
+		a.remarks AS "remarks",
+		a.business_id AS "flowBusinessId",
+		a.agent_approval_code as "agentApprovalCode",
+		a.agent_approval_name as "agentApprovalName" from (
+		SELECT a.id,
+		a.biz_key,
+		a.billtype_code,
+		a.billtype_name,
+		a.applicant_name,
+		a.content,
+		a.bill_date,
+		a.link_url_pc,
+		a.link_url_app,
+		a.action_type,
+		c.arrive_date,
+		<if test="dbName == 'oracle'">nvl(c.stepName, '重新提交') AS stepName,</if>
+		<if test="dbName == 'mssql'">isnull(c.stepName, '重新提交') AS stepName,</if>
+		<if test="dbName == 'mysql'">ifnull(c.stepName, '重新提交') AS stepName,</if>
+		c.step,
+		c.approval_code,
+		c.approval_name,
+		c.approval_status,
+		c.approval_date,
+		c.approval_memo,
+		c.company_code,
+		c.company_name,
+		c.office_code,
+		c.office_name,
+		c.applicant_code,
+		c.flow_id,
+		a.remarks,
+		c.id as business_id,
+		a.agent_approval_code,
+		a.agent_approval_name
+		FROM sys_flow_log a
+		<!-- 关联日志表，取最新的一条 -->
+		join (select a.biz_key, max(a.create_date) as create_date
+		from sys_flow_log a
+		where a.approval_code=#{approvalCode}
+		<if test="step != null  and step != ''">
+			AND a.step = #{step}
+		</if>
+		<if test="flowId != null  and flowId != ''">
+			AND a.flow_id = #{flowId}
+		</if>
+		group by a.biz_key) b
+		on a.biz_key = b.biz_key
+		and a.create_date = b.create_date
+		<!-- 关联业务表，取当前步骤、到达日期 -->
+		left join (select a.biz_key,
+		a.billtype_code,
+		a.arrive_date,
+		a.step,
+		a.approval_code,
+		a.approval_name,
+		a.approval_status,
+		a.approval_date,
+		a.approval_memo,
+		a.company_code,
+		a.company_name,
+		a.office_code,
+		a.office_name,
+		a.applicant_code,
+		a.applicant_name,
+		a.flow_id,
+		a.remarks,
+		a.id,
+		<if test="dbName == 'oracle'">to_char('待' || a.step_name) AS stepName</if>
+		<if test="dbName == 'mssql'">'待' + a.step_name AS "stepName"</if>
+		<if test="dbName == 'mysql'">concat('待', a.step_name) AS "stepName"</if>
+		from sys_flow_business a
+		where a.approval_status = '1'
+		union
+		select a.biz_key,
+		a.billtype_code,
+		a.arrive_date,
+		a.step,
+		a.approval_code,
+		a.approval_name,
+		a.approval_status,
+		a.approval_date,
+		a.approval_memo,
+		a.company_code,
+		a.company_name,
+		a.office_code,
+		a.office_name,
+		a.applicant_code,
+		a.applicant_name,
+		a.flow_id,
+		a.remarks,
+		a.id,
+		case when a.approval_status = 5 then
+		'重新发起' else
+		'审批结束' end stepName
+		from sys_flow_business a
+		where a.approval_status in ('2','4','5')
+		and a.is_end = '1') c
+		on a.biz_key = c.biz_key
+		and a.billtype_code = c.billtype_code
+		<where>
+			a.approval_code=#{approvalCode}
+			<if test="global.useCorpModel">
+				AND a.corp_code = #{corpCode}
+			</if>
+			<if test="billtypeCode != null  and billtypeCode != ''">
+				AND a.billtype_code != #{billtypeCode}
+			</if>
+			<if test="applicantName != null  and applicantName != ''">
+				AND a.applicant_name like
+				<if test="dbName == 'oracle'">'%'||#{applicantName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{applicantName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{applicantName},'%')</if>
+			</if>
+			<if test="bizKey != null  and bizKey != ''">
+				AND a.biz_key = #{bizKey}
+			</if>
+			<if test="content != null  and content != ''">
+				AND a.CONTENT like
+				<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+				AND a.bill_date <![CDATA[>=]]> #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				<if test="dbName == 'oracle'">AND to_char(a.bill_date,'yyyy-mm-dd') <![CDATA[<=]]> to_char( #{endDate},'yyyy-mm-dd')</if>
+				<if test="dbName == 'mssql'">AND CONVERT(varchar(100), a.bill_date, 23) <![CDATA[<=]]> CONVERT(varchar(100), #{endDate}, 23)</if>
+				<if test="dbName == 'mysql'">AND DATE_FORMAT(a.bill_date, '%Y-%m-%d') <![CDATA[<=]]> #{endDate} </if>
+			</if>
+			<if test="step != null  and step != ''">
+				AND a.step = #{step}
+			</if>
+			<if test="flowId != null  and flowId != ''">
+				AND a.flow_id = #{flowId}
+			</if>
+			<if test='flowApprovalStatus== "1"'>
+				<!-- 审批中 -->
+				AND (c.stepName is null or c.stepName != '审批结束')
+			</if>
+			<if test='flowApprovalStatus== "2"'>
+				<!-- 审批结束 -->
+				AND c.stepName = '审批结束'
+			</if>
+		</where> ) a
+		<where>
+			<if test="searchFlag !=null and searchFlag != ''">
+				<if test='searchFlag == "zb"'>
+					a.stepName not in ('审批结束','重新发起')
+				</if>
+				<if test='searchFlag == "yb"'>
+					a.stepName in ('审批结束','重新发起')
+				</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.bill_date desc
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查询当前用户待办流程列表  苏杨龙  -->
+	<select id="findProcessList" resultType="FlowBusiness">
+		SELECT
+		<include refid="flowBusinessColumns"/>
+		,b.action_type AS "actionType"
+		,b.id AS "flowBusinessApprovalId"
+		FROM sys_flow_business a
+		LEFT JOIN sys_flow_business_approval b ON a.id = b.flow_business_id AND b.approval_status='1' AND b.approval_code = #{approvalCode}
+		<where>
+			<!-- 审批主表为待办状态或子表为知会未读状态 -->
+			( a.approval_status='1' or (b.approval_status='1' and b.action_type='3') )
+			<if test="global.useCorpModel">
+				AND a.corp_code = #{corpCode}
+			</if>
+			and (
+			<!-- 指定审批人 -->
+			a.approval_code = #{approvalCode}
+			<!-- 不指定审批人，岗位符合 -->
+			OR EXISTS(SELECT 1 FROM sys_employee_post ep,sys_user u WHERE a.approval_type='1' and a.approval_obj_type='1'
+			and u.ref_code=ep.emp_code and ep.post_code=a.approval_obj_code and u.user_code=#{approvalCode} )
+			<!-- 不指定审批人，角色符合 -->
+			OR EXISTS(SELECT 1 FROM sys_user_role ur WHERE a.approval_type='1' and a.approval_obj_type='2'
+			and ur.role_code=a.approval_obj_code and ur.user_code=#{approvalCode} )
+			<!-- 不指定审批人，人员符合 -->
+			OR (a.approval_type='1' and (a.approval_obj_type='3' or a.approval_obj_type='4') and a.approval_obj_code = #{approvalCode} )
+			<!-- 审批子表 -->
+			OR (b.approval_status='1' and b.approval_code = #{approvalCode} and b.status = 0)
+			<if test="global.getConfig('eflow.task.agent') == 'true'">
+				<!-- 委托办理,查询是否有委托当前登录用户办理的流程，并且当前时间在委托时间范围内，并且状态为正常（为0） -->
+				OR (a.approval_code in (select a1.create_by from sys_flow_agent a1 where a1.agent_user_code=#{approvalCode}
+				and a1.status=#{STATUS_NORMAL} and #{agentDate} >= a1.agent_start_date and #{agentDate} &lt;= a1.agent_end_date))
+			</if>
+			)
+			<if test="applicantName != null  and applicantName != ''">
+				AND a.applicant_name like
+				<if test="dbName == 'oracle'">'%'||#{applicantName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{applicantName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{applicantName},'%')</if>
+			</if>
+			<if test="billtypeCode != null  and billtypeCode != ''">
+				AND a.billtype_code != #{billtypeCode}
+			</if>
+			<if test="step != null  and step != ''">
+				AND a.step = #{step}
+			</if>
+			<if test="content != null  and content != ''">
+				AND a.CONTENT like
+				<if test="dbName == 'oracle'">'%'||#{content}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{content}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{content},'%')</if>
+			</if>
+			<if test="beginBillDate != null  and beginBillDate != ''">
+				and a.BILL_DATE <![CDATA[>=]]> #{beginBillDate}
+			</if>
+			<if test="endBillDate != null  and endBillDate != ''">
+				<if test="dbName == 'oracle'">AND to_char(a.bill_date,'yyyy-mm-dd') <![CDATA[<=]]> to_char( #{endBillDate},'yyyy-mm-dd')</if>
+				<if test="dbName == 'mssql'">AND CONVERT(varchar(100), a.bill_date, 23) <![CDATA[<=]]> CONVERT(varchar(100), #{endBillDate}, 23)</if>
+				<if test="dbName == 'mysql'">AND DATE_FORMAT(a.bill_date, '%Y-%m-%d') <![CDATA[<=]]> #{endBillDate} </if>
+			</if>
+			<if test="flowId != null  and flowId != ''">
+				AND a.flow_id = #{flowId}
+			</if>
+			<if test="bizKey != null  and bizKey != ''">
+				AND a.biz_key = #{bizKey}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.bill_date desc
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 我的申请 -->
+	<select id="findapplicationList" resultType="FlowLog">
+		SELECT distinct
+		a.biz_key AS "bizKey",
+		a.billtype_code AS "billtypeCode",
+		a.billtype_name AS "billtypeName",
+		a.applicant_Name AS "applicantName",
+		a.content AS "content",
+		a.bill_date AS "billDate",
+		a.link_url_pc AS "linkUrlPc",
+		a.link_url_app AS "linkUrlApp",
+		c.arrive_date AS "arriveDate",
+		<if test="dbName == 'oracle'">nvl(c.stepName, '重新提交') AS "stepName",</if>
+		<if test="dbName == 'mssql'">isnull(c.stepName, '重新提交') AS "stepName",</if>
+		<if test="dbName == 'mysql'">ifnull(c.stepName, '重新提交') AS "stepName",</if>
+		c.step AS "step",
+		c.approval_code AS "approvalCode",
+		c.approval_name AS "approvalName",
+		c.approval_status AS "approvalStatus",
+		c.approval_date AS "approvalDate",
+		c.approval_memo AS "approvalMemo",
+		c.company_code AS "companyCode",
+		c.company_name AS "companyName",
+		c.office_code AS "officeCode",
+		c.office_name AS "officeName",
+		c.applicant_code AS "applicantCode",
+		c.flow_id AS "flowId",
+		a.remarks AS "remarks",
+		c.id AS "flowBusinessId"
+		FROM sys_flow_log a
+		<!-- 关联日志表，取最新的一条 -->
+		join (select a.biz_key, max(a.create_date) as create_date
+		from sys_flow_log a
+		where a.applicant_code=#{applicantCode}
+		<if test="step != null  and step != ''">
+			AND a.step = #{step}
+		</if>
+		<if test="flowId != null  and flowId != ''">
+			AND a.flow_id = #{flowId}
+		</if>
+		group by a.biz_key) b
+		on a.biz_key = b.biz_key
+		and a.create_date = b.create_date
+		<!-- 关联业务表，取当前步骤、到达日期 -->
+		left join (select a.biz_key,
+		a.billtype_code,
+		a.arrive_date,
+		a.step,
+		a.approval_code,
+		a.approval_name,
+		a.approval_status,
+		a.approval_date,
+		a.approval_memo,
+		a.company_code,
+		a.company_name,
+		a.office_code,
+		a.office_name,
+		a.applicant_code,
+		a.applicant_name,
+		a.flow_id,
+		a.remarks,
+		a.id,
+		<if test="dbName == 'oracle'">to_char('待' || a.step_name) AS stepName</if>
+		<if test="dbName == 'mssql'">'待' + a.step_name AS "stepName"</if>
+		<if test="dbName == 'mysql'">concat('待', a.step_name) AS "stepName"</if>
+		from sys_flow_business a
+		where a.approval_status = '1' and a.status != #{STATUS_DELETE}
+		union
+		select a.biz_key,
+		a.billtype_code,
+		a.arrive_date,
+		a.step,
+		a.approval_code,
+		a.approval_name,
+		a.approval_status,
+		a.approval_date,
+		a.approval_memo,
+		a.company_code,
+		a.company_name,
+		a.office_code,
+		a.office_name,
+		a.applicant_code,
+		a.applicant_name,
+		a.flow_id,
+		a.remarks,
+		a.id,
+		case when a.approval_status = 5 then
+		'重新发起' else '审批结束' end stepName
+		from sys_flow_business a
+		where a.approval_status in ('2','4','5')
+		and a.is_end = '1' and a.status != #{STATUS_DELETE}) c
+		on a.biz_key = c.biz_key
+		and a.billtype_code = c.billtype_code
+		<where>
+			a.applicant_code=#{applicantCode}
+			and a.status != #{STATUS_DELETE}
+			<if test="global.useCorpModel">
+				AND a.corp_code = #{corpCode}
+			</if>
+			<if test="billtypeCode != null  and billtypeCode != ''">
+				AND a.billtype_code != #{billtypeCode}
+			</if>
+			<if test="bizKey != null  and bizKey != ''">
+				AND a.biz_key = #{bizKey}
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+				AND a.bill_date <![CDATA[>=]]> #{beginDate}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				<if test="dbName == 'oracle'">AND to_char(a.bill_date,'yyyy-mm-dd') <![CDATA[<=]]> to_char( #{endDate},'yyyy-mm-dd')</if>
+				<if test="dbName == 'mssql'">AND CONVERT(varchar(100), a.bill_date, 23) <![CDATA[<=]]> CONVERT(varchar(100), #{endDate}, 23)</if>
+				<if test="dbName == 'mysql'">AND DATE_FORMAT(a.bill_date, '%Y-%m-%d') <![CDATA[<=]]> #{endDate} </if>
+			</if>
+			<if test="step != null  and step != ''">
+				AND a.step = #{step}
+			</if>
+			<if test="flowId != null  and flowId != ''">
+				AND a.flow_id = #{flowId}
+			</if>
+			<if test="searchFlag !=null and searchFlag != ''">
+				<if test='searchFlag == "zb"'>
+					and c.stepName not in ('审批结束','重新发起')
+				</if>
+				<if test='searchFlag == "yb"'>
+					and c.stepName in ('审批结束','重新发起')
+				</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.bill_date desc
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO msg_message(
+		id,
+		type,
+		content_title,
+		content_level,
+		content_type,
+		content_text,
+		receiver_type,
+		receiver_codes,
+		receiver_names,
+		sender,
+		sender_name,
+		send_date,
+		biz_key,
+		buttons,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		status,
+		biz_type,
+		email_cc,
+		email_bcc,
+		send_result,
+		corp_code,
+		corp_name
+		) VALUES (
+		#{id},
+		#{type},
+		#{contentTitle},
+		#{contentLevel},
+		#{contentType},
+		#{contentText},
+		#{receiverType},
+		#{receiverCodes},
+		#{receiverNames},
+		#{sender},
+		#{senderName},
+		#{sendDate},
+		#{bizKey},
+		#{buttons},
+		#{createBy.userCode},
+		#{createDate},
+		#{updateBy.userCode},
+		#{updateDate},
+		#{remarks},
+		#{status},
+		#{bizType},
+		#{emailCc},
+		#{emailBcc},
+		#{sendResult},
+		#{corpCode},
+		#{corpName}
+		)
+	</insert>
+
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE msg_message SET
+		type = #{type},
+		content_title =
+		#{contentTitle},
+		content_level = #{contentLevel},
+		content_type =
+		#{contentType},
+		content_text = #{contentText},
+		receiver_type =
+		#{receiverType},
+		receiver_codes = #{receiverCodes},
+		receiver_names =
+		#{receiverNames},
+		sender = #{sender},
+		sender_name = #{senderName},
+		send_date =
+		#{sendDate},
+		biz_key = #{bizKey},
+		buttons = #{buttons},
+		update_by =
+		#{updateBy.userCode},
+		update_date = #{updateDate},
+		remarks =
+		#{remarks},
+		biz_type = #{bizType},
+		email_cc = #{emailCc},
+		email_bcc =
+		#{emailBcc},
+		send_result = #{sendResult},
+		corp_code=#{corpCode},
+		corp_name=#{corpName}
+		WHERE id = #{id}
+		<if test="corpCode != null and corpCode != ''">
+			AND corp_code = #{corpCode}
+		</if>
+	</update>
+
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE msg_message SET
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<!-- 移动端消息条数 -->
+	<select id="findMessage" resultType="AppMessage">
+		select *
+		from (select a.content_type, count(*) AS messageNum
+		from msg_message a
+		inner join msg_message_record a1
+		on a.id = a1.message_id
+		where a1.receiver_code = #{receiverCodes}
+		and content_type is not null
+		and a1.status = 1 and a.type = 5
+		<if test="corpCode != null and corpCode != ''">
+			AND a.corp_code = #{corpCode}
+		</if>
+		group by content_type) b
+		left join (select max(m1.content_title) AS "contentTitle",
+		max(m1.remarks) AS "contentText",
+		max(m1.receiver_codes) AS "receiverCodes",
+		m1.content_type
+		from msg_message m1
+		join msg_message_record m2 on m1.id= m2.message_id
+		where m1.content_type in
+		(select distinct content_type from msg_message)
+		and m2.receiver_code = #{receiverCodes} and m2.status=1
+		<if test="corpCode != null and corpCode != ''">
+			AND m1.corp_code = #{corpCode}
+		</if>
+		group by m1.content_type) d
+		on b.content_type = d.content_type
+		right join (select name, value, type, sorts from sys_dict) e
+		on e.value = d.content_type
+		where e.type = 'msg_content_type'
+		and e.value is not null
+		and e.value not in (2, 3, 4)
+		order by e.sorts asc
+	</select>
+
+	<!-- 根据业务表的sysCode获取消息记录表的id -->
+	<select id="getRecordId" resultType="AppMessage">
+		select a.id AS "id" from
+		msg_message_record a
+		inner join msg_message b
+		on
+		a.message_id = b.id
+		where b.biz_key = #{sysCode}
+		and a.receiver_code =
+		#{receiverCodes}
+		and
+		a.status =1
+		<if test="corpCode != null and corpCode != ''">
+			AND b.corp_code = #{corpCode}
+		</if>
+	</select>
+
+	<!-- 移动端消息条数 Mc add 20161012 -->
+	<select id="findMessageNew" resultType="AppMessage">
+		(
+		SELECT
+		1 AS TYPE,
+		count(mm.id) as messageNum,
+		mm2.ct AS contentTitle,
+		mm2.RECEIVER_CODES AS receiverCodes
+		FROM
+		msg_message mm
+		RIGHT JOIN (
+		SELECT
+		content_title AS "ct",
+		RECEIVER_CODES
+		FROM
+		msg_message
+		WHERE
+		`STATUS` = #{STATUS_NORMAL}
+		AND RECEIVER_CODES = #{receiverCodes}
+		ORDER BY
+		CREATE_date DESC
+		LIMIT 1
+		) mm2 ON 1 = 1
+		WHERE
+		mm.`STATUS` = #{STATUS_NORMAL}
+		AND mm.RECEIVER_CODES = #{receiverCodes}
+		<!-- <if test="corpCode != null and corpCode != ''"> -->
+		<!-- AND mm.corp_code = #{corpCode} -->
+		<!-- </if> -->
+		LIMIT 1)
+		union all
+		SELECT 2 AS TYPE,
+		count(*) AS messageNum,
+		b.CONTENT AS contentTitle,
+		b.APPROVAL_CODE
+		FROM
+		sys_flow_business t
+		LEFT JOIN (
+		SELECT a.ID,
+		a.CONTENT,
+		a.APPROVAL_CODE,
+		a.UPDATE_DATE
+		FROM
+		sys_flow_business a
+		WHERE a.`STATUS` = #{STATUS_NORMAL}
+		AND a.APPROVAL_CODE = #{receiverCodes}
+		AND a.APPROVAL_STATUS = 1
+		ORDER BY a.UPDATE_DATE DESC
+		LIMIT 1 )
+		b ON t.ID = b.ID
+		WHERE t.`STATUS` = #{STATUS_NORMAL}
+		AND t.APPROVAL_CODE = #{receiverCodes}
+		AND t.APPROVAL_STATUS = 1
+		union all
+		SELECT 5 AS TYPE,
+		count(*) AS messageNum,
+		c.TITLE AS contentTitle,
+		c.USER_CODE AS receiverCodes
+		from oa_research a
+		inner join oa_research_person b on a.ID = b.RESEARCH_ID
+		LEFT JOIN
+		(SELECT a.ID,a.TITLE,b.user_code from oa_research a
+		inner join
+		oa_research_person b on a.ID = b.RESEARCH_ID
+		WHERE b.USER_CODE =
+		#{receiverCodes}
+		AND a.`STATUS` = #{STATUS_NORMAL}
+		AND b.`STATUS` =
+		#{STATUS_NORMAL}
+		AND a.RESEARCH_STATUS = '1'
+		AND b.IS_ANSWER = '0'
+		ORDER
+		BY a.UPDATE_DATE DESC
+		LIMIT 1) c ON a.ID = c.id
+		WHERE
+		a.research_status='1'
+		AND a.`STATUS` = #{STATUS_NORMAL}
+		AND b.`STATUS` = #{STATUS_NORMAL}
+		AND b.USER_CODE = #{receiverCodes}
+		and b.IS_ANSWER='0'
+		union all
+		(SELECT 4
+		AS TYPE,
+		count(*) AS messageNum,
+		mm.CONTENT_TITLE AS contentTitle,
+		mm.RECEIVER_CODES AS receiverCodes from msg_message mm
+		INNER JOIN msg_message_record mmr ON mm.ID = mmr.MESSAGE_ID
+		inner join cms_article ca ON ca.ID = mm.BIZ_KEY and ca.status = '0'
+		where mm.RECEIVER_CODES = #{receiverCodes} AND mm.CONTENT_TYPE = 1 AND
+		(mmr.`STATUS` = '1' OR mmr.`STATUS` = '3') and mm.status=0
+		)
+		<!-- (SELECT 4 AS TYPE, count(*) AS messageNum, a.TITLE AS contentTitle, 
+			b.user_code AS receiverCodes FROM cms_article a LEFT JOIN ( SELECT * FROM 
+			article_browse b WHERE b.USER_CODE = #{receiverCodes} AND b.`STATUS` = #{STATUS_NORMAL} 
+			) b ON a.ID = b.article_id LEFT JOIN cms_category c ON c.category_code = 
+			a.category_code LEFT JOIN sys_user d ON d.USER_CODE= a.CREATE_BY WHERE b.user_code 
+			IS NULL <if test="corpCode != null and corpCode != ''"> AND a.corp_code = 
+			#{corpCode} </if> AND a.`STATUS` = #{STATUS_NORMAL} AND c.`STATUS` = #{STATUS_NORMAL} 
+			AND d.`STATUS` = #{STATUS_NORMAL} LIMIT 1) -->
+		union all
+		(select
+		6 as Type,
+		count(*) AS "messageNum",
+		<!-- min(ifnull(a.title,a.CONTENT)) AS "content", -->
+		b.contentTitle AS "contentTitle",
+		a.user_id AS "receiverCodes"
+		from ppm_sw_routine_node a
+		left join ppm_sw_routine_node fq on a.root_node_id = fq.id
+		left join
+		sys_user u2 on fq.user_id = u2.user_code
+		left join ppm_sw_routine_node
+		zf on a.parent_id = zf.id
+		left join sys_user u3 on zf.user_id =
+		u3.user_code
+		inner join sys_user su on a.user_id = su.user_code and su.status = '0'
+		left
+		join (select
+		a.ID,
+		concat(su.user_name,"的待办事务") AS "contentTitle"
+		from ppm_sw_routine_node a
+		left join ppm_sw_routine_node fq on a.root_node_id = fq.id
+		left join
+		sys_user u2 on fq.user_id = u2.user_code
+		left join ppm_sw_routine_node
+		zf on a.parent_id = zf.id
+		left join sys_user u3 on zf.user_id =
+		u3.user_code
+		inner join sys_user su on a.user_id = su.user_code and su.status = '0'
+		where
+		(
+		(a.user_id = #{receiverCodes}
+		and (a.state &lt; '3' or a.state = '4')
+		and exists (select 1 from ppm_sw_routine_node pn where pn.id =
+		a.root_node_id and pn.state != '5')
+		)
+		or
+		(a.state = '3'
+		and exists (select 1 from ppm_sw_routine_node pn where pn.id =
+		a.parent_id and pn.user_id = #{receiverCodes})
+		)
+		)
+		ORDER BY a.UPDATE_DATE desc
+		LIMIT 1
+		) b on a.id= b.id
+		where
+		(
+		(a.user_id = #{receiverCodes}
+		and (a.state &lt; '3' or a.state = '4')
+		and exists (select 1 from ppm_sw_routine_node pn where pn.id =
+		a.root_node_id and pn.state != '5')
+		)
+		or
+		(a.state = '3'
+		and exists (select 1 from ppm_sw_routine_node pn where pn.id =
+		a.parent_id and pn.user_id = #{receiverCodes})
+		)
+		)
+		)
+	</select>
+	<select id="findMessageTwo" resultType="AppMessage">
+		SELECT 2 AS TYPE,
+		count(*) AS messageNum,
+		b.CONTENT AS contentTitle,
+		b.APPROVAL_CODE
+		FROM
+		sys_flow_business t
+		LEFT JOIN (
+		SELECT a.ID,
+		a.CONTENT,
+		a.APPROVAL_CODE,
+		a.UPDATE_DATE
+		FROM
+		sys_flow_business a
+		WHERE a.`STATUS` = #{STATUS_NORMAL}
+		AND a.APPROVAL_CODE = #{receiverCodes}
+		AND a.APPROVAL_STATUS = 1
+		ORDER BY a.UPDATE_DATE DESC
+		LIMIT 1 )
+		b ON t.ID = b.ID
+		WHERE t.`STATUS` = #{STATUS_NORMAL}
+		AND t.APPROVAL_CODE = #{receiverCodes}
+		AND t.APPROVAL_STATUS = 1
+	</select>
+	<!-- 获取单条数据 -->
+	<select id="getRoleMenuByUser" resultType="Menu">
+		SELECT DISTINCT
+		a.menu_code AS "menuCode",
+		a.name AS "name",
+		a.parent_code AS "parentCode",
+		a.parent_codes AS "parentCodes",
+		a.sorts AS "sorts",
+		a.hasnext AS "hasnext",
+		a.sort_grade AS "sortGrade",
+		a.module_code AS "moduleCode",
+		a.type AS "type",
+		a.target AS "target",
+		a.color AS "color",
+		a.icon AS "icon",
+		a.is_show AS "isShow",
+		a.permission AS "permission",
+		a.sys_code AS "sysCode",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate"
+		FROM sys_menu a
+		LEFT JOIN sys_menu p ON p.menu_code =
+		a.parent_code
+		JOIN sys_role_menu rm ON rm.menu_code = a.menu_code
+		JOIN
+		sys_role r ON r.role_code = rm.role_code
+		LEFT JOIN sys_user_role ur ON
+		ur.role_code = r.role_code
+		LEFT JOIN sys_user u ON u.user_code =
+		ur.user_code
+		WHERE (a.status = #{STATUS_NORMAL} OR a.status is null)
+		AND ((u.status = #{STATUS_NORMAL} AND u.user_code = #{userCode}) OR
+		r.role_code = '100'
+		<!-- <if test="defaultRoleCodes != null and defaultRoleCodes.length gt 
+			0"> OR r.role_code in <foreach collection="defaultRoleCodes" item="roleCode" 
+			open="(" separator="," close=")"> #{roleCode} </foreach> </if> -->
+		)
+		<if test="parentCode != null and parentCode != ''">
+			AND a.parent_code = #{parentCode}
+		</if>
+		<if test="sysCode != null and sysCode != ''">
+			AND a.sys_code = #{sysCode}
+		</if>
+		<if test="moduleCode != null and moduleCode != ''">
+			AND a.MODULE_CODE = #{moduleCode}
+		</if>
+		<if test="corpCode != null and corpCode != ''">
+			AND u.corp_code = #{corpCode}
+		</if>
+		AND a.SORT_GRADE !='0'
+		AND a.IS_SHOW ='1'
+		ORDER BY a.sorts ASC
+	</select>
+	<select id="messageList" resultType="AppMessage">
+		select *
+		from msg_message mm
+		join msg_message_record mmr on mm.ID =
+		mmr.MESSAGE_ID
+		where mm.`STATUS` = #{STATUS_NORMAL} and mmr.`STATUS` =
+		1 and
+		mmr.RECEIVER_CODE = #{receiverCodes}
+		<if test="corpCode != null and corpCode != ''">
+			AND mm.corp_code = #{corpCode}
+		</if>
+	</select>
+
+
+
+
+
+	<!-- app端单据列 -->
+	<select id="findBillFeeList" resultType="AppMessage">
+		SELECT distinct
+		a.BIZ_KEY as "bizKey",
+		a.APPLICANT_NAME as "applicantName",
+		a.BILLTYPE_CODE as "billtypeCode",
+		a.CONTENT as "CONTENT",
+		a.id as "id",
+		a.BILL_DATE as "billDate",
+		b.CREATE_DATE as "createDate"
+		from ebc_fee_apply b
+		inner JOIN sys_flow_log a on b.SYS_CODE=a.BIZ_KEY and a.STEP='-9' and
+		a.`STATUS`='0'
+		where b.`STATUS`='0'
+		AND b.BILLSORT_CODE in('ZF','BX')
+		<if test="applicantName != null and applicantName != ''">
+			<if test="dbName == 'oracle'">AND a.applicant_name like '%'||#{applicantName}||'%'</if>
+			<if test="dbName == 'mysql'">AND a.applicant_name like
+				concat('%',#{applicantName},'%')</if>
+		</if>
+		<if test="corpCode != null and corpCode != ''">
+			AND b.corp_code = #{corpCode}
+		</if>
+		<if test="billtypeCode != null and billtypeCode != ''">
+			AND b.billsort_code = #{billtypeCode}
+		</if>
+		<if test="companyCode != null and companyCode != ''">
+			and b.company_code=#{companyCode}
+		</if>
+		<if test="beginDate != null and beginDate != ''">
+			AND b.APPLYDATE <![CDATA[>=]]>#{beginDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			AND b.APPLYDATE <![CDATA[<]]>#{endDate}
+		</if>
+		<if test="beginMoney != null and beginMoney != ''">
+			AND b.APPLY_MONEY_SUM  <![CDATA[>=]]>
+			#{beginMoney}
+		</if>
+		<if test="endMoney != null and endMoney != ''">
+			AND b.APPLY_MONEY_SUM  <![CDATA[<=]]>
+			#{endMoney}
+		</if>
+		ORDER BY b.CREATE_DATE DESC
+	</select>
+	<select id="findBillList" resultType="AppMessage">
+		SELECT
+		a.APPLICANT_NAME AS 'applicantName',
+		a.BILLTYPE_CODE AS
+		'billtypeCode',
+		a.COMPANY_NAME AS 'companyName',
+		a.OFFICE_NAME AS
+		'officeName',
+		a.BIZ_KEY AS 'bizKey',
+		a.CONTENT AS 'content',
+		<if test="dbName =='oracle'">to_char(a.BILL_DATE,'yyyy-MM-dd hh:mm:ss') </if>
+		<if test="dbName =='mysql'">date_format(a.BILL_DATE, '%Y-%m-%d %H:%i:%s')</if>
+		AS 'billDate',
+		b.TYPE_NAME AS 'typeName',b.LEAVE_DAYS AS
+		'leaveDays',b.REASON AS 'reason',
+		c.REPAIR_TYPE_NAME AS 'repeirTypeName',c.DEPICTION AS 'depiction',
+		d.TRAVEL_DAYS AS 'travelDays',d.DESTINATION AS 'destination',d.VEHICLE AS
+		'vehicle',d.REASON AS 'reasons',
+		e.overtime_hours AS 'overtimeHours',e.REASON AS 'reasonss',
+		f.USE_ITEM AS 'useItem',f.USE_ROUTE AS 'useRoute',
+		g.REMARKS AS 'remarkss',
+		i.sort_name AS 'sortName',i.asset_std AS 'assetStd',
+		j.SUM_MONEY AS 'sumMoney'
+		FROM
+		sys_flow_log a
+		LEFT JOIN hr_leave b ON b.ID = a.BIZ_KEY
+		LEFT JOIN oa_repair c ON c.sys_code = a.BIZ_KEY
+		LEFT JOIN hr_travel d ON d.ID = a.BIZ_KEY
+		LEFT JOIN hr_overtime e ON e.ID = a.BIZ_KEY
+		LEFT JOIN app_car_application f ON f.ID = a.BIZ_KEY
+		LEFT JOIN hr_business g ON g.sys_code = a.BIZ_KEY
+		LEFT JOIN app_asset h ON h.sys_code = a.BIZ_KEY
+		LEFT JOIN app_asset_detail i on i.applicant_code=h.sys_code
+		LEFT JOIN ebc_borrowing_bill j on j.SYS_CODE=a.BIZ_KEY
+		WHERE
+		a.billtype_code IN ('QJ','BXI','CC','JB','YCSQ','QS','ZK','JK','ZC')  <!-- 
+			2018-03-09 增加 ZC 于慧亮（17806229029） add -->
+		AND a.billtype_code =#{billtypeCode}
+		AND a.step='0'
+		<if test="applicantName != null and applicantName != ''">
+			<if test="dbName == 'oracle'">AND a.applicant_name like '%'||#{applicantName}||'%'</if>
+			<if test="dbName == 'mysql'">AND a.applicant_name like
+				concat('%',#{applicantName},'%')</if>
+		</if>
+		<if test="corpCode != null and corpCode != ''">
+			AND a.corp_code = #{corpCode}
+		</if>
+		ORDER BY a.BILL_DATE DESC
+	</select>
+	<select id="getRoleMenuByParentCode" resultType="Menu">
+		SELECT DISTINCT
+		a.menu_code AS "menuCode",
+		a.name AS "name",
+		a.parent_code AS "parentCode",
+		a.parent_codes AS "parentCodes",
+		a.sorts AS "sorts",
+		a.hasnext AS "hasnext",
+		a.sort_grade AS "sortGrade",
+		a.module_code AS "moduleCode",
+		a.type AS "type",
+		a.target AS "target",
+		a.color AS "color",
+		a.icon AS "icon",
+		a.is_show AS "isShow",
+		a.permission AS "permission",
+		a.sys_code AS "sysCode",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate"
+		FROM sys_menu a
+		LEFT JOIN sys_menu p ON p.menu_code =
+		a.parent_code
+		JOIN sys_role_menu rm ON rm.menu_code = a.menu_code
+		JOIN
+		sys_role r ON r.role_code = rm.role_code
+		LEFT JOIN sys_user_role ur ON
+		ur.role_code = r.role_code
+		LEFT JOIN sys_user u ON u.user_code =
+		ur.user_code
+		WHERE u.user_code = #{userCode}
+		AND a.parent_code = #{parentCode}
+		<if test="global.useCorpModel">
+			AND u.corp_code = #{corpCode}
+		</if>
+		ORDER BY a.sorts ASC
+	</select>
+	
+	<!-- 手机端查询人员列表后台 -->
+	<select id="findPersonnelInfo" resultType="PeoPleSearch">
+		SELECT
+				firstPinyin (a.EMP_NAME) AS "extendS1",
+				pinyin(a.EMP_NAME) AS "extendS2",
+				b.user_code AS "userCode",
+		        b.user_name AS "userName",
+				a.EMP_CODE AS "empCode",
+				a.EMP_NAME AS "empName",
+				c.office_name AS "officeName",
+				c.office_code AS "officeCode",
+				c.office_name AS "company"
+			FROM
+				sys_employee a
+		LEFT JOIN sys_user b on b.ref_code=a.emp_code
+		LEFT JOIN sys_office c on c.office_code=a.office_code
+		left join sys_company d on a.company_code = d.company_code
+		where
+		a.status != #{STATUS_DELETE}
+		AND b.status != #{STATUS_DELETE}
+		AND b.USER_CODE is NOT NULL
+        <if test="userName != null and userName != ''">
+				AND a.EMP_NAME like concat('%',#{userName},'%')
+		</if>	
+	</select>
+	
+</mapper>

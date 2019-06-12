@@ -1,0 +1,128 @@
+<%@ page contentType="text/html;charset=UTF-8" trimDirectiveWhitespaces="true"%>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<c:set var="extLibs" value="validate,grid"/>
+<sys:header title="资产入库管理" extLibs="${extLibs}" />
+<div class="portlet box ${boxStyleColor}">
+	<div class="portlet-title">
+		<div class="caption"><i class="fa fa-coffee"></i> 资产入库管理</div>
+		<div class="actions">
+			<a href="#" class="btn btn-default btn-sm" id="btnSearch" title="查询"><i class="fa fa-search"></i> 查询</a>
+			<shiro:hasPermission name="ass:assetInfo:edit">
+				<a href="${ctx}/ass/assetInfo/form" class="btn btn-default btn-sm btnTool" title="新增资产入库"><i class="fa fa-plus"></i> 新增</a>
+                <a href="#" class="btn btn-default btn-sm" id="btnExport" title="导出"><i class="fa fa-external-link"></i> 导出</a>
+                <a href="#" class="btn btn-default btn-sm" id="btnImport"><i class="fa fa-pencil-square-o"></i> ${fns:text('导入')}</a>
+            </shiro:hasPermission>
+		</div>
+	</div>
+    <div id="importBox" class="hide">
+        <form:form id="importDataForm" action="${ctx}/ass/assetInfo/importFile" method="post" enctype="multipart/form-data"
+                   class="form-search" style="padding-left:20px;text-align:center;" onsubmit="" ><br/>
+            <input id="uploadFile" name="file" type="file" style="width:330px;margin-left:100px;" /><br/><br/>
+            <input id="btmImportSubmit" class="btn btn-primary" onclick="upload();" type="submit" value="${fns:text('导入数据')}" style="margin-left:43px;" />&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="${ctxStatic}/modules/sys/office/资产入库模板.xlsx" style="margin-right:0px;" >${fns:text('下载模板')}</a>
+        </form:form>
+    </div>
+    <sys:message content="${message}"></sys:message>
+	<div class="portlet-body list">
+		<form:form id="searchForm" modelAttribute="assetInfo" action="${ctx}/ass/assetInfo/listData" method="post" class="breadcrumb form-inline hide"
+				data-page-no="${page.pageNo}" data-page-size="${page.pageSize}" data-order-by="${page.orderBy}">
+			<div class="form-group">
+				<label class="control-label">状态：</label>
+				<div class="input-inline">
+					<form:select path="status" class="form-control input-sm width-160">
+						<form:option value="" label="全部"/>
+						<form:options items="${fns:getDictList('search_status')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+					</form:select>
+				</div>
+			</div>
+			<div class="form-group" style="margin-left:10px;"> 
+				<input class="btn btn-primary btn-sm" type="submit" value="查询"/>&nbsp;
+				<input class="btn default btn-sm" type="reset" value="重置"/>
+			</div>
+		</form:form>
+		<table id="dataGrid"></table>
+		<div id="dataGridPage"></div>
+	</div>
+</div>
+<sys:footer extLibs="${extLibs}" />
+<script type="text/javascript">
+	// 初始化DataGrid对象
+	$("#dataGrid").dataGrid({
+
+		searchForm: $("#searchForm"), // 数据来源表单
+		tabPageId: '${param.tabPageId}',// 当前页签编号
+
+		// 设置数据表格列
+		columnModel: [
+            {header:'状态', name:'status', index:'a.status', width:200, align:"left",formatter: function(val, obj, row, act){
+                    var Status = ["闲置","已物理删除","已领用"]
+                    return Status[row.status]
+                }},
+            {header:'资产编码', name:'assetCode', index:'a.asset_code', width:200, align:"left"},
+            {header:'资产名称', name:'assetName', index:'a.asset_name', width:200, align:"left"},
+			{header:'资产分类编码', name:'sortCode', index:'a.sort_code', width:200, align:"left", frozen:true, formatter: function(val, obj, row, act){
+				return '<a href="${ctx}/ass/assetInfo/form?id='+row.id+'" class="btnList" data-title="编辑资产入库">'+(val ? val : row.id)+'</a>';
+			}},
+			{header:'资产分类名称', name:'sortName', index:'a.sort_name', width:200, align:"left"},
+			{header:'型号', name:'version', index:'a.version', width:200, align:"left"},
+			{header:'SN号', name:'snCode', index:'a.sn_code', width:200, align:"left"},
+			{header:'公司名称', name:'companyName', index:'a.company_name', width:200, align:"left"},
+			{header:'责任部门', name:'officeName', index:'a.office_name', width:200, align:"left"},
+			{header:'区域名称', name:'regionName', index:'a.region_name', width:200, align:"left"},
+			{header:'责任人名称', name:'dutyName', index:'a.duty_name', width:200, align:"left"},
+			{header:'存放地点', name:'storagePlace', index:'a.storage_place', width:200, align:"left"},
+			{header:'操作', name:'actions', width:100, fixed:true, sortable:false, formatter: function(val, obj, row, act){
+				var actions = [];//<shiro:hasPermission name="ass:assetInfo:edit">
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/ass/assetInfo/form?id='+row.id+'" class="btnList" title="编辑资产入库"><i class="fa fa-pencil"></i></a>&nbsp;');
+					actions.push('<a href="${ctx}/ass/assetInfo/delete?id='+row.id+'" class="btnList" title="删除该资产入库" data-confirm="确认要删除该资产入库吗？"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				}//</shiro:hasPermission>
+				return actions.join('');
+			}}
+		],
+		ajaxSuccess: function(data){ // 加载成功后执行方法
+			
+		}
+	});
+    //数据导出
+    $("#btnExport").click(function(){
+        top.$.jBox.confirm("确认要导出数据吗？","系统提示",function(v,h,f){
+            if(v=="ok"){
+                ajaxDownload('${ctx}/ass/assetInfo/export',$("#searchForm").serialize());
+            }
+        },{buttonsFocus:1});
+        top.$('.jbox-body .jbox-icon').css('top','55px');
+    });
+
+
+    $("#btnImport").click(function(){
+        $.jBox($("#importBox").html(),{title:"${fns:text('导入数据')}",buttons:{"${fns:text('关闭')}":true},bottomText:"导入文件不能超过5M，仅允许导入“xls”或“xlsx”格式文件"});
+    });
+    //导入loading
+    function upload(){
+        $.jBox.tip("正在检查数据合法性并导入数据到数据库，请稍后...", 'loading');
+    }
+    /**
+     * Ajax 文件下载   ajaxDownload('ExcelDownload.do','find=commoncode','post' );
+     * @param url
+     * @param data
+     * @param method
+     */
+    function ajaxDownload(url, data, method) {
+        // 获取url和data
+        if (url && data) {
+            // data 是 string 或者 array/object
+            data = typeof data == 'string' ? data : jQuery.param(data);
+            // 把参数组装成 form的 input
+            var inputs = '';
+            $.each(data.split('&'), function() {
+                var pair = this.split('=');
+                inputs += '<input type="hidden" name="' + pair[0] + '" value="'
+                    + pair[1] + '" />';
+            });
+            // request发送请求
+            $('<form action="' + url + '" method="' + (method || 'post')
+                + '" >' + inputs + '</form>').appendTo('body').submit().remove();
+        }
+    }
+</script>

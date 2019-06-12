@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.mdm.dao.BtypeExtDao">
+    
+    <!-- 输出字段列 -->
+	<sql id="btypeExtColumns">
+		a.btype_code AS "btypeCode",
+		a.btype_name AS "btypeName",
+		a.property_code AS "propertyCode",
+		a.property_name AS "propertyName",
+		a.btype_sorts AS "btypeSorts",
+		a.register_capital AS "registerCapital",
+		a.btype_url AS "btypeUrl",
+		a.btype_intro AS "btypeIntro",
+		a.main_business AS "mainBusiness",
+		a.coordinate AS "coordinate",
+		a.business_scope AS "businessScope",
+		a.is_market AS "isMarket",
+		a.market_no AS "marketNo",
+		a.scale AS "scale",
+		a.peop_num AS "peopNum",
+		a.trade_sort_code AS "tradeSortCode",
+		a.country_code AS "countryCode",
+		a.trade_sort_name AS "tradeSortName",
+		a.country_name AS "countryName",
+		a.province_code AS "provinceCode",
+		a.province_name AS "provinceName",
+		a.city_code AS "cityCode",
+		a.city_name AS "cityName",
+		a.district_code AS "districtCode",
+		a.district_name AS "districtName",
+		a.garden_code AS "gardenCode",
+		a.garden_name AS "gardenName",
+		a.incubator_code AS "incubatorCode",
+		a.incubator_name AS "incubatorName",
+		a.incubate_status AS "incubateStatus",
+		a.create_by AS "createBy.userCode",
+		a.join_incubate_date AS "joinIncubateDate",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.status AS "status",
+		a.province_code||'/'||a.city_code||'/'||a.district_code AS "areaCode",
+		a.province_name||'/'||a.city_name||'/'||a.district_name AS "areaName",
+		a.market_sort_code AS "marketSortCode",
+		a.market_sort_name AS "marketSortName",
+		a.market_code AS "marketCode",
+		a.field_code AS "fieldCode",
+		a.field_name AS "fieldName",
+		a.high_certificate_code As "highCertificateCode"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="btypeExtJoins">
+	</sql>
+    
+    <!-- 获取单行数据 -->
+	<select id="get" resultType="BtypeExt">
+		SELECT 
+			<include refid="btypeExtColumns"/>
+		FROM ass_btype_ext a
+		<include refid="btypeExtJoins"/>
+		WHERE a.btype_code = #{btypeCode}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="BtypeExt">
+		SELECT 
+			<include refid="btypeExtColumns"/>
+		FROM ass_btype_ext a
+		<include refid="btypeExtJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="btypeCode != null and btypeCode != ''">
+				AND a.btype_code = #{btypeCode}
+			</if>
+			<if test="btypeName != null and btypeName != ''">
+				AND a.btype_name = #{btypeName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="BtypeExt">
+		SELECT 
+			<include refid="btypeExtColumns"/>
+		FROM ass_btype_ext a
+		<include refid="btypeExtJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_btype_ext(
+			btype_code,
+			btype_name,
+			property_code,
+			property_name,
+			btype_sorts,
+			register_capital,
+			btype_url,
+			btype_intro,
+			main_business,
+			coordinate,
+			business_scope,
+			is_market,
+			market_no,
+			scale,
+			peop_num,
+			trade_sort_code,
+			country_code,
+			trade_sort_name,
+			country_name,
+			province_code,
+			province_name,
+			city_code,
+			city_name,
+			district_code,
+			district_name,
+			garden_code,
+			garden_name,
+			incubator_code,
+			incubator_name,
+			incubate_status,
+			create_by,
+			join_incubate_date,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			status,
+			market_sort_code,
+		    market_sort_name,
+			market_code,
+			field_code,
+			field_name,
+			high_certificate_code
+		) VALUES (
+			#{btypeCode},
+			#{btypeName},
+			#{propertyCode},
+			#{propertyName},
+			#{btypeSorts},
+			#{registerCapital},
+			#{btypeUrl},
+			#{btypeIntro},
+			#{mainBusiness},
+			#{coordinate},
+			#{businessScope},
+			#{isMarket},
+			#{marketNo},
+			#{scale},
+			#{peopNum},
+			#{tradeSortCode},
+			#{countryCode},
+			#{tradeSortName},
+			#{countryName},
+			#{provinceCode},
+			#{provinceName},
+			#{cityCode},
+			#{cityName},
+			#{districtCode},
+			#{districtName},
+			#{gardenCode},
+			#{gardenName},
+			#{incubatorCode},
+			#{incubatorName},
+			#{incubateStatus},
+			#{createBy.userCode},
+			#{joinIncubateDate},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{remarks},
+			#{status},
+			#{marketSortCode},
+			#{marketSortName},
+			#{marketCode},
+			#{fieldCode},
+			#{fieldName},
+			#{highCertificateCode}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_btype_ext SET 	
+			btype_name = #{btypeName},
+			property_code = #{propertyCode},
+			property_name = #{propertyName},
+			btype_sorts = #{btypeSorts},
+			register_capital = #{registerCapital},
+			btype_url = #{btypeUrl},
+			btype_intro = #{btypeIntro},
+			main_business = #{mainBusiness},
+			coordinate = #{coordinate},
+			business_scope = #{businessScope},
+			is_market = #{isMarket},
+			market_no = #{marketNo},
+			scale = #{scale},
+			peop_num = #{peopNum},
+			trade_sort_code = #{tradeSortCode},
+			country_code = #{countryCode},
+			trade_sort_name = #{tradeSortName},
+			country_name = #{countryName},
+			province_code = #{provinceCode},
+			province_name = #{provinceName},
+			city_code = #{cityCode},
+			city_name = #{cityName},
+			district_code = #{districtCode},
+			district_name = #{districtName},
+			garden_code = #{gardenCode},
+			garden_name = #{gardenName},
+			incubator_code = #{incubatorCode},
+			incubator_name = #{incubatorName},
+			incubate_status = #{incubateStatus},
+			join_incubate_date = #{joinIncubateDate},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			market_sort_code = #{marketSortCode},
+			market_sort_name = #{marketSortName},
+			market_code = #{marketCode},
+			field_code = #{fieldCode},
+			field_name = #{fieldName},
+			high_certificate_code = #{highCertificateCode}
+		WHERE btype_code = #{btypeCode}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_btype_ext SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE btype_code = #{btypeCode}
+	</update>
+	
+</mapper>

@@ -1,0 +1,9 @@
+.chart_table{width: 99%;border-collapse: collapse;}
+.chart_td{width: 30%;}
+.caveat_table{width: 99%;border-collapse: collapse;border-radius:8px !important;font-size: 12px;}
+.caveat_table tr td{border: 1px solid #ddd;height: 34px;padding-left: 3px;}
+.caveat_title{text-align: center;font-size: 14px;font-weight: bold;}
+.caveat_config{background-color: #428bca;height: 40px !important;color: #fff;font-size: 14px;}
+.input_wd{width: 50px;}
+.input_wd1{width:77%;}
+.btn_update{border-radius: 5px !important;background-color: #24c6cb;color: #fff;border: 0px;width: 45px;height: 25px;margin-left: 2px;}

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.changeinfo.dao.AssetChangeInfoDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="assetChangeInfoColumns">
+		a.id AS "id",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.duty_code AS "dutyCode",
+		a.duty_name AS "dutyName",
+		a.storage_place AS "storagePlace",
+		a.storage_place_code AS "storagePlaceCode",
+		a.age_limit AS "ageLimit",
+		a.status AS "status",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		o4.office_name AS "office.officeName",
+		u6.user_name AS "user.userName"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="assetChangeInfoJoins">
+		LEFT JOIN sys_office o4 ON o4.office_code = a.office_code
+		LEFT JOIN sys_user u6 ON u6.user_code = a.user_code
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetChangeInfo">
+		SELECT 
+			<include refid="assetChangeInfoColumns"/>
+		FROM ass_asset_change_info a
+		<include refid="assetChangeInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetChangeInfo">
+		SELECT 
+			<include refid="assetChangeInfoColumns"/>
+		FROM ass_asset_change_info a
+		<include refid="assetChangeInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="companyName != null and companyName != ''">
+				AND a.company_name = #{companyName}
+			</if>
+			<if test="officeName != null and officeName != ''">
+				AND a.office_name = #{officeName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetChangeInfo">
+		SELECT 
+			<include refid="assetChangeInfoColumns"/>
+		FROM ass_asset_change_info a
+		<include refid="assetChangeInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_change_info(
+			id,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			user_code,
+			user_name,
+			region_code,
+			region_name,
+			duty_code,
+			duty_name,
+			storage_place,
+			storage_place_code,
+			age_limit,
+			status,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks
+		) VALUES (
+			#{id},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{user.userCode},
+			#{userName},
+			#{regionCode},
+			#{regionName},
+			#{dutyCode},
+			#{dutyName},
+			#{storagePlace},
+			#{storagePlaceCode},
+			#{ageLimit},
+			#{status},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{remarks}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_change_info SET 	
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			duty_code = #{dutyCode},
+			duty_name = #{dutyName},
+			storage_place = #{storagePlace},
+			storage_place_code = #{storagePlaceCode},
+			age_limit = #{ageLimit},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_asset_change_info SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

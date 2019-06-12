@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.mdm.dao.SelectDao">
+	<!-- 查询机构信息 -->
+	<select id="findBtypeList" resultType="btypeInfo">
+		SELECT a.btype_code AS
+		"btypeCode",
+		a.btype_name AS "btypeName",
+		a.org_code AS "orgCode",
+		a.linkman AS "linkman",
+		a.linkman_tel AS "linkmanTel",
+		a.btype_sort_code AS "btypeSortCode",
+		a.btype_sort_name AS "btypeSortName",
+		a.is_admin AS "isAdmin",
+		b.province_code||'/'||b.city_code||'/'||b.district_code AS "areaCode",
+		b.province_name||'/'||b.city_name||'/'||b.district_name AS "areaName"
+		FROM ass_btype_info a
+		INNER JOIN ass_btype_ext b on a.btype_code=b.btype_code
+        <where>
+			<if test="btypeName != null and btypeName != ''">
+				AND a.btype_name LIKE '%'||#{btypeName}||'%'
+			</if>
+			<if test="btypeExt.areaCode != null and btypeExt.areaCode !=''">
+	            AND b.province_code||'/'||b.city_code||'/'||b.district_code=#{btypeExt.areaCode}
+	        </if>
+		</where>
+	</select>
+	<!-- 根据字典类型获取用户字典 -->
+	<select id="findUserDictByTypeCode" resultType="userDict">
+		SELECT
+		t.dict_name AS "dict_name", t.dict_value AS "dictValue"
+		FROM sys_user_dict t
+		WHERE t.dict_type_code=#{dictTypeCode}
+	</select>
+	<!-- 根据区编码返回市编码 -->
+	<select id="getCityCodeDistrictCode" resultType="java.lang.String">
+		SELECT b.area_code
+		FROM sys_area a
+		inner join sys_area b
+		on a.parent_code = b.area_code
+		inner join sys_area c
+		on b.parent_code = c.area_code
+		WHERE a.area_code = #{districtCode}
+	</select>
+	<!-- 根据区编码返回省编码 -->
+	<select id="getProvinceCodeDistrictCode" resultType="java.lang.String">
+		SELECT c.area_code
+		FROM sys_area a
+		inner join sys_area b
+		on a.parent_code = b.area_code
+		inner join sys_area c
+		on b.parent_code = c.area_code
+		WHERE a.area_code = #{districtCode}
+	</select>
+</mapper>

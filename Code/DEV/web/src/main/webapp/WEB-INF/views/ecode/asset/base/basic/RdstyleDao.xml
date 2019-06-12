@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.basic.dao.RdstyleDao">
+    
+    <!-- 输出字段列 -->
+	<sql id="rdstyleColumns">
+		a.rd_code AS "rdCode",
+		a.rd_name AS "rdName",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.billsort_code AS "billsortCode",
+		a.billsort_name AS "billsortName",
+		a.is_in AS "isIn",
+		a.is_out AS "isOut",
+		a.is_consign AS "isConsign",
+		a.order_code AS "orderCode",
+		a.memo AS "memo",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="rdstyleJoins">
+	</sql>
+    
+    <!-- 获取单行数据 -->
+	<select id="get" resultType="Rdstyle">
+		SELECT 
+			<include refid="rdstyleColumns"/>
+		FROM ass_rdstyle a
+		<include refid="rdstyleJoins"/>
+		<where>
+		<if test="rdCode != null and rdCode != ''">
+				AND a.rd_code = #{rdCode}
+			</if>
+		<if test="corpCode != null and corpCode != ''">
+				AND a.corp_Code = #{corpCode}
+			</if> 
+			</where>
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="Rdstyle">
+		SELECT 
+			<include refid="rdstyleColumns"/>
+		FROM ass_rdstyle a
+		<include refid="rdstyleJoins"/>
+		<where>
+			a.status = #{STATUS_NORMAL}
+			<if test="rdCode != null and rdCode != ''">
+				AND a.rd_code = #{rdCode}
+			</if>
+			<if test="corpCode != null and corpCode != ''">
+				AND a.corp_Code = #{corpCode}
+			</if> 
+			<if test="rdName != null and rdName != ''">
+				AND a.rd_name = #{rdName}
+			</if>
+			<if test="billsortCode != null and billsortCode != ''">
+				AND a.BILLSORT_CODE = #{billsortCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="Rdstyle">
+		SELECT 
+			<include refid="rdstyleColumns"/>
+		FROM ass_rdstyle a
+		<include refid="rdstyleJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_rdstyle(
+			rd_code,
+			rd_name,
+			corp_code,
+			corp_name,
+			billsort_code,
+			billsort_name,
+			is_in,
+			is_out,
+			is_consign,
+			order_code,
+			memo,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{rdCode},
+			#{rdName},
+			#{corpCode},
+			#{corpName},
+			#{billsortCode},
+			#{billsortName},
+			#{isIn},
+			#{isOut},
+			#{isConsign},
+			#{orderCode},
+			#{memo},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_rdstyle SET 	
+			rd_name = #{rdName},
+			billsort_code = #{billsortCode},
+			billsort_name = #{billsortName},
+			is_in = #{isIn},
+			is_out = #{isOut},
+			is_consign = #{isConsign},
+			order_code = #{orderCode},
+			memo = #{memo},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			status = #{status}
+		WHERE rd_code = #{rdCode}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_rdstyle SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE rd_code = #{rdCode}
+	</update>
+	
+</mapper>

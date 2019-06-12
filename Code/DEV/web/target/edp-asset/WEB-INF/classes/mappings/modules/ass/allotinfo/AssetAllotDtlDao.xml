@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.allotinfo.dao.AssetAllotDtlDao">
+
+    <!-- 输出字段列 -->
+    <sql id="assetAllotDtlColumns">
+		a.id AS "id",
+		a.allot_code AS "allotCode",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit_price AS "unitPrice",
+		a.unit AS "unit",
+		a.sn_code AS "snCode",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.buy_date AS "buyDate",
+		a.use_date AS "useDate",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.allot_office_code AS "allotOfficeCode",
+		a.allot_office_name AS "allotOfficeName",
+		a.storage_place_code AS "storagePlaceCode",
+		a.storage_place AS "storagePlace",
+		a.age_limit AS "ageLimit",
+		a.change_office AS "changeOffice",
+		a.change_duty AS "changeDuty",
+		a.change_storage_place AS "changeStoragePlace",
+		a.change_region AS "changeRegion",
+		a.asset_status AS "assetStatus",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o14.office_name AS "office.officeName",
+		u18.user_name AS "user.userName"
+	</sql>
+
+    <!-- 输出字段关联表 -->
+    <sql id="assetAllotDtlJoins">
+        <!-- 		LEFT JOIN ass_asset_allot_info b ON b.id = a.allot_code -->
+        LEFT JOIN sys_office o14 ON o14.office_code = a.office_code
+        LEFT JOIN sys_user u18 ON u18.user_code = a.user_code
+    </sql>
+
+    <!-- 获取单条数据 -->
+    <select id="get" resultType="AssetAllotDtl">
+        SELECT
+        <include refid="assetAllotDtlColumns"/>
+        FROM ass_asset_allot_dtl a
+        <include refid="assetAllotDtlJoins"/>
+        WHERE a.id = #{id}
+    </select>
+    <!-- 获取多条数据 -->
+    <select id="findUsedCode" resultType="AssetAllotDtl">
+        SELECT
+        <include refid="assetAllotDtlColumns"/>
+        FROM ass_asset_allot_dtl a
+        <include refid="assetAllotDtlJoins"/>
+        WHERE a.status != #{STATUS_DELETE} and a.allot_code = #{allotCode}
+    </select>
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="AssetAllotDtl">
+        SELECT
+        <include refid="assetAllotDtlColumns"/>
+        FROM ass_asset_allot_dtl a
+        <include refid="assetAllotDtlJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="allotCode != null and allotCode != ''">
+                AND a.allot_code = #{allotCode}
+            </if>
+            <if test="assetName != null and assetName != ''">
+                AND a.asset_name = #{assetName}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findAllList" resultType="AssetAllotDtl">
+        SELECT
+        <include refid="assetAllotDtlColumns"/>
+        FROM ass_asset_allot_dtl a
+        <include refid="assetAllotDtlJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.create_date ASC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insert">
+		INSERT INTO ass_asset_allot_dtl(
+			id,
+			allot_code,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			unit_price,
+			unit,
+			sn_code,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			buy_date,
+			use_date,
+			user_code,
+			user_name,
+			region_code,
+			region_name,
+		    allot_office_code,
+		    allot_office_name,
+		    storage_place_code,
+			storage_place,
+			age_limit,
+			change_office,
+			change_duty,
+			change_storage_place,
+			change_region,
+			asset_status,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{allotCode},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{unitPrice},
+			#{unit},
+			#{snCode},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{buyDate},
+			#{useDate},
+			#{user.userCode},
+			#{userName},
+			#{regionCode},
+			#{regionName},
+			#{allotOfficeCode},
+			#{allotOfficeName},
+			#{storagePlaceCode},
+			#{storagePlace},
+			#{ageLimit},
+			#{changeOffice},
+			#{changeDuty},
+			#{changeStoragePlace},
+			#{changeRegion},
+			#{assetStatus},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+
+    <!-- 更新数据 -->
+    <update id="update">
+		UPDATE ass_asset_allot_dtl SET 	
+			allot_code = #{allotCode},
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			unit_price = #{unitPrice},
+			unit = #{unit},
+			sn_code = #{snCode},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			buy_date = #{buyDate},
+			use_date = #{useDate},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			allot_office_code= #{allotOfficeCode},
+		    allot_office_name = #{allotOfficeName},
+		    storage_place_code = #{storagePlaceCode},
+			storage_place = #{storagePlace},
+			age_limit = #{ageLimit},
+			change_office = #{changeOffice},
+			change_duty = #{changeDuty},
+			change_storage_place = #{changeStoragePlace},
+			change_region = #{changeRegion},
+			asset_status = #{assetStatus},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+    <!-- 逻辑删除数据 -->
+    <update id="delete">
+        UPDATE ass_asset_allot_dtl SET
+        update_by = #{updateBy.id},
+        update_date = #{updateDate},
+        status = #{STATUS_DELETE}
+        <choose>
+            <when test="id != null and id != ''">
+                WHERE id = #{id}
+            </when>
+            <otherwise>
+                WHERE allot_code = #{allotCode}
+            </otherwise>
+        </choose>
+    </update>
+    <!-- 物理删除 -->
+    <update id="wulidelete">
+        delete from ass_asset_allot_dtl
+        WHERE allot_code = #{allotCode}
+    </update>
+
+</mapper>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: cn.net.ecode:edp-formtable:5.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-formtable/5.0-SNAPSHOT/edp-formtable-5.0-20181030.072604-5.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-formtable/5.0-SNAPSHOT/edp-formtable-5.0-20181030.072604-5-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../../../../maven3.1.1/maven/repository/cn/net/ecode/edp-formtable/5.0-SNAPSHOT/edp-formtable-5.0-20181030.072604-5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.usedinfo.dao.AssetUsedInfoDao">
+    <!-- 输出字段列 -->
+    <sql id="assetUsedInfoColumns">
+		a.id AS "id",
+		a.used_code AS "usedCode",
+		a.receiver_code AS "receiverCode",
+		a.receiver_name AS "receiverName",
+		a.receiver_date AS "receiverDate",
+		a.used_company_code AS "usedCompanyCode",
+		a.used_company_name AS "usedCompanyName",
+		a.used_office_code AS "usedOfficeCode",
+		a.used_office_name AS "usedOfficeName",
+		a.used_region_code AS "usedRegionCode",
+		a.used_region_name AS "usedRegionName",
+		a.used_storage_place AS "usedStoragePlace",
+		a.approval AS "approval",
+		a.approval_name AS "approvalName",
+		a.approval_memo AS "approvalMemo",
+		a.approval_date AS "approvalDate",
+		a.approval_status AS "approvalStatus",
+	    a.asset_class_code AS "assetClassCode",
+		a.asset_class AS "assetClass",
+		a.number_recipients AS "numberRecipients",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+    <sql id="assetUsedDtlColumns">
+		a.id AS "id",
+		a.used_code AS "usedCode",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.storage_place AS "storagePlace",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.return_satus AS "returnSatus",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+    <!-- 输出字段关联表 -->
+    <sql id="assetUsedInfoJoins">
+    </sql>
+    <!--//获取部门信息-->
+    <select id="getOffice" resultType="AssetUsedInfo">
+		select t.office_code as "usedOfficeCode",
+		       a.office_name as "usedOfficeName",
+		       c.company_name as "usedCompanyName",
+		       c.company_code as "usedCompanyCode"
+	    from sys_employee t
+		left join sys_office a on t.office_code=a.office_code
+		left join sys_company c
+		on t.company_code=c.company_code
+		where t.emp_code=#{receiverCode}
+		and t.status='0'
+	</select>
+
+    <!-- 根据userCode获取公司编码 -->
+    <select id="getCompanyCode" resultType="String">
+		SELECT b.COMPANY_CODE FROM sys_user a
+        left join sys_employee b
+        on a.REF_CODE=b.EMP_CODE and b.`STATUS`='0'
+        where a.`STATUS`='0'
+        and a.USER_CODE=#{receiverCode};
+	</select>
+
+    <!-- 获取单条数据 -->
+    <select id="get" resultType="AssetUsedInfo">
+        SELECT
+        <include refid="assetUsedInfoColumns"/>
+        FROM ass_asset_used_info a
+        <include refid="assetUsedInfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="AssetUsedInfo">
+        SELECT
+        <include refid="assetUsedInfoColumns"/>
+        FROM ass_asset_used_info a
+        <include refid="assetUsedInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="receiverCode != null and receiverCode != ''">
+                AND a.receiver_code = #{receiverCode}
+            </if>
+            <if test="receiverCode != null and receiverCode != ''">
+                AND a.receiver_code = #{receiverCode}
+            </if>
+            <if test="usedCompanyName != null and usedCompanyName != ''">
+                AND a.used_company_name = #{usedCompanyName}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询数据列表 -->
+    <select id="findListDtl" resultType="AssetUsedDtl">
+        SELECT
+        <include refid="assetUsedDtlColumns"/>
+        FROM ass_asset_used_dtl a
+        <include refid="assetUsedInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="status != null and status != ''">
+                AND a.status = #{status}
+            </if>
+            <if test="usedCode != null and usedCode != ''">
+                AND a.used_code = #{usedCode}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findAllList" resultType="AssetUsedInfo">
+        SELECT
+        <include refid="assetUsedInfoColumns"/>
+        FROM ass_asset_used_info a
+        <include refid="assetUsedInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 插入数据 -->
+    <insert id="insert">
+		INSERT INTO ass_asset_used_info(
+			id,
+			used_code,
+			receiver_code,
+			receiver_name,
+			receiver_date,
+			used_company_code,
+			used_company_name,
+			used_office_code,
+			used_office_name,
+			used_region_code,
+			used_region_name,
+			used_storage_place,
+		    approval,
+		    approval_name,
+		    approval_memo,
+		    approval_date,
+		    approval_status,
+		    asset_class_code,
+		    asset_class,
+		    number_recipients,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{usedCode},
+			#{receiverCode},
+			#{receiverName},
+			#{receiverDate},
+			#{usedCompanyCode},
+			#{usedCompanyName},
+			#{usedOfficeCode},
+			#{usedOfficeName},
+			#{usedRegionCode},
+			#{usedRegionName},
+			#{usedStoragePlace},
+			#{approval},
+		#{approvalName},
+		#{approvalMemo},
+		#{approvalDate},
+		#{approvalStatus},
+		#{assetClassCode},
+		#{assetClass},
+		#{numberRecipients},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+    <!-- 插入子表数据 -->
+    <insert id="saveDtl">
+		INSERT INTO ass_asset_used_dtl(
+			id,
+			used_code,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			storage_place,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			user_code,
+			user_name,
+			return_satus,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{usedCode},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{storagePlace},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{user.userCode},
+			#{userName},
+			#{returnSatus},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+    <!-- 更新数据 -->
+    <update id="update">
+		UPDATE ass_asset_used_info SET 	
+			used_code = #{usedCode},
+			receiver_code = #{receiverCode},
+			receiver_name = #{receiverName},
+			receiver_date = #{receiverDate},
+			used_company_code = #{usedCompanyCode},
+			used_company_name = #{usedCompanyName},
+			used_office_code = #{usedOfficeCode},
+			used_office_name = #{usedOfficeName},
+			used_region_code = #{usedRegionCode},
+			used_region_name = #{usedRegionName},
+			used_storage_place = #{usedStoragePlace},
+			approval=#{approval},
+		    approval_name=#{approvalName},
+		    approval_memo=#{approvalMemo},
+		    approval_date=#{approvalDate},
+		    approval_status=#{approvalStatus},
+	        asset_class_code=#{assetClassCode},
+		    asset_class=#{assetClass},
+		    number_recipients=#{numberRecipients},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+    <!-- 逻辑删除数据 -->
+    <update id="deleteUsedCode">
+		UPDATE ass_asset_used_dtl SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE used_code = #{usedCode}
+	</update>
+
+    <!-- 逻辑删除数据 -->
+    <update id="delete">
+		UPDATE ass_asset_used_info SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

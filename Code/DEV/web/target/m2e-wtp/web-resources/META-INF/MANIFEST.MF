@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: Ecode EDP Web
+Implementation-Version: 5.0-SNAPSHOT
+Built-By: Administrator
+Implementation-Vendor-Id: cn.net.ecode
+Build-Jdk: 1.8.0_161-1-redhat
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Shandong Ecode
+Main-Class: cn.net.ecode.modules.config.Application
+

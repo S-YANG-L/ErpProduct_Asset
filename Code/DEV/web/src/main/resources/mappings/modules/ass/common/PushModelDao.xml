@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.common.dao.PushModelDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="pushModelColumns">
+		a.id AS "id",
+		a.receiver_code AS "receiverCode",
+		a.receiver_name AS "receiverName",
+		a.device_model AS "deviceModel",
+		a.push_settings AS "pushSettings",
+		a.bill_notice AS "billNotice",
+		a.message_notice AS "messageNotice",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="pushModelJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="PushModel">
+		SELECT 
+			<include refid="pushModelColumns"/>
+		FROM app_push_model_copy a
+		<include refid="pushModelJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="PushModel">
+		SELECT 
+			<include refid="pushModelColumns"/>
+		FROM app_push_model a
+		<include refid="pushModelJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="receiverCode != null and receiverCode != ''">
+				AND a.receiver_code = #{receiverCode}
+			</if>
+			<if test="receiverName != null and receiverName != ''">
+				AND a.receiver_name LIKE #{receiverName}
+			</if>
+			<if test="deviceModel != null and deviceModel != ''">
+				AND a.device_model = #{deviceModel}
+			</if>
+			<if test="pushSettings != null and pushSettings != ''">
+				AND a.push_settings = #{pushSettings}
+			</if>
+			<if test="billNotice != null and billNotice != ''">
+				AND a.bill_notice = #{billNotice}
+			</if>
+			<if test="messageNotice != null and messageNotice != ''">
+				AND a.message_notice = #{messageNotice}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="PushModel">
+		SELECT 
+			<include refid="pushModelColumns"/>
+		FROM app_push_model a
+		<include refid="pushModelJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO app_push_model(
+			id,
+			receiver_code,
+			receiver_name,
+			device_model,
+			push_settings,
+			bill_notice,
+			message_notice,
+			corp_code,
+			corp_name,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{receiverCode},
+			#{receiverName},
+			#{deviceModel},
+			#{pushSettings},
+			#{billNotice},
+			#{messageNotice},
+			#{corpCode},
+			#{corpName},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE app_push_model SET 	
+			receiver_code = #{receiverCode},
+			receiver_name = #{receiverName},
+			device_model = #{deviceModel},
+			push_settings = #{pushSettings},
+			bill_notice = #{billNotice},
+			message_notice = #{messageNotice},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			status = #{status}
+		WHERE id = #{id}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE app_push_model SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

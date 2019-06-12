@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.outbound.dao.OutboundBillDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="outboundBillColumns">
+		a.sys_code AS "sysCode",
+		a.bill_code AS "billCode",
+		a.outbound_code AS "outboundCode",
+		a.outbounder_code AS "outbounderCode",
+		a.outbounder_name AS "outbounderName",
+		a.outbound_date AS "outboundDate",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.wh_code AS "whCode",
+		a.wh_name AS "whName",
+		a.outbound_number AS "outboundNumber",
+		a.operator_code AS "operatorCode",
+		a.operator_name AS "operatorName",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.office_code AS "officeCode",
+		a.apply_no AS "applyNo",
+		a.apply_date AS "applyDate",
+		a.approval_status AS "approvalStatus",
+		a.approval_date AS "approvalDate",
+		a.approval AS "approval",
+		a.approval_name AS "approvalName",
+		a.memo AS "memo",
+		a.remarks AS "remarks",
+		a.create_date AS "createDate",
+		a.create_by AS "createBy.userCode",
+		a.update_date AS "updateDate",
+		a.update_by AS "updateBy.userCode",
+		a.status AS "status",
+		o10.office_name AS "office.officeName"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="outboundBillJoins">
+		LEFT JOIN sys_office o10 ON o10.office_code = a.office_code
+		LEFT JOIN sys_office o11 ON o11.office_code = a.office_name
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="OutboundBill">
+		SELECT 
+			<include refid="outboundBillColumns"/>
+		FROM ass_outbound_bill a
+		<include refid="outboundBillJoins"/>
+		WHERE a.sys_code = #{sysCode}
+	</select>
+	
+	<!-- 根据userCode获取公司编码 -->
+    <select id="getCompanyCode" resultType="String">
+		SELECT b.COMPANY_CODE FROM sys_user a
+        left join sys_employee b
+        on a.REF_CODE=b.EMP_CODE and b.`STATUS`='0'
+        where a.`STATUS`='0'
+        and a.USER_CODE=#{outbounderCode};
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="OutboundBill">
+		SELECT 
+			<include refid="outboundBillColumns"/>
+		FROM ass_outbound_bill a
+		<include refid="outboundBillJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+            AND a.memo =#{memo}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if><if test="outbounderCode != null and outbounderCode != ''">
+				AND a.outbounder_code = #{outbounderCode}
+			</if>
+            <if test="sortName != null and sortName != ''">
+                AND (a.sort_name like concat('%' ,#{sortName},'%'))
+            </if>
+            <if test="outbounderName != null and outbounderName != ''">
+                AND (a.outbounder_name like concat('%' ,#{outbounderName},'%'))
+            </if>
+			<if test="outboundDate != null and outboundDate != ''">
+				AND DATE_FORMAT(a.outbound_date,'%Y-%m-%d') = DATE_FORMAT(#{outboundDate},'%Y-%m-%d')
+			</if>
+			<if test="applyDate != null and applyDate != ''">
+				AND DATE_FORMAT(a.apply_date,'%Y-%m-%d') = DATE_FORMAT(#{applyDate},'%Y-%m-%d')
+			</if>
+            <if test="beginDate != null and beginDate != '' ">
+                <!-- MONTH(a.create_date) between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY) -->
+                AND a.outbound_date between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+            </if>
+			<if test="approvalStatus != null and approvalStatus != ''">
+				AND a.approval_status = #{approvalStatus}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="OutboundBill">
+		SELECT 
+			<include refid="outboundBillColumns"/>
+		FROM ass_outbound_bill a
+		<include refid="outboundBillJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!--//获取部门信息-->
+    <select id="getOffice" resultType="OutboundBill">
+		select t.office_code as "officeCode",
+		       a.office_name as "officeName",
+		       c.company_name as "CompanyName",
+		       c.company_code as "CompanyCode"
+	    from sys_employee t
+		left join sys_office a on t.office_code=a.office_code
+		left join sys_company c
+		on t.company_code=c.company_code
+		where t.emp_code=#{outbounderCode}
+		and t.status='0'
+	</select>
+	
+	<!-- 插入子表数据 -->
+    <insert id="saveDtl">
+		INSERT INTO ass_outbound_bill_dtl(
+			sys_id,
+			sys_code,
+			bill_code,
+			outbound_code,
+			inout_order,
+			order_date,
+			psn_code,
+			outbound_number,
+			psn_name,
+			articles_name,
+			articles_code,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			qty,
+			price,
+			sun_money,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			status,
+			remarks
+		) VALUES (
+			#{sysId},
+			#{sysCode},
+			#{billCode},
+			#{outboundCode},
+			#{inoutOrder},
+			#{orderDate},
+			#{psnCode},
+			#{outboundNumber},
+			#{psnName},
+			#{articlesName},
+			#{articlesCode},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{qty},
+			#{price},
+			#{sunMoney},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{createDate},
+			#{createBy.userCode},
+			#{updateDate},
+			#{updateBy.userCode},
+			#{status},
+			#{remarks}
+		)
+	</insert>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_outbound_bill(
+			sys_code,
+			bill_code,
+			outbound_code,
+			outbounder_code,
+			outbounder_name,
+			outbound_date,
+			sort_code,
+		    sort_name,
+		    outbound_number,
+			wh_code,
+			wh_name,
+			operator_code,
+			operator_name,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			apply_no,
+			apply_date,
+			approval_status,
+			approval_date,
+			approval,
+			approval_name,
+			memo,
+			remarks,
+			create_date,
+			create_by,
+			update_date,
+			update_by,
+			status
+		) VALUES (
+			#{sysCode},
+			#{billCode},
+			#{outboundCode},
+			#{outbounderCode},
+			#{outbounderName},
+			#{outboundDate},
+			#{sortCode},
+		    #{sortName},
+		    #{outboundNumber},
+		    #{whCode},
+			#{whName},
+			#{operatorCode},
+			#{operatorName},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{applyNo},
+			#{applyDate},
+			#{approvalStatus},
+			#{approvalDate},
+			#{approval},
+			#{approvalName},
+			#{memo},
+			#{remarks},
+			#{createDate},
+			#{createBy.userCode},
+			#{updateDate},
+			#{updateBy.userCode},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_outbound_bill SET 	
+			bill_code = #{billCode},
+			outbound_code = #{outboundCode},
+			outbounder_code = #{outbounderCode},
+			outbounder_name = #{outbounderName},
+			outbound_date = #{outboundDate},
+			sort_code  = #{sortCode},
+		    sort_name  = #{sortName},
+		    outbound_number = #{outboundNumber},
+			wh_code = #{whCode},
+		    wh_name  = #{whName},
+			operator_code = #{operatorCode},
+			operator_name = #{operatorName},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			apply_no = #{applyNo},
+			apply_date = #{applyDate},
+			approval_status = #{approvalStatus},
+			approval_date = #{approvalDate},
+			approval = #{approval},
+			approval_name = #{approvalName},
+			memo = #{memo},
+			remarks = #{remarks},
+			update_date = #{updateDate},
+			update_by = #{updateBy.userCode}
+		WHERE sys_code = #{sysCode}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		DELETE from ass_outbound_bill
+		WHERE sys_code = #{sysCode}
+	</update>
+    <!-- 逻辑删除流程日志数据 -->
+    <update id="deleteFlowLog">
+	DELETE
+	FROM sys_flow_log
+	WHERE biz_key = #{sysCode}
+	</update>
+</mapper>

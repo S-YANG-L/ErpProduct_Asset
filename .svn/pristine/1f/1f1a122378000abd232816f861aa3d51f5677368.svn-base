@@ -1,0 +1,1203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.assetsput.dao.AssetInfoDao">
+
+    <!-- 输出字段列 -->
+    <sql id="assAssetInfoColumns">
+		a.id AS "id",
+		a.finance_code AS "financeCode",
+				a.top_sort_code AS "topSortCode",
+		a.top_sort_name AS "topSortName",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit_price AS "unitPrice",
+		a.unit AS "unit",
+		a.sn_code AS "snCode",
+		a.bar_code AS "barCode",
+		a.qr_code AS "qrCode",
+		a.duty_office_code AS "dutyOfficeCode",
+		a.duty_office_name AS "dutyOfficeName",
+		a.residual_value AS "residualValue",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.buy_date AS "buyDate",
+		a.use_date AS "useDate",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.duty_code AS "dutyCode",
+		a.duty_name AS "dutyName",
+		a.storage_place AS "storagePlace",
+		a.storage_place_code AS "storagePlaceCode",
+		a.supplier_code AS "supplierCode",
+		a.supplier AS "supplier",
+		a.quantity  AS "quantity",
+		a.occupancy AS "occupancy",
+		a.picture_path AS "picturePath",
+		a.age_limit AS "ageLimit",
+		a.clear_date AS "clearDate",
+		a.asset_status AS "assetStatus",
+		a.account_status AS "accountStatus",
+		a.account_quantity AS "accountQuantity",
+		a.account_com_status AS "accountComStatus",
+		a.net_price AS "netPrice",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o13.office_name AS "office.officeName",
+		u17.user_name AS "user.userName"
+
+	</sql>
+    <!-- 输出字段列 -->
+    <sql id="assAssetInfoCheackColumns">
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.unit_price AS "unitPrice",
+		a.unit AS "unit",
+		a.sn_code AS "snCode",
+		a.bar_code AS "barCode",
+		a.qr_code AS "qrCode",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.buy_date AS "buyDate",
+		a.use_date AS "useDate",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.region_code AS "regionCode",
+		a.region_name AS "regionName",
+		a.duty_code AS "dutyCode",
+		a.duty_name AS "dutyName",
+		a.storage_place AS "storagePlace",
+		a.storage_place_code AS "storagePlaceCode",
+		a.supplier_code AS "supplierCode",
+		a.supplier AS "supplier",
+		a.quantity  AS "quantity",
+		a.occupancy AS "occupancy",
+		a.picture_path AS "picturePath",
+		a.age_limit AS "ageLimit",
+		a.clear_date AS "clearDate",
+		a.asset_status AS "assetStatus",
+		a.account_status AS "accountStatus",
+		a.account_quantity AS "accountQuantity",
+		a.account_com_status AS "accountComStatus",
+		a.net_price AS "netPrice",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o13.office_name AS "office.officeName",
+		u17.user_name AS "user.userName"
+	</sql>
+
+    <!-- 输出字段关联表 -->
+    <sql id="assAssetInfoJoins">
+		LEFT JOIN sys_office o13 ON o13.office_code = a.office_code
+		LEFT JOIN sys_user u17 ON u17.user_code = a.user_code
+	</sql>
+
+    <!-- 获取单条数据 -->
+    <select id="getid" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+
+    <!-- 获取单条数据 -->
+    <select id="getAssetCodesql" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        WHERE a.asset_code = #{assetCode}
+    </select>
+
+    <!-- 获取单条数据 -->
+    <select id="get" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        WHERE a.id = #{id}
+    </select>
+    <!-- 查询数据列表 -->
+    <select id="findListdtl" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status =0
+            <!--<if test="assetCode != null and assetCode != ''">-->
+            <!--AND a.asset_code not  in (#{assetCode})-->
+            <!--</if>-->
+            <if test="assetStatus != null and assetStatus != ''">
+                AND a.asset_status = #{assetStatus}
+            </if>
+            <if test="assetCode != null and assetCode != ''">
+                AND a.asset_code = #{assetCode}
+            </if>
+            <if test="user != null and user.userCode != null and user.userCode != ''">
+                AND a.user_code = #{user.userCode}
+            </if>
+            <if test="assetName != null and assetName != ''">
+                AND (a.asset_name like concat('%' ,#{assetName},'%'))
+            </if>
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+        </where>
+    </select>
+    <!-- 查询部门汇总数据列表 -->
+    <select id="findOffice" resultType="AssetOffice">
+        SELECT
+        office_code AS "officeCode",
+        office_name AS "officeName",
+        COUNT(asset_name) as "sumAssetName",
+        sum(unit_price) as "Je"
+        FROM ass_asset_info
+        <where>
+            office_name is not null AND office_name !='' AND asset_status =1
+            <if test="officeName != null and officeName != ''">
+                and (office_name like concat('%' ,#{officeName},'%'))
+            </if>
+        </where>
+        GROUP BY office_code,office_name
+    </select>
+
+    <!-- 盘点数据列表 -->
+    <select id="findListCheck" resultType="AssetCheckDtl">
+        SELECT
+        <include refid="assAssetInfoCheackColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            AND a.asset_status in (0,1,3)
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="office != null and office.officeCode != null and office.officeCode != ''">
+                AND a.office_code = #{office.officeCode}
+            </if>
+            <if test="regionCode != null and regionCode != ''">
+                AND a.region_code = #{regionCode}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询数据列表 -->
+    <select id="findListPrint" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="assetCodes != null and assetCodes.length != 0">
+                AND a.asset_code in
+                <foreach collection="assetCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <!-- 查询数据列表 -->
+    <select id="findListPrintlist" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="assetCodes != null and assetCodes.length != 0">
+                AND a.id in
+                <foreach collection="assetCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <!-- 查询数据列表 -->
+    <select id="findListDepre" resultType="AssetDepreDtl">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            and a.asset_status IN (0, 1, 5)
+            <if test="topSortCode != null and topSortCode != ''">
+                AND a.top_sort_code = #{topSortCode}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询数据列表 -->
+    <select id="findList" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="assetStatus != null and assetStatus != ''">
+                AND a.asset_status in (#{assetStatus})
+            </if>
+            <if test="assetStatuss != null and assetStatuss.length != 0">
+                AND a.asset_status in
+                <foreach collection="assetStatuss" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="topSortCode != null and topSortCode != ''">
+                AND a.top_sort_code = #{topSortCode}
+            </if>
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+            <if test="assetName != null and assetName != ''">
+                AND (a.asset_name like concat('%' ,#{assetName},'%'))
+            </if>
+            <if test="assetCode != null and assetCode != ''">
+                AND (a.asset_code like concat('%' ,#{assetCode},'%'))
+            </if>
+            <if test="storagePlaceCode != null and storagePlaceCode != ''">
+                AND a.storage_place_code = #{storagePlaceCode}
+            </if>
+            <if test="supplierCode != null and supplierCode != ''">
+                AND a.supplier_code = #{supplierCode}
+            </if>
+            <if test="financeCode != null and financeCode != ''">
+                AND (a.finance_code like concat('%' ,#{financeCode},'%'))
+            </if>
+            <if test="brand != null and brand != ''">
+                AND (a.brand like concat('%' ,#{brand},'%'))
+            </if>
+            <if test="version != null and version != ''">
+                AND (a.version like concat('%' ,#{version},'%'))
+            </if>
+            <if test="residualValue != null and residualValue != ''">
+                AND a.residual_value = #{residualValue}
+            </if>
+            <if test="unitPrice != null and unitPrice != ''">
+                AND (a.unit_price like concat('%' ,#{unitPrice},'%'))
+            </if>
+            <if test="office != null and office.officeCode != null and office.officeCode != ''">
+                AND a.office_code = #{office.officeCode}
+            </if>
+            <if test="topSortCode != null and topSortCode != ''">
+                AND a.top_sort_code = #{topSortCode}
+            </if>
+            <if test="regionCode != null and regionCode != ''">
+                AND a.region_code = #{regionCode}
+            </if>
+            <if test="ageLimit != null and ageLimit != ''">
+                AND a.age_limit = #{ageLimit}
+            </if>
+            <if test="buyDate != null and buyDate != '' ">
+                AND a.buy_date between #{beginDate} and LAST_DAY(DATE_ADD(#{endDate},INTERVAL 1 DAY))
+            </if>
+            <if test="storagePlace != null and storagePlace != ''">
+                AND (a.storage_place like concat('%' ,#{storagePlace},'%'))
+            </if>
+            <if test="regionName != null and regionName != ''">
+                AND a.region_name = #{regionName}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND a.company_name = #{companyName}
+            </if>
+            <if test="assetCodes != null and assetCodes.length != 0">
+                AND a.asset_code not in
+                <foreach collection="assetCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="user != null and user.userCode != null and user.userCode != ''">
+                AND a.user_code = #{user.userCode}
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询月增加对账数据列表 -->
+    <select id="findSumList" resultType="AssetSum">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="assetStatus != null and assetStatus != ''">
+                AND a.asset_status = #{assetStatus}
+            </if>
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+            <if test="storagePlaceCode != null and storagePlaceCode != ''">
+                AND a.storage_place_code = #{storagePlaceCode}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND a.company_name = #{companyName}
+            </if>
+            <if test="beginDate != null and beginDate != '' ">
+                AND a.buy_date between #{beginDate} and LAST_DAY(DATE_ADD(#{endDate},INTERVAL 1 DAY))
+            </if>
+
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询资产清单数据列表 -->
+    <select id="findAssetListing" resultType="AssetListing">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+            <if test="storagePlaceCode != null and storagePlaceCode != ''">
+                AND a.storage_place_code = #{storagePlaceCode}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND a.company_name = #{companyName}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND (a.sort_name like concat('%' ,#{sortName},'%'))
+            </if>
+            <if test="assetStatus != null and assetStatus != ''">
+                AND a.asset_status = #{assetStatus}
+            </if>
+            <if test="topSortCode != null and topSortCode != ''">
+                AND a.top_sort_code = #{topSortCode}
+            </if>
+            <if test="topSortName != null and topSortName != ''">
+                AND (a.top_sort_name like concat('%' ,#{topSortName},'%'))
+            </if>
+            <if test="assetName != null and assetName != ''">
+                AND (a.asset_name like concat('%' ,#{assetName},'%'))
+            </if>
+            <if test="assetCode != null and assetCode != ''">
+                AND a.asset_code = #{assetCode}
+            </if>
+            <if test="beginDate != null and beginDate != '' ">
+                AND a.buy_date between #{beginDate} and LAST_DAY(DATE_ADD(#{endDate},INTERVAL 1 DAY))
+            </if>
+            <if test="office != null and office.officeCode != null and office.officeCode != ''">
+                AND a.office_code = #{office.officeCode}
+            </if>
+            <if test="officeName != null and officeName != ''">
+                AND (a.office_name like concat('%' ,#{officeName},'%'))
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询过期资产清单数据列表 -->
+    <select id="findOverData" resultType="AssetOverTime">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            AND a.asset_status = 0 and ((PERIOD_DIFF(DATE_FORMAT(NOW(),'%Y%m'),DATE_FORMAT(buy_date,'%Y%m')))+1) >
+            a.age_limit
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+            <if test="storagePlaceCode != null and storagePlaceCode != ''">
+                AND a.storage_place_code = #{storagePlaceCode}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND a.company_name = #{companyName}
+            </if>
+            <if test="beginDate != null and beginDate != '' ">
+                AND a.buy_date between #{beginDate} and LAST_DAY(DATE_ADD(#{endDate},INTERVAL 1 DAY))
+            </if>
+            <if test="assetName != null and assetName != ''">
+                AND (a.asset_name like concat('%' ,#{assetName},'%'))
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询个人资产清单数据列表 -->
+    <select id="findPersonalData" resultType="AssetPersonal">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="assetStatus != null and assetStatus != ''">
+                AND a.asset_status = #{assetStatus}
+            </if>
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="sortName != null and sortName != ''">
+                AND a.sort_name = #{sortName}
+            </if>
+            <if test="storagePlaceCode != null and storagePlaceCode != ''">
+                AND a.storage_place_code = #{storagePlaceCode}
+            </if>
+            <if test="companyName != null and companyName != ''">
+                AND a.company_name = #{companyName}
+            </if>
+            <if test="beginDate != null and beginDate != '' ">
+                AND a.buy_date between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+            </if>
+            <if test="user != null and user.userCode !=null and user.userCode != ''">
+                AND a.user_code = #{user.userCode}
+            </if>
+            <if test="userName != null  and userName != ''">
+                AND a.user_name = #{userName}
+            </if>
+            <if test="assetName != null and assetName != ''">
+                AND (a.asset_name like concat('%' ,#{assetName},'%'))
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+    <!-- 查询数据列表 -->
+    <select id="findAssetList" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+            <if test="assetStatus != null and assetStatus != ''">
+                AND a.asset_status = #{assetStatus}
+            </if>
+            <if test="assetCode != null and assetCode != ''">
+                AND a.asset_code = #{assetCode}
+            </if>
+            <if test="sortCode != null and sortCode != ''">
+                AND a.sort_code = #{sortCode}
+            </if>
+            <if test="assetName != null and assetName != ''">
+                AND a.asse_name = #{assetName}
+            </if>
+            <if test="assetStatuss != null and assetStatuss.length != 0">
+                AND a.asset_status in
+                <foreach collection="assetStatuss" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="assetCodes != null and assetCodes.length != 0">
+                AND a.asset_code not in
+                <foreach collection="assetCodes" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询数据列表（全部数据） -->
+    <select id="findAllList" resultType="AssetInfo">
+        SELECT
+        <include refid="assAssetInfoColumns"/>
+        FROM ass_asset_info a
+        <include refid="assAssetInfoJoins"/>
+        <where>
+            a.status != #{STATUS_DELETE}
+        </where>
+        <choose>
+            <when test="page !=null and page.orderBy != null and page.orderBy != ''">
+                ORDER BY ${page.orderBy}
+            </when>
+            <otherwise>
+                ORDER BY a.update_date DESC
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 插入数据 -->
+    <insert id="insert">
+		INSERT INTO ass_asset_info(
+			id,
+			finance_code,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			version,
+			unit_price,
+			unit,
+			sn_code,
+			bar_code,
+		    qr_code,
+		    top_sort_code,
+		    top_sort_name,
+		    duty_office_code,
+		    duty_office_name,
+		    residual_value,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			buy_date,
+			use_date,
+			user_code,
+			user_name,
+			region_code,
+			region_name,
+			duty_code,
+			duty_name,
+			storage_place,
+			storage_place_code,
+			supplier_code,
+			supplier,
+			quantity,
+			occupancy,
+			picture_path,
+			age_limit,
+			clear_date,
+			asset_status,
+			account_status,
+			account_quantity,
+		    account_com_status,
+		    net_price,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{financeCode},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{version},
+			#{unitPrice},
+			#{unit},
+			#{snCode},
+			#{barCode},
+			#{qrCode},
+			#{topSortCode},
+		    #{topSortName},
+		    #{dutyOfficeCode},
+		    #{dutyOfficeName},
+		    #{residualValue},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{buyDate},
+			#{useDate},
+			#{user.userCode},
+			#{userName},
+			#{regionCode},
+			#{regionName},
+			#{dutyCode},
+			#{dutyName},
+			#{storagePlace},
+			#{storagePlaceCode},
+			#{supplierCode},
+			#{supplier},
+			#{quantity},
+			#{occupancy},
+			#{picturePath},
+			#{ageLimit},
+			#{clearDate},
+			#{assetStatus},
+			#{accountStatus},
+			#{accountQuantity},
+			#{accountComStatus},
+			#{netPrice},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+    <!-- 更新数据 -->
+    <update id="updataChange">
+		UPDATE ass_asset_info SET
+			finance_code =#{financeCode},
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			unit_price = #{unitPrice},
+			unit = #{unit},
+			sn_code = #{snCode},
+			bar_code = #{barCode},
+			qr_code = #{qrCode},
+			top_sort_code =#{topSortCode},
+		    top_sort_name =#{topSortName},
+		    duty_office_code =#{dutyOfficeCode},
+		    duty_office_name =#{dutyOfficeName},
+		    residual_value =#{residualValue},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			buy_date = #{buyDate},
+			use_date = #{useDate},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			duty_code = #{dutyCode},
+			duty_name = #{dutyName},
+			storage_place = #{storagePlace},
+			storage_place_code = #{storagePlaceCode},
+			supplier = #{supplier},
+			occupancy = #{occupancy},
+			picture_path = #{picturePath},
+			age_limit = #{ageLimit},
+			clear_date = #{clearDate},
+			asset_status = #{assetStatus},
+			account_status = #{accountStatus},
+			account_quantity = #{accountQuantity},
+			account_com_status = #{accountComStatus},
+			net_price = #{netPrice},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE asset_code = #{assetCode}
+	</update>
+    <!-- 更新数据 -->
+    <update id="update">
+		UPDATE ass_asset_info SET
+		    finance_code =#{financeCode},
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			unit_price = #{unitPrice},
+			unit = #{unit},
+			sn_code = #{snCode},
+			top_sort_code =#{topSortCode},
+		    top_sort_name =#{topSortName},
+		    duty_office_code =#{dutyOfficeCode},
+		    duty_office_name =#{dutyOfficeName},
+		    residual_value =#{residualValue},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			buy_date = #{buyDate},
+			use_date = #{useDate},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			region_code = #{regionCode},
+			region_name = #{regionName},
+			duty_code = #{dutyCode},
+			duty_name = #{dutyName},
+			storage_place = #{storagePlace},
+			storage_place_code = #{storagePlaceCode},
+			supplier_code = #{supplierCode},
+			supplier = #{supplier},
+			quantity = #{quantity},
+			occupancy = #{occupancy},
+			picture_path = #{picturePath},
+			age_limit = #{ageLimit},
+			clear_date = #{clearDate},
+			asset_status = #{assetStatus},
+			account_status = #{accountStatus},
+			account_quantity = #{accountQuantity},
+			account_com_status = #{accountComStatus},
+			net_price = #{netPrice},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+
+    <!-- 改变状态 -->
+    <update id="updatauserStatus">
+		UPDATE ass_asset_info SET
+			   office_code = #{office.officeCode},
+			   office_name = #{officeName},
+			   use_date = #{useDate},
+			   user_code = #{user.userCode},
+			   user_name = #{userName},
+			   asset_status = #{assetStatus}
+		WHERE asset_code = #{assetCode}
+	</update>
+
+    <!-- 逻辑删除数据 -->
+    <update id="delete">
+		UPDATE ass_asset_info SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE id = #{id}
+	</update>
+    <!-- 获取多条数据 -->
+     <select id="findAllData1" resultType="AssetListing">
+      SELECT '领用' as aaa,  DATE_FORMAT(a.receiver_date,'%Y-%m-%d') as dealDate,a.receiver_name as dealName,
+      CONCAT('使用部门由"空"变为“',a.used_office_name,'"，使用人由"空"变为"',a.receiver_name,'"') as dealAll
+      FROM ass_asset_used_info a
+      RIGHT JOIN ass_asset_used_dtl b
+      ON a.id = b.used_code
+      WHERE asset_code = #{assetCode}
+     </select>
+     <select id="findAllData2" resultType="AssetListing">
+       SELECT '退库' as aaa, DATE_FORMAT(c.receiver_date,'%Y-%m-%d') as dealDate,c.retire_name as dealName,
+       CONCAT('使用部门由"',c.return_office_name,'"变为"空",使用人由"',c.retire_name,'"变为"空"') as dealAll
+       FROM   ass_asset_return_info c
+       RIGHT JOIN  ass_asset_return_dtl d
+       ON c.id = d.return_code
+       WHERE asset_code = #{assetCode}
+     </select>
+     <select id="findAllData3" resultType="AssetListing">
+      SELECT '变更' as aaa,DATE_FORMAT(e.change_date,'%Y-%m-%d') as dealDate, e.operator_name as dealName,f.change_info as dealAll
+      FROM ass_asset_change_info e
+      RIGHT JOIN ass_asset_change_dtl f
+	  on e.id = f.change_code
+	  WHERE asset_code = #{assetCode}
+     </select>
+     <select id="findAllData4" resultType="AssetListing">
+      SELECT '调拨'as aaa,DATE_FORMAT(g.allot_date,'%Y-%m-%d')  as dealDate,g.operator_name as dealName,
+      CONCAT(g.operator_name,'调拨了',h.asset_Name) as dealAll
+      FROM ass_asset_allot_info g
+      RIGHT JOIN ass_asset_allot_dtl h
+      ON g.id = h.allot_code
+      WHERE asset_code = #{assetCode}
+	 </select>
+    <!-- 查询资产折旧 -->
+    <select id="findZheJiuData" resultType="AssetZheJiu">
+        SELECT
+        a.assetCode AS assetCode,
+        a.assetName AS assetName,
+        a.unitPrice AS unitPrice,
+        a.BQZJ AS bqzJ,
+        a.LJZJ AS ljzJ,
+        CASE
+        WHEN (
+        ((
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(a.buy_date, '%Y%m')
+        )
+        )
+        ) > a.age_limit
+        ) THEN
+        0
+        WHEN (
+        a.age_limit > (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(a.buy_date, '%Y%m')
+        )
+        )
+        )
+        ) THEN
+        (a.unitPrice - a.LJZJ)
+        END AS qZ,
+        CASE
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(a.buy_date, '%Y%m')
+        )
+        )
+        ) > a.age_limit
+        ) THEN
+        0
+        WHEN (
+        a.age_limit > (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(a.buy_date, '%Y%m')
+        )
+        )
+        )
+        ) THEN
+        (a.unitPrice - a.LJZJ)
+        END AS qcZ,
+        a.ageLimit AS ageLimit,
+        a.SYYF AS syyF,
+        a.SYQX AS syqX
+        FROM
+        (
+        SELECT
+        age_limit,
+        buy_date,
+        asset_code AS assetCode,
+        asset_name AS assetName,
+        unit_price AS unitPrice,
+        CASE
+        WHEN (
+        (
+        age_limit >= (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) and (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) != 0
+        )
+        ) THEN
+        FORMAT(
+        (
+        (((100 - residual_value)/100) / age_limit) * unit_price
+        ),
+        2
+        )
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) = 0
+        ) THEN
+        0
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) > age_limit
+        ) THEN
+        0
+        END AS BQZJ,
+        CASE
+        WHEN (
+        age_limit >= (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        ) and (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) != 0
+        ) THEN
+        FORMAT(
+        (
+        (
+        (((100 - residual_value)/100) / age_limit) * unit_price
+        ) * (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        ),
+        2
+        )
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) = 0
+        ) THEN
+        0
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) > age_limit
+        ) THEN
+        unit_price
+        END AS LJZJ,
+        age_limit AS ageLimit,
+        CASE
+        WHEN (
+        0>= (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        ) THEN
+        0
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) > 0
+        ) THEN
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        END AS SYYF,
+        CASE
+        WHEN (
+        (
+        age_limit >= (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        ) THEN
+        (
+        age_limit - (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        )
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) > age_limit
+        ) THEN
+        0
+        END AS SYQX
+        FROM
+        ass_asset_info
+        <where>
+            <if test="topSortCode != null and topSortCode != ''">
+                top_sort_code = #{topSortCode}
+            </if>
+        </where>
+        ) a
+    </select>
+    <!-- 查询资产折旧总计 -->
+    <select id="findZheJiuSumData" resultType="AssetZheJiu">
+        SELECT
+        SUM(a.unit_price) AS zczE,
+        round((SUM(a.zhe)),2) AS zclJ
+        FROM(
+        SELECT unit_price,
+        CASE
+        WHEN (
+        age_limit >= (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        ) and (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) != 0
+        ) THEN
+        FORMAT(
+        (
+        (
+        (((100 - residual_value)/100) / age_limit) * unit_price
+        ) * (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        )
+        ),
+        2
+        )
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) = 0
+        ) THEN
+        0
+        WHEN (
+        (
+        (
+        PERIOD_DIFF(
+        DATE_FORMAT(NOW(), '%Y%m'),
+        DATE_FORMAT(buy_date, '%Y%m')
+        )
+        )
+        ) > age_limit
+        ) THEN
+        unit_price
+        END AS zhe
+        FROM
+        ass_asset_info
+        <where>
+            <if test="topSortCode != null and topSortCode != ''">
+                top_sort_code = #{topSortCode}
+            </if>
+        </where>
+        ) a
+    </select>
+
+</mapper>

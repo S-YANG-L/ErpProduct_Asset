@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.basic.dao.WarehouseDao">
+    
+    <!-- 输出字段列 -->
+	<sql id="warehouseColumns">
+		a.wh_code AS "whCode",
+		a.wh_name AS "whName",
+		a.wh_code AS "whCodeFrom",
+		a.wh_name AS "whNameFrom",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.dept_code AS "deptCode",
+		a.dept_name AS "deptName",
+		a.addr AS "addr",
+		a.tel AS "tel",
+		a.fax AS "fax",
+		a.director AS "director",
+		a.order_code AS "orderCode",
+		a.search_code AS "searchCode",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="warehouseJoins">
+		LEFT JOIN sys_office o8 ON o8.office_code = a.dept_name
+		LEFT JOIN sys_user u12 ON u12.user_code = a.director
+	</sql>
+    
+    <!-- 获取单行数据 -->
+	<select id="get" resultType="Warehouse">
+		SELECT 
+			<include refid="warehouseColumns"/>
+		FROM ass_warehouse a
+		<include refid="warehouseJoins"/>
+		WHERE a.wh_code = #{whCode}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="Warehouse">
+		SELECT 
+			<include refid="warehouseColumns"/>
+		FROM ass_warehouse a
+		<include refid="warehouseJoins"/>
+		<where>
+		and a.company_code in
+			(
+			    select t.ctrl_data from sys_user_data_scope t
+				where t.ctrl_type='SYS_COMPANY' and t.user_code=#{currentUser.userCode}  
+			)
+		and	a.status != #{STATUS_DELETE}
+			<if test="whName != null and whName != ''">
+				AND a.wh_name = #{whName}
+			</if>
+			<if test="companyCode != null and companyCode != ''">
+				AND a.COMPANY_CODE = #{companyCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="Warehouse">
+		SELECT 
+			<include refid="warehouseColumns"/>
+		FROM ass_warehouse a
+		<include refid="warehouseJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_warehouse(
+			wh_code,
+			wh_name,
+			corp_code,
+			corp_name,
+			company_code,
+			company_name,
+			dept_code,
+			dept_name,
+			addr,
+			tel,
+			fax,
+			director,
+			order_code,
+			search_code,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{whCode},
+			#{whName},
+			#{corpCode},
+			#{corpName},
+			#{companyCode},
+			#{companyName},
+			#{deptCode},
+			#{deptName},
+			#{addr},
+			#{tel},
+			#{fax},
+			#{director},
+			#{orderCode},
+			#{searchCode},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_warehouse SET 	
+			wh_name = #{whName},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			dept_code = #{deptCode},
+			dept_name = #{deptName},
+			addr = #{addr},
+			tel = #{tel},
+			fax = #{fax},
+			director = #{director},
+			order_code = #{orderCode},
+			search_code = #{searchCode},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			status = #{status}
+		WHERE wh_code = #{whCode}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_warehouse SET 
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		WHERE wh_code = #{whCode}
+	</update>
+
+	<!-- 删除数据时判断仓库编码是否已经使用 -->
+	<select id="findWhcode" resultType="Warehouse">
+		select WH_CODE from
+		ass_lade_bill
+		where WH_CODE = #{whCode}
+		union
+		select WH_CODE from ass_order_bill
+		where WH_CODE = #{whCode}
+	</select>
+	
+</mapper>

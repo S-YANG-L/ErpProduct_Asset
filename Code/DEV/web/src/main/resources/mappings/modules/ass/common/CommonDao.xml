@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.common.dao.CommonDao">
+    <select id="getOfficeCompany" resultType="Common">
+       select t.office_code as "officeCode",
+          a.office_name as "officeName",
+          c.company_name as "companyName",
+          c.company_code as "companyCode"
+        from sys_employee t
+        left join sys_office a on t.office_code=a.office_code
+        left join sys_company c
+        on t.company_code=c.company_code
+        where t.emp_code=#{usercode}
+        and t.status='0'
+    </select>
+
+    <select id="getMaxbillcode" resultType="CodeAssetSort">
+        select
+        a.SYS_ID as "sysId",
+        a.CORP_CODE as "corpCode",
+        a.CORP_NAME as "corpName",
+        a.COMPANY_CODE as "companyCode",
+        a.COMPANY_NAME as "companyName",
+        a.ACCOUNT_YEAR as "accoutYear",
+        a.BILLSORT_CODE as "billsortCode",
+        a.BILLSORT_NAME as "billsortName",
+        a.MAX_CODE as "maxCode"
+        from as_max_billcode a
+        where a.BILLSORT_CODE= #{billsortCode}
+        <if test="accoutYear != null and accoutYear != ''">
+            and a.ACCOUNT_YEAR=#{accoutYear}
+        </if>
+    </select>
+    <!-- 插入数据 -->
+    <insert id="insertBillcode">
+		INSERT INTO as_max_billcode(
+          SYS_ID,
+          CORP_CODE ,
+          CORP_NAME,
+          COMPANY_CODE,
+          COMPANY_NAME,
+          ACCOUNT_YEAR,
+          BILLSORT_CODE,
+          BILLSORT_NAME,
+          MAX_CODE
+		) VALUES (
+			#{sysId},
+			#{corpCode},
+			#{corpName},
+			#{companyCode},
+			#{companyName},
+			#{accoutYear},
+			#{billsortCode},
+			#{billsortName},
+			#{maxCode}
+		)
+	</insert>
+    <!-- 更新数据 -->
+    <update id="updateBillcode">
+		UPDATE as_max_billcode a SET
+          a.CORP_CODE =#{corpCode},
+          a.CORP_NAME  =#{corpName},
+          a.COMPANY_CODE  =#{companyCode},
+          a.COMPANY_NAME  =#{companyName},
+          a.BILLSORT_CODE =#{billsortCode},
+          a.BILLSORT_NAME =#{billsortName},
+          a.MAX_CODE = #{maxCode}
+		WHERE a.BILLSORT_CODE = #{billsortCode}
+	</update>
+</mapper>

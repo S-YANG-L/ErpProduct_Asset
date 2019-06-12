@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.cancelstocks.dao.AssetReturnInfoDao">
+	
+	<!-- 输出字段列 -->
+	<sql id="assetReturnInfoColumns">
+		a.id AS "id",
+		a.return_code AS "returnCode",
+		a.retire_code AS "retireCode",
+		a.retire_name AS "retireName",
+		a.receiver_date AS "receiverDate",
+		a.return_company_code AS "returnCompanyCode",
+		a.return_company_name AS "returnCompanyName",
+		a.return_office_code AS "returnOfficeCode",
+		a.return_office_name AS "returnOfficeName",
+		a.return_region_code AS "returnRegionCode",
+		a.return_region_name AS "returnRegionName",
+		a.return_storage_place AS "returnStoragePlace",
+		a.approval_status AS "approvalStatus",
+		a.approval AS "approval",
+		a.approval_name AS "approvalName",
+		a.approval_memo AS "approvalMemo",
+		a.approval_date AS "approvalDate",
+		a.notes AS "notes",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="assetReturnInfoJoins">
+	</sql>
+	
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetReturnInfo">
+		SELECT 
+			<include refid="assetReturnInfoColumns"/>
+		FROM ass_asset_return_info a
+		<include refid="assetReturnInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetReturnInfo">
+		SELECT 
+			<include refid="assetReturnInfoColumns"/>
+		FROM ass_asset_return_info a
+		<include refid="assetReturnInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+            <if test="approvalStatus != null and approvalStatus != ''">
+                <if test="approvalStatus == 1">
+                    AND a.approval_status in (0,1,3)
+                </if>
+                <if test="approvalStatus == 2">
+                    AND a.approval_status = #{approvalStatus}
+                </if>
+            </if>
+            <if test="retireCode != null and retireCode != ''">
+                AND a.retire_code = #{retireCode}
+            </if>
+			<if test="returnCompanyName != null and returnCompanyName != ''">
+				AND a.return_company_name = #{returnCompanyName}
+			</if>
+			<if test="returnOfficeName != null and returnOfficeName != ''">
+				AND a.return_office_name = #{returnOfficeName}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetReturnInfo">
+		SELECT 
+			<include refid="assetReturnInfoColumns"/>
+		FROM ass_asset_return_info a
+		<include refid="assetReturnInfoJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+    <!--//获取部门信息-->
+    <select id="getOffice" resultType="AssetReturnInfo">
+		select t.office_code as "returnOfficeCode",
+		       a.office_name as "returnOfficeName",
+		       c.company_name as "returnCompanyName",
+		       c.company_code as "returnCompanyCode"
+	    from sys_employee t
+		left join sys_office a on t.office_code=a.office_code
+		left join sys_company c
+		on t.company_code=c.company_code
+		where t.emp_code=#{retireCode}
+		and t.status='0'
+	</select>
+
+    <!-- 根据userCode获取公司编码 -->
+    <select id="getCompanyCode" resultType="String">
+		SELECT b.COMPANY_CODE FROM sys_user a
+        left join sys_employee b
+        on a.REF_CODE=b.EMP_CODE and b.`STATUS`='0'
+        where a.`STATUS`='0'
+        and a.USER_CODE=#{receiverCode};
+	</select>
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_return_info(
+			id,
+			return_code,
+			retire_code,
+			retire_name,
+			receiver_date,
+			return_company_code,
+			return_company_name,
+			return_office_code,
+			return_office_name,
+			return_region_code,
+			return_region_name,
+			return_storage_place,
+			approval_status,
+			approval,
+		    approval_name,
+		    approval_memo,
+		    approval_date,
+			notes,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{returnCode},
+			#{retireCode},
+			#{retireName},
+			#{receiverDate},
+			#{returnCompanyCode},
+			#{returnCompanyName},
+			#{returnOfficeCode},
+			#{returnOfficeName},
+			#{returnRegionCode},
+			#{returnRegionName},
+			#{returnStoragePlace},
+			#{approvalStatus},
+			#{approval},
+		#{approvalName},
+		#{approvalMemo},
+		#{approvalDate},
+			#{notes},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_return_info SET 	
+			return_code = #{returnCode},
+			retire_code = #{retireCode},
+			retire_name = #{retireName},
+			receiver_date = #{receiverDate},
+			return_company_code = #{returnCompanyCode},
+			return_company_name = #{returnCompanyName},
+			return_office_code = #{returnOfficeCode},
+			return_office_name = #{returnOfficeName},
+			return_region_code = #{returnRegionCode},
+			return_region_name = #{returnRegionName},
+			return_storage_place = #{returnStoragePlace},
+			approval_status = #{approvalStatus},
+			approval=#{approval},
+		    approval_name=#{approvalName},
+		    approval_memo=#{approvalMemo},
+		    approval_date=#{approvalDate},
+			notes = #{notes},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate}
+		WHERE id = #{id}
+	</update>
+    <!-- 逻辑删除数据 -->
+    <update id="delete">
+		delete
+		FROM ass_asset_return_info
+		WHERE id = #{id};
+	</update>
+    <!-- 逻辑删除流程日志数据 -->
+    <update id="deleteFlowLog">
+	DELETE
+	FROM sys_flow_log
+	WHERE biz_key = #{id}
+	</update>
+</mapper>

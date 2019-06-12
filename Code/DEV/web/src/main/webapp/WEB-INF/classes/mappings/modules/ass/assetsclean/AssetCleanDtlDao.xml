@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.assetsclean.dao.AssetCleanDtlDao">
+
+	<!-- 输出字段列 -->
+	<sql id="assetCleanDtlColumns">
+		a.id AS "id",
+		a.beginDate as "beginDate",
+		a.endDate as "endDate",
+		a.clean_date as "cleanDate",
+		a.clean_code AS "cleanCode",
+		a.asset_code AS "assetCode",
+		a.asset_name AS "assetName",
+		a.sort_code AS "sortCode",
+		a.sort_name AS "sortName",
+		a.brand AS "brand",
+		a.version AS "version",
+		a.storage_place AS "storagePlace",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.office_code AS "office.officeCode",
+		a.office_name AS "officeName",
+		a.user_code AS "user.userCode",
+		a.user_name AS "userName",
+		a.extend_s1 AS "extendS1",
+		a.extend_s2 AS "extendS2",
+		a.extend_s3 AS "extendS3",
+		a.remarks AS "remarks",
+		a.create_by AS "createBy.userCode",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.status AS "status",
+		o12.office_name AS "office.officeName",
+		u14.user_name AS "user.userName"
+	</sql>
+
+	<!-- 输出字段关联表 -->
+	<sql id="assetCleanDtlJoins">
+<!-- 		LEFT JOIN ass_asset_clean b ON b.id = a.clean_code -->
+		LEFT JOIN sys_office o12 ON o12.office_code = a.office_code
+		LEFT JOIN sys_user u14 ON u14.user_code = a.user_code
+	</sql>
+	<!-- 获取单条数据 -->
+	<select id="findUsedCode" resultType="AssetCleanDtl">
+		SELECT
+		<include refid="assetCleanDtlColumns"/>
+		FROM ass_asset_clean__dtl a
+		<include refid="assetCleanDtlJoins"/>
+		WHERE a.status != #{STATUS_DELETE}
+		and  a.clean_code=#{cleanCode}
+	</select>
+	<!-- 获取单条数据 -->
+	<select id="findCleanData" resultType="AssetCleanDtl">
+		SELECT
+		<include refid="assetCleanDtlColumns"/>
+		FROM ass_asset_clean__dtl a
+		<include refid="assetCleanDtlJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE} and a.asset_status = 4
+			<if test="cleanCode != null and cleanCode != ''">
+				AND a.clean_code = #{cleanCode}
+			</if>
+			<if test="beginDate != null and beginDate != '' ">
+				AND a.clean_date between #{beginDate} and DATE_ADD(#{endDate},INTERVAL 1 DAY)
+			</if>
+		</where>
+	</select>
+
+
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="AssetCleanDtl">
+		SELECT
+			<include refid="assetCleanDtlColumns"/>
+		FROM ass_asset_clean__dtl a
+		<include refid="assetCleanDtlJoins"/>
+		WHERE a.id = #{id}
+	</select>
+
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="AssetCleanDtl">
+		SELECT
+			<include refid="assetCleanDtlColumns"/>
+		FROM ass_asset_clean__dtl a
+		<include refid="assetCleanDtlJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="cleanCode != null and cleanCode != ''">
+				AND a.clean_code = #{cleanCode}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="AssetCleanDtl">
+		SELECT
+			<include refid="assetCleanDtlColumns"/>
+		FROM ass_asset_clean__dtl a
+		<include refid="assetCleanDtlJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO ass_asset_clean__dtl(
+			id,
+			clean_code,
+			asset_code,
+			asset_name,
+			sort_code,
+			sort_name,
+			brand,
+			clean_date,
+			version,
+			storage_place,
+			company_code,
+			company_name,
+			office_code,
+			office_name,
+			user_code,
+			user_name,
+			extend_s1,
+			extend_s2,
+			extend_s3,
+			remarks,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			status
+		) VALUES (
+			#{id},
+			#{cleanCode},
+			#{assetCode},
+			#{assetName},
+			#{sortCode},
+			#{sortName},
+			#{brand},
+			#{cleanDate},
+			#{version},
+			#{storagePlace},
+			#{companyCode},
+			#{companyName},
+			#{office.officeCode},
+			#{officeName},
+			#{user.userCode},
+			#{userName},
+			#{extendS1},
+			#{extendS2},
+			#{extendS3},
+			#{remarks},
+			#{createBy.userCode},
+			#{createDate},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{status}
+		)
+	</insert>
+
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE ass_asset_clean__dtl SET
+			clean_code = #{cleanCode},
+			asset_code = #{assetCode},
+			asset_name = #{assetName},
+			sort_code = #{sortCode},
+			sort_name = #{sortName},
+			brand = #{brand},
+			version = #{version},
+			storage_place = #{storagePlace},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			office_code = #{office.officeCode},
+			office_name = #{officeName},
+			user_code = #{user.userCode},
+			user_name = #{userName},
+			extend_s1 = #{extendS1},
+			extend_s2 = #{extendS2},
+			extend_s3 = #{extendS3},
+			remarks = #{remarks},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			asset_status = #{assetStatus}
+		WHERE id = #{id}
+	</update>
+	<!-- 改变状态 -->
+	<update id="updateDtl">
+		UPDATE ass_asset_clean__dtl SET
+			   asset_status = #{assetStatus}
+		WHERE asset_code = #{assetCode}
+	</update>
+	<!-- 逻辑删除数据 -->
+	<update id="delete">
+		UPDATE ass_asset_clean__dtl SET
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			status = #{STATUS_DELETE}
+		<choose>
+			<when test="id != null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE clean_code = #{cleanCode}
+			</otherwise>
+		</choose>
+	</update>
+
+</mapper>

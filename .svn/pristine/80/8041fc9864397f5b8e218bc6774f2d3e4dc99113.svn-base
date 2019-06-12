@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.net.ecode.modules.ass.price.dao.InvPriceAdjustDao">
+    
+	<!-- 输出字段列 -->
+	<sql id="invPriceAdjustColumns">
+		a.sys_code AS "sysCode",
+		a.create_date AS "createDate",
+		a.grant_bill_no AS "grantBillNo",
+		a.company_code AS "companyCode",
+		a.company_name AS "companyName",
+		a.price_type AS "priceType",
+		a.flag AS "flag",
+		a.grade AS "grade",
+		a.region_code AS "regionCode",
+		a.channel_code AS "channelCode",
+		a.btype_code AS "btypeCode",
+		a.price_type_memo AS "priceTypeMemo",
+		a.begin_date AS "beginDate",
+		a.end_date AS "endDate",
+		a.approval_status AS "approvalStatus",
+		a.approval_date AS "approvalDate",
+		a.approval AS "approval",
+		a.approval_name AS "approvalName",
+		a.approval_memo AS "approvalMemo",
+		a.memo AS "memo",
+		a.status AS "status",
+		a.sys_date AS "sysDate",
+		a.corp_code AS "corpCode",
+		a.corp_name AS "corpName",
+		a.create_by AS "createBy.userCode",
+		a.update_by AS "updateBy.userCode",
+		a.update_date AS "updateDate",
+		a.order_date AS "orderDate"
+	</sql>
+	
+	<!-- 输出字段关联表 -->
+	<sql id="invPriceAdjustJoins">
+	</sql>
+    
+	<!-- 获取单条数据 -->
+	<select id="get" resultType="InvPriceAdjust">
+		SELECT 
+			<include refid="invPriceAdjustColumns"/>
+		FROM scm_inv_price_version a
+		<include refid="invPriceAdjustJoins"/>
+		WHERE a.sys_code = #{sysCode}
+	</select>
+	
+	<!-- 查询数据列表 -->
+	<select id="findList" resultType="InvPriceAdjust">
+		SELECT 
+			<include refid="invPriceAdjustColumns"/>
+		FROM scm_inv_price_version a
+		<include refid="invPriceAdjustJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+			and a.company_code in
+			(
+			    select t.ctrl_data from sys_user_data_scope t
+				where t.ctrl_type='SYS_COMPANY' and t.user_code=#{currentUser.userCode}  
+			)
+			
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="companyCode != null and companyCode != ''">
+				AND a.company_code = #{companyCode}
+			</if>
+			<if test="grantBillNo != null and grantBillNo != ''">
+				AND a.grant_bill_no = #{grantBillNo}
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+		     AND a.begin_date <![CDATA[>=]]> #{beginDate}
+	        </if>
+	        <if test="endDate != null and endDate != ''">
+		     AND a.end_date <![CDATA[<=]]> #{endDate}
+	        </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.grant_bill_no DESC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 根据用户公司权限查出公司列表 -->
+	<select id="findCompanyListByDataScope" resultType="Company">
+
+	     select a.user_code,
+               a.user_name,
+               b.ctrl_data,
+               c.company_code as "companyCode",
+               c.company_name_simple as "companyNameSimple"
+          from sys_user a
+         inner join sys_user_data_scope b
+            on a.user_code = b.user_code
+         inner join sys_company c
+            on c.company_code = b.ctrl_data
+         where b.ctrl_type = 'SYS_COMPANY'
+           and a.user_code = #{userCode}
+
+	</select>
+	<!-- 查询数据列表（全部数据） -->
+	<select id="findAllList" resultType="InvPriceAdjust">
+		SELECT 
+			<include refid="invPriceAdjustColumns"/>
+		FROM scm_inv_price_version a
+		<include refid="invPriceAdjustJoins"/>
+		<where>
+			a.status != #{STATUS_DELETE}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 插入数据 -->
+	<insert id="insert">
+		INSERT INTO scm_inv_price_version(
+			sys_code,
+			create_date,
+			grant_bill_no,
+			company_code,
+			company_name,
+			price_type,
+			flag,
+			grade,
+			region_code,
+			channel_code,
+			btype_code,
+			price_type_memo,
+			begin_date,
+			end_date,
+			approval_status,
+			approval_date,
+			approval,
+			approval_name,
+			approval_memo,
+			memo,
+			status,
+			sys_date,
+			corp_code,
+			corp_name,
+			create_by,
+			update_by,
+			update_date,
+			order_date
+		) VALUES (
+			#{sysCode},
+			#{createDate},
+			#{grantBillNo},
+			#{companyCode},
+			#{companyName},
+			#{priceType},
+			#{flag},
+			#{grade},
+			#{regionCode},
+			#{channelCode},
+			#{btypeCode},
+			#{priceTypeMemo},
+			#{beginDate},
+			#{endDate},
+			#{approvalStatus},
+			#{approvalDate},
+			#{approval},
+			#{approvalName},
+			#{approvalMemo},
+			#{memo},
+			#{status},
+			#{sysDate},
+			#{corpCode},
+			#{corpName},
+			#{createBy.userCode},
+			#{updateBy.userCode},
+			#{updateDate},
+			#{orderDate}
+		)
+	</insert>
+	
+	<!-- 更新数据 -->
+	<update id="update">
+		UPDATE scm_inv_price_version SET 	
+			grant_bill_no = #{grantBillNo},
+			company_code = #{companyCode},
+			company_name = #{companyName},
+			price_type = #{priceType},
+			flag = #{flag},
+			grade = #{grade},
+			region_code = #{regionCode},
+			channel_code = #{channelCode},
+			btype_code = #{btypeCode},
+			price_type_memo = #{priceTypeMemo},
+			begin_date = #{beginDate},
+			end_date = #{endDate},
+			approval_status = #{approvalStatus},
+			approval_date = #{approvalDate},
+			approval = #{approval},
+			approval_name = #{approvalName},
+			approval_memo = #{approvalMemo},
+			memo = #{memo},
+			status = #{status},
+			update_by = #{updateBy.userCode},
+			update_date = #{updateDate},
+			order_date = #{orderDate}
+		WHERE sys_code = #{sysCode}
+	</update>
+	
+	<!-- 逻辑删除数据 -->
+	<delete id="delete">
+		delete from scm_inv_price_version  
+		WHERE sys_code = #{sysCode}
+	</delete>
+	
+	<delete id="deleteDetil">
+		delete from scm_inv_price
+		WHERE sys_code = #{sysCode}
+	</delete>
+	<!-- 更新审批状态 -->
+	<update id="updateApproStatus">
+		UPDATE scm_inv_price_version SET 
+		 begin_date = #{beginDate},
+			approval_status = #{approvalStatus},
+			approval_date = #{approvalDate},
+			approval = #{approval},
+			approval_name = #{approvalName}
+		WHERE sys_code = #{sysCode}
+	</update>
+	
+	
+	
+		<!-- 查询数据列表 -->
+	<select id="findDetailList" resultType="InvPriceAdjust">
+		SELECT 
+			<include refid="invPriceAdjustColumns"/>,
+			b.INV_CODE AS "invCode",
+			b.INV_NAME AS "invName",
+			b.LAST_PRICE AS  "lastPrice",
+			b.LAST_LOW_PRICE AS "lastLowPrice",
+			b.PRICE AS "price",
+			b.LOW_PRICE AS "lowPrice"
+		FROM scm_inv_price_version a
+		left join scm_inv_price b on a.sys_code =b.sys_code
+		<where>
+			a.status != #{STATUS_DELETE}
+			and a.company_code in
+			(
+			    select t.ctrl_data from sys_user_data_scope t
+				where t.ctrl_type='SYS_COMPANY' and t.user_code=#{currentUser.userCode}  
+			)
+			
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="companyCode != null and companyCode != ''">
+				AND a.company_code = #{companyCode}
+			</if>
+			<if test="grantBillNo != null and grantBillNo != ''">
+				AND a.grant_bill_no = #{grantBillNo}
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+		     AND a.begin_date <![CDATA[>=]]> #{beginDate}
+	        </if>
+	        <if test="endDate != null and endDate != ''">
+		     AND a.end_date <![CDATA[<=]]> #{endDate}
+	        </if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.grant_bill_no DESC
+			</otherwise>
+		</choose>
+	</select>
+		<!-- 获取最大行序号 -->
+	<select id="getMaxSerialNo" resultType="java.lang.Integer">
+	   select ifnull(max(serial_no),0) as "serialNo" 
+	   from scm_inv_price
+	   where sys_code = #{sysCode}
+	</select>
+	
+</mapper>
